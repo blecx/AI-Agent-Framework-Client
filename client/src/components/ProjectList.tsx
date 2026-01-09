@@ -1,0 +1,187 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import apiClient from '../services/apiClient';
+import type { Project } from '../types';
+import './ProjectList.css';
+
+export default function ProjectList() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newProject, setNewProject] = useState({ key: '', name: '', description: '' });
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch projects
+  const { data: projectsResponse, isLoading, error: queryError } = useQuery({
+    queryKey: ['projects'],
+    queryFn: async () => {
+      const response = await apiClient.listProjects();
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to load projects');
+      }
+      return response.data || [];
+    },
+  });
+
+  // Create project mutation
+  const createProjectMutation = useMutation({
+    mutationFn: async (project: { key: string; name: string; description?: string }) => {
+      const response = await apiClient.createProject(
+        project.key,
+        project.name,
+        project.description
+      );
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to create project');
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      setShowCreateForm(false);
+      setNewProject({ key: '', name: '', description: '' });
+      setError(null);
+    },
+    onError: (error: Error) => {
+      setError(error.message);
+    },
+  });
+
+  const handleCreateProject = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newProject.key || !newProject.name) {
+      setError('Project key and name are required');
+      return;
+    }
+    createProjectMutation.mutate(newProject);
+  };
+
+  const handleViewProject = (projectKey: string) => {
+    navigate(`/project/${projectKey}`);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="project-list-container">
+        <div className="loading">Loading projects...</div>
+      </div>
+    );
+  }
+
+  if (queryError) {
+    return (
+      <div className="project-list-container">
+        <div className="error">Error loading projects: {(queryError as Error).message}</div>
+      </div>
+    );
+  }
+
+  const projects = projectsResponse || [];
+
+  return (
+    <div className="project-list-container">
+      <header className="project-list-header">
+        <h1>Projects</h1>
+        <button
+          className="btn-primary"
+          onClick={() => setShowCreateForm(!showCreateForm)}
+        >
+          {showCreateForm ? 'Cancel' : '+ Create Project'}
+        </button>
+      </header>
+
+      {error && <div className="error-message">{error}</div>}
+
+      {showCreateForm && (
+        <div className="create-project-form">
+          <h2>Create New Project</h2>
+          <form onSubmit={handleCreateProject}>
+            <div className="form-group">
+              <label htmlFor="projectKey">Project Key *</label>
+              <input
+                id="projectKey"
+                type="text"
+                value={newProject.key}
+                onChange={(e) => setNewProject({ ...newProject, key: e.target.value })}
+                placeholder="e.g., my-project"
+                required
+              />
+              <small>Unique identifier (lowercase, hyphens allowed)</small>
+            </div>
+            <div className="form-group">
+              <label htmlFor="projectName">Project Name *</label>
+              <input
+                id="projectName"
+                type="text"
+                value={newProject.name}
+                onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
+                placeholder="e.g., My Awesome Project"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="projectDescription">Description</label>
+              <textarea
+                id="projectDescription"
+                value={newProject.description}
+                onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+                placeholder="Optional project description"
+                rows={3}
+              />
+            </div>
+            <div className="form-actions">
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={createProjectMutation.isPending}
+              >
+                {createProjectMutation.isPending ? 'Creating...' : 'Create Project'}
+              </button>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => {
+                  setShowCreateForm(false);
+                  setError(null);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {projects.length === 0 ? (
+        <div className="empty-state">
+          <p>No projects yet. Create your first project to get started!</p>
+        </div>
+      ) : (
+        <div className="projects-grid">
+          {projects.map((project: Project) => (
+            <div
+              key={project.key}
+              className="project-card"
+              onClick={() => handleViewProject(project.key)}
+            >
+              <h3>{project.name}</h3>
+              <p className="project-key">Key: {project.key}</p>
+              {project.description && (
+                <p className="project-description">{project.description}</p>
+              )}
+              <div className="project-meta">
+                <span>Created: {new Date(project.createdAt).toLocaleDateString()}</span>
+                {project.gitRepo && (
+                  <span className="git-status">
+                    📁 {project.gitRepo.branch}
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
