@@ -1,5 +1,17 @@
 # Dependencies
 node_modules/
+package-lock.json
+
+# Build output
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
 client/node_modules/
 
 # Build outputs
@@ -19,6 +31,8 @@ client/.env.local
 .idea/
 *.swp
 *.swo
+
+# OS
 *~
 
 # OS files
@@ -26,11 +40,16 @@ client/.env.local
 Thumbs.db
 
 # Logs
+logs/
 logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
 
 # Testing
 coverage/
