@@ -1,23 +1,27 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import { Conversation, PromptMessage, ApiConfig } from './types';
+import { Conversation, PromptMessage, ApiConfig, Workflow } from './types';
 import { HistoryService } from './services/historyService';
 import { ApiService } from './services/apiService';
+import { WorkflowService } from './services/workflowService';
 import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { ChatInput } from './components/ChatInput';
+import { WorkflowPanel } from './components/WorkflowPanel';
 
 function App() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentWorkflow, setCurrentWorkflow] = useState<Workflow | null>(null);
   const [apiConfig] = useState<ApiConfig>({
     baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000',
     apiKey: import.meta.env.VITE_API_KEY || ''
   });
 
   const apiService = new ApiService(apiConfig);
+  const workflowService = new WorkflowService(apiService);
 
   // Load conversations from localStorage on mount
   useEffect(() => {
@@ -79,25 +83,71 @@ function App() {
       // Reload conversations to reflect the change
       setConversations(HistoryService.getConversations());
 
-      // Get conversation history for context
-      const historyForApi = conversation?.messages.map(m => ({
-        role: m.role,
-        content: m.content
-      })) || [];
+      // Check if this is a workflow command
+      const workflowCommand = workflowService.parseWorkflowCommand(content);
+      if (workflowCommand) {
+        // Create and execute workflow
+        const workflow = workflowService.createWorkflow(
+          workflowCommand.name,
+          workflowCommand.steps.map(step => ({ name: step }))
+        );
+        setCurrentWorkflow(workflow);
 
-      // Send to API
-      const response = await apiService.sendPrompt(content, historyForApi);
+        // Add system message about workflow
+        const workflowMessage: PromptMessage = {
+          id: `msg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+          role: 'system',
+          content: `Started workflow "${workflowCommand.name}" with ${workflowCommand.steps.length} steps. Executing...`,
+          timestamp: Date.now()
+        };
+        HistoryService.addMessage(currentConversationId, workflowMessage);
+        setConversations(HistoryService.getConversations());
 
-      // Add assistant response
-      const assistantMessage: PromptMessage = {
-        id: `msg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
-        role: 'assistant',
-        content: response,
-        timestamp: Date.now()
-      };
+        // Execute workflow
+        try {
+          await workflowService.executeAllSteps(workflow, (updatedWorkflow) => {
+            setCurrentWorkflow({ ...updatedWorkflow });
+          });
 
-      HistoryService.addMessage(currentConversationId, assistantMessage);
-      setConversations(HistoryService.getConversations());
+          // Add completion message
+          const completionMessage: PromptMessage = {
+            id: `msg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+            role: 'assistant',
+            content: `Workflow "${workflowCommand.name}" completed successfully!`,
+            timestamp: Date.now()
+          };
+          HistoryService.addMessage(currentConversationId, completionMessage);
+          setConversations(HistoryService.getConversations());
+        } catch (workflowError) {
+          const errorMsg: PromptMessage = {
+            id: `msg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+            role: 'system',
+            content: `Workflow failed: ${workflowError instanceof Error ? workflowError.message : 'Unknown error'}`,
+            timestamp: Date.now()
+          };
+          HistoryService.addMessage(currentConversationId, errorMsg);
+          setConversations(HistoryService.getConversations());
+        }
+      } else {
+        // Regular message - send to API
+        const historyForApi = conversation?.messages.map(m => ({
+          role: m.role,
+          content: m.content
+        })) || [];
+
+        const response = await apiService.sendPrompt(content, historyForApi);
+
+        // Add assistant response
+        const assistantMessage: PromptMessage = {
+          id: `msg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+          role: 'assistant',
+          content: response,
+          timestamp: Date.now()
+        };
+
+        HistoryService.addMessage(currentConversationId, assistantMessage);
+        setConversations(HistoryService.getConversations());
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send message. Please check your API configuration.');
       
@@ -140,6 +190,7 @@ function App() {
           messages={currentConversation?.messages || []} 
           isLoading={isLoading}
         />
+        {currentWorkflow && <WorkflowPanel workflow={currentWorkflow} />}
         <ChatInput 
           onSendMessage={handleSendMessage} 
           disabled={isLoading}
