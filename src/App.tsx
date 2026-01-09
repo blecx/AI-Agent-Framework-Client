@@ -52,11 +52,25 @@ function App() {
   };
 
   const handleSendMessage = async (content: string) => {
+    // Create a new conversation if none exists
     if (!currentConversationId) {
-      // Create a new conversation if none exists
-      handleNewConversation();
+      const newConv = HistoryService.createConversation();
+      setConversations([newConv, ...conversations]);
+      setCurrentConversationId(newConv.id);
+      setError(null);
+      
+      // Use the new conversation ID for the message
+      setTimeout(() => {
+        // Trigger the message send with the new conversation
+        handleSendMessageToConversation(newConv.id, content);
+      }, 0);
       return;
     }
+
+    await handleSendMessageToConversation(currentConversationId, content);
+  };
+
+  const handleSendMessageToConversation = async (conversationId: string, content: string) => {
 
     setIsLoading(true);
     setError(null);
@@ -71,10 +85,10 @@ function App() {
 
     try {
       // Save user message to history
-      HistoryService.addMessage(currentConversationId, userMessage);
+      HistoryService.addMessage(conversationId, userMessage);
       
       // Update the conversation title if this is the first message
-      const conversation = HistoryService.getConversation(currentConversationId);
+      const conversation = HistoryService.getConversation(conversationId);
       if (conversation && conversation.messages.length === 1) {
         conversation.title = content.substring(0, 50) + (content.length > 50 ? '...' : '');
         HistoryService.saveConversation(conversation);
@@ -100,7 +114,7 @@ function App() {
           content: `Started workflow "${workflowCommand.name}" with ${workflowCommand.steps.length} steps. Executing...`,
           timestamp: Date.now()
         };
-        HistoryService.addMessage(currentConversationId, workflowMessage);
+        HistoryService.addMessage(conversationId, workflowMessage);
         setConversations(HistoryService.getConversations());
 
         // Execute workflow
@@ -116,7 +130,7 @@ function App() {
             content: `Workflow "${workflowCommand.name}" completed successfully!`,
             timestamp: Date.now()
           };
-          HistoryService.addMessage(currentConversationId, completionMessage);
+          HistoryService.addMessage(conversationId, completionMessage);
           setConversations(HistoryService.getConversations());
         } catch (workflowError) {
           const errorMsg: PromptMessage = {
@@ -125,7 +139,7 @@ function App() {
             content: `Workflow failed: ${workflowError instanceof Error ? workflowError.message : 'Unknown error'}`,
             timestamp: Date.now()
           };
-          HistoryService.addMessage(currentConversationId, errorMsg);
+          HistoryService.addMessage(conversationId, errorMsg);
           setConversations(HistoryService.getConversations());
         }
       } else {
@@ -145,7 +159,7 @@ function App() {
           timestamp: Date.now()
         };
 
-        HistoryService.addMessage(currentConversationId, assistantMessage);
+        HistoryService.addMessage(conversationId, assistantMessage);
         setConversations(HistoryService.getConversations());
       }
     } catch (err) {
@@ -159,7 +173,7 @@ function App() {
         timestamp: Date.now()
       };
       
-      HistoryService.addMessage(currentConversationId, errorMessage);
+      HistoryService.addMessage(conversationId, errorMessage);
       setConversations(HistoryService.getConversations());
     } finally {
       setIsLoading(false);

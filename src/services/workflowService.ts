@@ -104,15 +104,18 @@ export class WorkflowService {
   /**
    * Parse a workflow command from user input
    * Example: "workflow: data-analysis with steps: collect, process, visualize"
+   * Also supports: "workflow: 'my workflow' with steps: step1, step2"
    */
   parseWorkflowCommand(input: string): { name: string; steps: string[] } | null {
-    const workflowMatch = input.match(/workflow:\s*([^\s]+)\s+with steps:\s*(.+)/i);
+    // Support quoted workflow names or names with hyphens/underscores
+    const workflowMatch = input.match(/workflow:\s*(?:'([^']+)'|"([^"]+)"|([a-zA-Z0-9_-]+))\s+with steps:\s*(.+)/i);
     if (!workflowMatch) {
       return null;
     }
 
-    const name = workflowMatch[1].trim();
-    const stepsStr = workflowMatch[2].trim();
+    // Get workflow name from whichever capture group matched
+    const name = (workflowMatch[1] || workflowMatch[2] || workflowMatch[3]).trim();
+    const stepsStr = workflowMatch[4].trim();
     const steps = stepsStr.split(',').map(s => s.trim()).filter(s => s.length > 0);
 
     return { name, steps };
