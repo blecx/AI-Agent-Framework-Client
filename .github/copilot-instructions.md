@@ -60,14 +60,29 @@ docker build -t ai-agent-client . # Build image only
 ## Project Structure
 ```
 AI-Agent-Framework-Client/
+├── .github/
+│   ├── prompts/                   # Build prompts documentation
+│   │   ├── README.md             # Overview of prompt-based development
+│   │   ├── step-01-initial-setup.md
+│   │   ├── step-02-api-testing-ui.md
+│   │   └── step-03-project-management-ui.md
+│   └── copilot-instructions.md
 ├── client/                        # MAIN WORKING DIRECTORY
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── ApiTester.tsx     # Main UI (~250 lines)
-│   │   │   └── ApiTester.css
+│   │   │   ├── ApiTester.tsx     # Legacy API testing UI
+│   │   │   ├── ProjectList.tsx   # Project listing (146 lines)
+│   │   │   ├── ProjectView.tsx   # Project details (147 lines)
+│   │   │   ├── ProposePanel.tsx  # Change proposals (214 lines)
+│   │   │   ├── ApplyPanel.tsx    # Apply proposals (200 lines)
+│   │   │   └── CommandPanel.tsx  # Command interface (207 lines)
 │   │   ├── services/
-│   │   │   └── api.ts            # API client (~260 lines)
-│   │   ├── App.tsx               # Main component
+│   │   │   ├── api.ts            # Legacy API client
+│   │   │   └── apiClient.ts      # Project management API (125 lines)
+│   │   ├── types/
+│   │   │   └── index.ts          # Shared TypeScript types
+│   │   ├── App.tsx               # Main app with routing
+│   │   ├── App.css               # App styles with navigation
 │   │   ├── main.tsx              # Entry point
 │   │   └── assets/, *.css
 │   ├── public/vite.svg
@@ -87,10 +102,11 @@ AI-Agent-Framework-Client/
 
 ## Key Config Details
 - **TypeScript**: 3 configs (tsconfig.json references app/node configs), ES2022 target, strict mode, no emit
-- **Dependencies**: react 19, vite 7, eslint 9, typescript 5.9 (no test libs)
+- **Dependencies**: react 19, react-router-dom, axios, vite 7, eslint 9, typescript 5.9
 - **Environment**: `VITE_API_BASE_URL` (default: `http://localhost:8000/api`) - set at **build time**
-- **Entry Points**: index.html → main.tsx → App.tsx → ApiTester.tsx
-- **API Endpoints**: /health, /info, /agents, /agents/{id}/capabilities, /execute (POST)
+- **Entry Points**: index.html → main.tsx → App.tsx (with routing) → Components
+- **Routes**: /, /projects/:key, /projects/:key/propose, /projects/:key/apply, /commands
+- **API Endpoints**: /projects, /projects/:key, /projects/:key/propose, /commands
 
 ## Common Issues
 | Problem | Solution |
@@ -124,12 +140,22 @@ AI-Agent-Framework-Client/
 9. **Docker v2**: `docker compose` (space, not hyphen)
 
 ## Making Changes
-- **UI**: `src/components/ApiTester.tsx` + `.css`
-- **API**: `src/services/api.ts` (endpoints, test methods)
-- **Styles**: Component .css or global index.css
+- **UI Components**: `src/components/` - ProjectList, ProjectView, ProposePanel, ApplyPanel, CommandPanel
+- **API Clients**: 
+  - `src/services/api.ts` - Legacy API testing service
+  - `src/services/apiClient.ts` - Project management API
+- **Routing**: `src/App.tsx` - React Router configuration
+- **Styles**: Component-specific .css files, global index.css, App.css for navigation
+- **Types**: `src/types/index.ts` - Shared TypeScript interfaces
 - **Config**: vite.config.ts, eslint.config.js, tsconfig.*.json
 
 **After changes**: `npm run dev` → test → `npm run lint` → `npm run build` → commit source only
+
+## Project Build History
+See `.github/prompts/` for step-by-step prompts used to build this project:
+- **Step 1**: Initial React + Vite + TypeScript setup
+- **Step 2**: API testing UI (legacy ApiTester component)
+- **Step 3**: Full project management UI with routing (current)
 
 ## Validated Commands
 These instructions validated by running:
