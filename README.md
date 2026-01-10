@@ -1,57 +1,34 @@
 # AI-Agent-Framework-Client
 
-This is a web client that connects to the AI-Agent-Framework API and utilizes all its capabilities. It also provides specific workflows that are handled step by step by the AI-Agent.
+A modern web client for the [AI-Agent-Framework](https://github.com/blecx/AI-Agent-Framework) API. This application provides a graphical interface to manage projects, propose document changes, apply proposals, and execute commands through an AI agent.
 
 ## Features
 
-- 🤖 **AI Agent Integration**: Connect to the AI-Agent-Framework API for intelligent responses
-- 💾 **Prompt History Storage**: All conversations are automatically saved to browser localStorage
-- 💬 **Multi-Conversation Support**: Create and manage multiple conversation threads
-- 🎯 **Step-by-Step Workflows**: Execute complex workflows with the AI agent
-- 🎨 **Modern UI**: Clean, responsive interface built with React and TypeScript
+- 📁 **Project Management**: Create, view, and manage projects with document structures
+- ✍️ **Propose Changes**: Submit document change proposals with file uploads
+- ✅ **Apply Proposals**: Review and apply pending proposals to projects
+- 💬 **Command Interface**: Chat-style command execution with history
+- 🎨 **Modern UI**: Clean, responsive interface built with React 19 and TypeScript
+- 🚀 **Fast Development**: Powered by Vite with Hot Module Replacement (HMR)
+- 🐳 **Docker Ready**: Multi-stage Docker build with Nginx for production
+
+## Tech Stack
+
+- **Frontend**: React 19.2, TypeScript 5.9, React Router DOM
+- **Build Tool**: Vite 7.2
+- **HTTP Client**: Axios
+- **Linting**: ESLint 9 with TypeScript support
+- **Deployment**: Docker with Nginx Alpine
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
-- npm or yarn
+- Node.js 18+ (tested with v20.19.6)
+- npm 10+ (tested with v10.8.2)
+- Docker (optional, for containerized deployment)
 
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/blecx/AI-Agent-Framework-Client.git
-cd AI-Agent-Framework-Client
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Configure the API endpoint:
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and set your AI-Agent-Framework API URL:
-```
-VITE_API_URL=http://localhost:8000
-VITE_API_KEY=your_api_key_here
-```
-
-### Development
-
-Start the development server:
-2. Build and run with Docker Compose:
-```bash
-docker-compose up -d
-```
-
-3. Access the application at `http://localhost:3000`
-
-### Option 2: Local Development
+### Option 1: Local Development
 
 1. Clone the repository:
 ```bash
@@ -71,6 +48,11 @@ cp .env.example .env
 # Edit .env to set VITE_API_BASE_URL
 ```
 
+Default configuration:
+```
+VITE_API_BASE_URL=http://localhost:8000/api
+```
+
 4. Start the development server:
 ```bash
 npm run dev
@@ -78,325 +60,175 @@ npm run dev
 
 The application will be available at `http://localhost:3000`
 
-### Build
+### Option 2: Docker Deployment
 
-Create a production build:
+1. Build and run with Docker Compose:
 ```bash
+docker compose up -d
+```
+
+2. Access the application at `http://localhost:3000`
+
+To stop:
+```bash
+docker compose down
+```
+
+### Build for Production
+
+Create an optimized production build:
+```bash
+cd client
 npm run build
 ```
+
+The build output will be in `client/dist/`
 
 Preview the production build:
 ```bash
 npm run preview
 ```
 
-## Usage
+## Project Structure
 
-### Basic Chat
-
-1. **Start a New Conversation**: Click the "+ New Conversation" button in the sidebar
-2. **Send Messages**: Type your message in the input area and press Enter (or click Send)
-3. **View History**: All conversations are saved automatically and can be accessed from the sidebar
-4. **Switch Conversations**: Click on any conversation in the sidebar to view and continue it
-
-### Workflow Commands
-
-Execute workflows using the following syntax:
 ```
-workflow: workflow-name with steps: step1, step2, step3
+AI-Agent-Framework-Client/
+├── client/                        # Main application directory
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── ProjectList.tsx   # List all projects
+│   │   │   ├── ProjectView.tsx   # View single project details
+│   │   │   ├── ProposePanel.tsx  # Propose document changes
+│   │   │   ├── ApplyPanel.tsx    # Apply proposals
+│   │   │   └── CommandPanel.tsx  # Command interface
+│   │   ├── services/
+│   │   │   ├── api.ts             # Legacy API service
+│   │   │   └── apiClient.ts       # Project management API client
+│   │   ├── types/
+│   │   │   └── index.ts           # TypeScript type definitions
+│   │   ├── App.tsx                # Main app component with routing
+│   │   └── main.tsx               # Application entry point
+│   ├── dist/                      # Build output (gitignored)
+│   ├── package.json               # Dependencies and scripts
+│   ├── vite.config.ts             # Vite configuration
+│   ├── tsconfig.json              # TypeScript configuration
+│   └── eslint.config.js           # ESLint configuration
+├── Dockerfile                     # Multi-stage Docker build
+├── docker-compose.yml             # Docker Compose configuration
+├── nginx.conf                     # Nginx server configuration
+└── README.md                      # This file
 ```
 
-For workflow names with spaces, use quotes:
-```
-workflow: 'my workflow name' with steps: initialize, process, finalize
-```
+## Available Routes
 
-Example:
-```
-workflow: data-analysis with steps: collect, process, analyze, visualize
-```
+- `/` - Project list page
+- `/projects/:projectKey` - Project details view
+- `/projects/:projectKey/propose` - Propose changes panel
+- `/projects/:projectKey/apply` - Apply proposals panel
+- `/commands` - Command interface
 
-The workflow panel will appear below the chat showing real-time progress of each step.
+## npm Scripts
 
-## Architecture
+From the `client/` directory:
 
-### Components
-
-- **Sidebar** (`src/components/Sidebar.tsx`): Displays conversation history and allows creating new conversations
-- **ChatArea** (`src/components/ChatArea.tsx`): Shows messages in the current conversation
-- **ChatInput** (`src/components/ChatInput.tsx`): Input area for sending new messages
-- **Message** (`src/components/Message.tsx`): Individual message component
-- **WorkflowPanel** (`src/components/WorkflowPanel.tsx`): Visual workflow execution tracker
-
-### Services
-
-- **HistoryService** (`src/services/historyService.ts`): Manages conversation storage in localStorage
-  - `getConversations()`: Retrieve all conversations
-  - `saveConversation()`: Save or update a conversation
-  - `createConversation()`: Create a new conversation
-  - `addMessage()`: Add a message to a conversation
-  - `deleteConversation()`: Delete a conversation
-
-- **ApiService** (`src/services/apiService.ts`): Handles communication with the AI-Agent-Framework API
-  - `sendPrompt()`: Send a prompt to the API
-  - `executeWorkflow()`: Execute a workflow step
-  - `getStatus()`: Check API status
-
-- **WorkflowService** (`src/services/workflowService.ts`): Manages workflow execution
-  - `createWorkflow()`: Create a new workflow instance
-  - `executeWorkflowStep()`: Execute a single workflow step
-  - `executeAllSteps()`: Execute all remaining steps
-  - `parseWorkflowCommand()`: Parse workflow commands from user input
-
-### Data Storage
-
-All conversations are stored in the browser's localStorage using the key `ai_agent_conversations`. Each conversation includes:
-- Unique ID
-- Title (derived from first message)
-- Array of messages (user, assistant, system)
-- Created and updated timestamps
-
-### Data Model
-
-```typescript
-interface PromptMessage {
-  id: string;
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  timestamp: number;
-}
-
-interface Conversation {
-  id: string;
-  title: string;
-  messages: PromptMessage[];
-  createdAt: number;
-  updatedAt: number;
-}
-
-interface Workflow {
-  id: string;
-  name: string;
-  steps: WorkflowStep[];
-  currentStepIndex: number;
-  status: 'idle' | 'running' | 'completed' | 'failed';
-}
-5. Access the application at `http://localhost:5173`
+- `npm run dev` - Start development server with HMR
+- `npm run build` - Build for production (TypeScript + Vite)
+- `npm run preview` - Preview production build locally
+- `npm run lint` - Run ESLint on source code
 
 ## Configuration
 
 ### Environment Variables
 
-Create a `.env` file in the `client` directory with the following:
+Environment variables are set at **build time** (not runtime). Rebuild the application after changing these values:
 
-```env
-VITE_API_BASE_URL=http://localhost:8000/api
-```
+- `VITE_API_BASE_URL` - Base URL for the AI-Agent-Framework API (default: `http://localhost:8000/api`)
+- `VITE_API_KEY` - Optional API key for authentication
 
-You can also configure the API URL directly in the web interface.
+### Vite Configuration
 
-### Docker Configuration
-
-Edit `docker-compose.yml` to customize:
-- Port mapping (default: 3000:80)
-- API base URL
-- Container name and network settings
-
-## Usage
-
-### Testing API Endpoints
-
-The application provides several ways to test your API:
-
-1. **Predefined Tests**: Click on any of the built-in test cards to test common endpoints:
-   - Health Check
-   - API Info
-   - List Agents
-   - Agent Capabilities
-
-2. **Run All Tests**: Execute all predefined tests in sequence
-
-3. **Custom Tests**: Use the custom test section to:
-   - Specify any endpoint path
-   - Choose HTTP method (GET, POST, PUT, DELETE, PATCH)
-   - Provide request body (JSON)
-
-### Test Results
-
-Each test displays:
-- ✓ Success or ✗ Error status
-- HTTP method and endpoint
-- Response time in milliseconds
-- Detailed response data (expandable)
-- Error messages (if any)
-
-## Development
-
-### Project Structure
-
-```
-AI-Agent-Framework-Client/
-├── client/                     # React application
-│   ├── src/
-│   │   ├── components/        # React components
-│   │   │   ├── ApiTester.tsx  # Main testing interface
-│   │   │   └── ApiTester.css  # Component styles
-│   │   ├── services/          # API service layer
-│   │   │   └── api.ts         # API client implementation
-│   │   ├── App.tsx            # Main application component
-│   │   └── main.tsx           # Application entry point
-│   ├── package.json           # Dependencies and scripts
-│   └── vite.config.ts         # Vite configuration
-├── Dockerfile                 # Docker image configuration
-├── docker-compose.yml         # Docker Compose setup
-├── nginx.conf                 # Nginx configuration for production
-└── README.md                  # This file
-```
-
-### Available Scripts
-
-In the `client` directory:
-
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build production bundle
-- `npm run preview` - Preview production build locally
-- `npm run lint` - Run ESLint for code quality
-
-### Building for Production
-
-#### Local Build
-```bash
-cd client
-npm run build
-```
-
-The built files will be in `client/dist/`.
-
-#### Docker Build
-```bash
-docker build -t ai-agent-client .
-docker run -p 3000:80 ai-agent-client
-```
+The Vite dev server is configured to:
+- Run on `0.0.0.0:3000` (accessible from network)
+- Use React plugin with Fast Refresh
+- Support TypeScript out of the box
 
 ## API Integration
 
-The client expects the AI-Agent-Framework API to have the following endpoints:
+The application integrates with the [AI-Agent-Framework](https://github.com/blecx/AI-Agent-Framework) API and expects the following endpoints:
 
-- `POST /api/prompt`: Send a prompt and receive a response
-  - Request: `{ prompt: string, history: Array<{role: string, content: string}> }`
-  - Response: `{ response: string }`
+- `GET /projects` - List all projects
+- `GET /projects/:key` - Get project details
+- `POST /projects` - Create a new project
+- `POST /projects/:key/propose` - Propose changes
+- `POST /projects/:key/proposals/:id/apply` - Apply a proposal
+- `POST /commands` - Execute a command
+- `GET /commands/history` - Get command history
 
-- `POST /api/workflow`: Execute a workflow step
-  - Request: `{ workflow: string, params: object }`
-  - Response: `{ stepId: string, result: string, isComplete: boolean }`
+**Note**: Mock data is used when the API is unavailable for development purposes.
 
-- `GET /api/status`: Check API status
-  - Response: `{ status: string, version?: string }`
+## Development
 
-## Technologies
+### Adding New Components
 
-- **React 19**: UI framework
-- **TypeScript**: Type-safe development
-- **Vite**: Fast build tool and dev server
-- **CSS3**: Styling
+1. Create component file in `client/src/components/`
+2. Create corresponding CSS file for styling
+3. Add route in `App.tsx` if needed
+4. Update type definitions in `client/src/types/` if necessary
 
-## Project Structure
+### Code Style
 
+- Follow TypeScript strict mode
+- Use functional components with hooks
+- Prefer `const` over `let`
+- Use type-only imports for types: `import type { Type } from '...'`
+- Run `npm run lint` before committing
+
+## Docker Details
+
+The multi-stage Dockerfile:
+1. **Builder stage**: Uses Node 20 Alpine to install dependencies and build the app
+2. **Production stage**: Uses Nginx Alpine to serve the static files
+
+This results in a small, efficient production image (~50MB).
+
+## Troubleshooting
+
+### Build Fails
+
+```bash
+cd client
+rm -rf node_modules package-lock.json dist
+npm install
+npm run build
 ```
-AI-Agent-Framework-Client/
-├── src/
-│   ├── components/         # React components
-│   │   ├── ChatArea.tsx
-│   │   ├── ChatInput.tsx
-│   │   ├── Message.tsx
-│   │   ├── Sidebar.tsx
-│   │   └── WorkflowPanel.tsx
-│   ├── services/           # Business logic
-│   │   ├── apiService.ts
-│   │   ├── historyService.ts
-│   │   └── workflowService.ts
-│   ├── types/              # TypeScript types
-│   │   └── index.ts
-│   ├── App.tsx             # Main application component
-│   ├── App.css             # Application styles
-│   ├── main.tsx            # Application entry point
-│   └── vite-env.d.ts       # Vite type definitions
-├── index.html              # HTML entry point
-├── vite.config.ts          # Vite configuration
-├── tsconfig.json           # TypeScript configuration
-├── package.json            # Dependencies and scripts
-└── README.md               # This file
-```
 
-## Features in Detail
+### Port Already in Use
 
-### Prompt History Storage
+The dev server will automatically use the next available port. For Docker, edit the port mapping in `docker-compose.yml`.
 
-- Automatic saving of all conversations to localStorage
-- Persistent across browser sessions
-- Support for unlimited conversations
-- Each message includes role, content, and timestamp
-- Automatic title generation from first message
+### API Connection Issues
 
-### AI Agent Integration
+- Verify `VITE_API_BASE_URL` is correctly set
+- Check that the AI-Agent-Framework API is running
+- Rebuild after changing environment variables
 
-- Context-aware conversations with full history
-- Error handling with informative messages
-- Support for streaming responses (when API supports it)
-- Configurable API endpoint and authentication
+## Contributing
 
-### Workflow Execution
-
-- Parse workflow commands from natural language
-- Step-by-step execution visualization
-- Real-time status updates for each step
-- Support for multiple concurrent workflows
-- Automatic error handling and retry logic
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run `npm run lint` and `npm run build`
+5. Submit a pull request
 
 ## License
 
 ISC
-The client expects the AI-Agent-Framework API to be available at the configured base URL. Default endpoints tested:
 
-- `GET /health` - Health check endpoint
-- `GET /info` - API information and version
-- `GET /agents` - List available agents
-- `GET /agents/{id}/capabilities` - Get agent capabilities
-- `POST /execute` - Execute agent tasks
+## Related Projects
 
-Customize these endpoints in `src/services/api.ts` to match your API specification.
+- [AI-Agent-Framework](https://github.com/blecx/AI-Agent-Framework) - The backend API for this client
 
-## Troubleshooting
+## Support
 
-### CORS Issues
-
-If you encounter CORS errors, ensure your API server has the appropriate CORS headers configured:
-
-```
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-Access-Control-Allow-Headers: Content-Type, Authorization
-```
-
-### Connection Refused
-
-If tests fail with "Connection refused":
-1. Verify the API server is running
-2. Check the API base URL configuration
-3. Ensure no firewall is blocking the connection
-
-### Docker Issues
-
-If Docker container fails to start:
-1. Check Docker logs: `docker-compose logs`
-2. Ensure port 3000 is not already in use
-3. Verify Docker and Docker Compose are properly installed
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is open source and available under the MIT License.
+For issues and questions, please open an issue on GitHub.
 
