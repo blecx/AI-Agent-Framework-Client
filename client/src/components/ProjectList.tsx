@@ -5,7 +5,8 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient, { type Project, type ApiError } from '../services/apiClient';
+import apiClient from '../services/apiClient';
+import type { Project, ApiError } from '../services/apiClient';
 import './ProjectList.css';
 
 export default function ProjectList() {

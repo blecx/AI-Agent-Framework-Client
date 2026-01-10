@@ -1,12 +1,29 @@
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import ProjectList from './components/ProjectList'
 import ProjectView from './components/ProjectView'
 import ProposePanel from './components/ProposePanel'
+import ApplyPanel from './components/ApplyPanel'
 import CommandPanel from './components/CommandPanel'
 import ApiTester from './components/ApiTester'
 import apiClient from './services/apiClient'
 import './App.css'
+
+// Create a QueryClient instance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+})
+
+function ApplyPanelWrapper() {
+  const { projectKey } = useParams<{ projectKey: string }>()
+  return <ApplyPanel projectKey={projectKey || ''} />
+}
 
 function Navigation() {
   const location = useLocation()
@@ -58,21 +75,24 @@ function Navigation() {
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Navigation />
-        <main className="app-main">
-          <Routes>
-            <Route path="/" element={<ProjectList />} />
-            <Route path="/projects" element={<ProjectList />} />
-            <Route path="/projects/:projectKey" element={<ProjectView />} />
-            <Route path="/projects/:projectKey/propose" element={<ProposePanel />} />
-            <Route path="/commands" element={<CommandPanel />} />
-            <Route path="/api-tester" element={<ApiTester />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <div className="App">
+          <Navigation />
+          <main className="app-main">
+            <Routes>
+              <Route path="/" element={<ProjectList />} />
+              <Route path="/projects" element={<ProjectList />} />
+              <Route path="/projects/:projectKey" element={<ProjectView />} />
+              <Route path="/projects/:projectKey/propose" element={<ProposePanel />} />
+              <Route path="/projects/:projectKey/apply" element={<ApplyPanelWrapper />} />
+              <Route path="/commands" element={<CommandPanel />} />
+              <Route path="/api-tester" element={<ApiTester />} />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    </QueryClientProvider>
   )
 }
 

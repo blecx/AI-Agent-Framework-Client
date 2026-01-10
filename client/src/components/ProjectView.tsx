@@ -5,7 +5,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import apiClient, { type Project, type Proposal, type ApiError } from '../services/apiClient';
+import apiClient from '../services/apiClient';
+import type { Project, Proposal, ApiError } from '../services/apiClient';
 import './ProjectView.css';
 
 export default function ProjectView() {
@@ -35,8 +36,10 @@ export default function ProjectView() {
   const loadProposals = useCallback(async () => {
     if (!projectKey) return;
     try {
-      const data = await apiClient.getProposals(projectKey);
-      setProposals(data);
+      const response = await apiClient.getProposals(projectKey);
+      if (response.success && response.data) {
+        setProposals(response.data);
+      }
     } catch (err) {
       // Silently fail for proposals if endpoint doesn't exist
       console.error('Failed to load proposals:', err);
