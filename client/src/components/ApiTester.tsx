@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import apiService, { type TestResult } from '../services/api';
+import { useToast } from '../hooks/useToast';
 import './ApiTester.css';
 
 interface TestConfig {
@@ -9,6 +10,7 @@ interface TestConfig {
 }
 
 export default function ApiTester() {
+  const toast = useToast();
   const [apiUrl, setApiUrl] = useState(apiService.getBaseUrl());
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
@@ -51,6 +53,7 @@ export default function ApiTester() {
       setTestResults((prev) => [...prev, result]);
     } catch (error) {
       console.error('Test error:', error);
+      toast.showError('Test execution failed');
     }
     setIsRunning(false);
   };
@@ -77,7 +80,7 @@ export default function ApiTester() {
         try {
           body = JSON.parse(customBody);
         } catch {
-          alert('Invalid JSON in request body');
+          toast.showError('Invalid JSON in request body');
           setIsRunning(false);
           return;
         }
@@ -91,6 +94,7 @@ export default function ApiTester() {
       setTestResults((prev) => [...prev, result]);
     } catch (error) {
       console.error('Custom test error:', error);
+      toast.showError('Custom test execution failed');
     }
     setIsRunning(false);
   };

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../services/apiClient';
 import type { Proposal } from '../types';
+import ConfirmDialog from './ConfirmDialog';
+import { useToast } from '../hooks/useToast';
 import './ApplyPanel.css';
 
 interface ApplyPanelProps {
@@ -10,8 +12,14 @@ interface ApplyPanelProps {
 
 export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
   const queryClient = useQueryClient();
+  const toast = useToast();
   const [selectedProposal, setSelectedProposal] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    type: 'apply' | 'reject';
+    proposalId: string | null;
+  }>({ isOpen: false, type: 'apply', proposalId: null });
 
   // Fetch proposals
   const { data: proposalsResponse, isLoading } = useQuery({
@@ -39,9 +47,12 @@ export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
       queryClient.invalidateQueries({ queryKey: ['project', projectKey] });
       setError(null);
       setSelectedProposal(null);
+      toast.showSuccess('Proposal applied successfully');
     },
     onError: (error: Error) => {
+      console.error('Error applying proposal:', error);
       setError(error.message);
+      toast.showError(`Failed to apply proposal: ${error.message}`);
     },
   });
 
@@ -58,22 +69,36 @@ export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
       queryClient.invalidateQueries({ queryKey: ['proposals', projectKey] });
       setError(null);
       setSelectedProposal(null);
+      toast.showSuccess('Proposal rejected');
     },
     onError: (error: Error) => {
+      console.error('Error rejecting proposal:', error);
       setError(error.message);
+      toast.showError(`Failed to reject proposal: ${error.message}`);
     },
   });
 
   const handleApply = (proposalId: string) => {
-    if (confirm('Are you sure you want to apply this proposal?')) {
-      applyMutation.mutate(proposalId);
-    }
+    setConfirmDialog({ isOpen: true, type: 'apply', proposalId });
   };
 
   const handleReject = (proposalId: string) => {
-    if (confirm('Are you sure you want to reject this proposal?')) {
-      rejectMutation.mutate(proposalId);
+    setConfirmDialog({ isOpen: true, type: 'reject', proposalId });
+  };
+
+  const handleConfirm = () => {
+    if (confirmDialog.proposalId) {
+      if (confirmDialog.type === 'apply') {
+        applyMutation.mutate(confirmDialog.proposalId);
+      } else {
+        rejectMutation.mutate(confirmDialog.proposalId);
+      }
     }
+    setConfirmDialog({ isOpen: false, type: 'apply', proposalId: null });
+  };
+
+  const handleCancel = () => {
+    setConfirmDialog({ isOpen: false, type: 'apply', proposalId: null });
   };
 
   if (isLoading) {
@@ -164,6 +189,7 @@ export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
                 <button
                   className="btn-close"
                   onClick={() => setSelectedProposal(null)}
+                  aria-label="Close preview"
                 >
                   ✕
                 </button>
@@ -211,6 +237,7 @@ export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
                     className="btn-primary btn-apply"
                     onClick={() => handleApply(selected.id)}
                     disabled={applyMutation.isPending}
+                    aria-label="Apply this proposal"
                   >
                     {applyMutation.isPending ? 'Applying...' : 'Apply Proposal'}
                   </button>
@@ -218,6 +245,7 @@ export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
                     className="btn-secondary btn-reject"
                     onClick={() => handleReject(selected.id)}
                     disabled={rejectMutation.isPending}
+                    aria-label="Reject this proposal"
                   >
                     {rejectMutation.isPending ? 'Rejecting...' : 'Reject'}
                   </button>
@@ -227,6 +255,19 @@ export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
           )}
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        title={confirmDialog.type === 'apply' ? 'Apply Proposal' : 'Reject Proposal'}
+        message={
+          confirmDialog.type === 'apply'
+            ? 'Are you sure you want to apply this proposal? This will make changes to the project.'
+            : 'Are you sure you want to reject this proposal? This action cannot be undone.'
+        }
+        confirmText={confirmDialog.type === 'apply' ? 'Apply' : 'Reject'}
+      />
     </div>
   );
 }
