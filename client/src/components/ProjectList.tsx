@@ -89,14 +89,24 @@ export default function ProjectList() {
       {error && (
         <div className="error-message">
           {error}
-          <button onClick={() => setError(null)}>×</button>
+          <button aria-label="Close error message" onClick={() => setError(null)}>×</button>
         </div>
       )}
 
       {showCreateForm && (
-        <div className="modal-overlay" onClick={() => setShowCreateForm(false)}>
+        <div className="modal-overlay" onClick={() => setShowCreateForm(false)} role="dialog" aria-labelledby="create-project-title" aria-modal="true">
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Create New Project</h2>
+            <div className="modal-header">
+              <h2 id="create-project-title">Create New Project</h2>
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Close create project dialog"
+                onClick={() => setShowCreateForm(false)}
+              >
+                ×
+              </button>
+            </div>
             <form onSubmit={handleCreateProject}>
               <div className="form-group">
                 <label htmlFor="projectName">Project Name *</label>

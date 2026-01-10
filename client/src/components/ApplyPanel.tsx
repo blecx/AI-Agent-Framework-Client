@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '../hooks/useToast';
+import ConfirmDialog from './ConfirmDialog';
 import apiClient from '../services/apiClient';
 import type { Proposal } from '../types';
 import './ApplyPanel.css';
@@ -10,8 +12,11 @@ interface ApplyPanelProps {
 
 export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
   const queryClient = useQueryClient();
+  const toast = useToast();
   const [selectedProposal, setSelectedProposal] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showApplyConfirm, setShowApplyConfirm] = useState<string | null>(null);
+  const [showRejectConfirm, setShowRejectConfirm] = useState<string | null>(null);
 
   // Fetch proposals
   const { data: proposalsResponse, isLoading } = useQuery({
@@ -39,9 +44,14 @@ export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
       queryClient.invalidateQueries({ queryKey: ['project', projectKey] });
       setError(null);
       setSelectedProposal(null);
+      setShowApplyConfirm(null);
+      toast.showSuccess('Proposal applied successfully!');
     },
     onError: (error: Error) => {
+      console.error('Failed to apply proposal:', error);
       setError(error.message);
+      setShowApplyConfirm(null);
+      toast.showError(error.message);
     },
   });
 
@@ -58,22 +68,23 @@ export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
       queryClient.invalidateQueries({ queryKey: ['proposals', projectKey] });
       setError(null);
       setSelectedProposal(null);
+      setShowRejectConfirm(null);
+      toast.showSuccess('Proposal rejected');
     },
     onError: (error: Error) => {
+      console.error('Failed to reject proposal:', error);
       setError(error.message);
+      setShowRejectConfirm(null);
+      toast.showError(error.message);
     },
   });
 
   const handleApply = (proposalId: string) => {
-    if (confirm('Are you sure you want to apply this proposal?')) {
-      applyMutation.mutate(proposalId);
-    }
+    applyMutation.mutate(proposalId);
   };
 
   const handleReject = (proposalId: string) => {
-    if (confirm('Are you sure you want to reject this proposal?')) {
-      rejectMutation.mutate(proposalId);
-    }
+    rejectMutation.mutate(proposalId);
   };
 
   if (isLoading) {
@@ -95,66 +106,61 @@ export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
         Review and apply pending proposals. You can preview changes before applying them.
       </p>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && (
+        <div className="error-message">
+          {error}
+          <button aria-label="Dismiss error" onClick={() => setError(null)}>×</button>
+        </div>
+      )}
 
       {proposals.length === 0 ? (
         <div className="empty-state">
-          <p>No proposals yet. Create a proposal in the "Propose Changes" tab.</p>
+          <p>No proposals found for this project.</p>
+        </div>
+      ) : pendingProposals.length === 0 ? (
+        <div className="empty-state">
+          <p>No pending proposals. All proposals have been processed.</p>
         </div>
       ) : (
-        <div className="proposals-container">
-          <div className="proposals-list">
-            <h3>Proposals ({proposals.length})</h3>
-            {pendingProposals.length === 0 ? (
-              <p className="no-pending">No pending proposals</p>
-            ) : (
-              pendingProposals.map((proposal: Proposal) => (
-                <div
-                  key={proposal.id}
-                  className={`proposal-item ${selectedProposal === proposal.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedProposal(proposal.id)}
-                >
-                  <div className="proposal-header">
-                    <h4>{proposal.title}</h4>
-                    <span className={`status-badge status-${proposal.status}`}>
-                      {proposal.status}
-                    </span>
-                  </div>
+        <>
+          <div className="proposals-grid">
+            {pendingProposals.map((proposal: Proposal) => (
+              <div key={proposal.id} className="proposal-card">
+                <div className="proposal-card-header">
+                  <h3>{proposal.title}</h3>
+                  <span className="proposal-status">{proposal.status}</span>
+                </div>
+                <div className="proposal-card-body">
                   <p className="proposal-description">{proposal.description}</p>
                   <div className="proposal-meta">
-                    <span>{proposal.changes.length} changes</span>
                     <span>Created: {new Date(proposal.createdAt).toLocaleDateString()}</span>
+                    <span>{proposal.changes.length} change(s)</span>
                   </div>
                 </div>
-              ))
-            )}
-
-            {proposals.filter((p: Proposal) => p.status !== 'pending').length > 0 && (
-              <>
-                <h3 style={{ marginTop: '2rem' }}>History</h3>
-                {proposals
-                  .filter((p: Proposal) => p.status !== 'pending')
-                  .map((proposal: Proposal) => (
-                    <div
-                      key={proposal.id}
-                      className="proposal-item history-item"
-                    >
-                      <div className="proposal-header">
-                        <h4>{proposal.title}</h4>
-                        <span className={`status-badge status-${proposal.status}`}>
-                          {proposal.status}
-                        </span>
-                      </div>
-                      <div className="proposal-meta">
-                        <span>Created: {new Date(proposal.createdAt).toLocaleDateString()}</span>
-                        {proposal.appliedAt && (
-                          <span>Applied: {new Date(proposal.appliedAt).toLocaleDateString()}</span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-              </>
-            )}
+                <div className="proposal-card-actions">
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => setSelectedProposal(proposal.id)}
+                  >
+                    Preview
+                  </button>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => setShowApplyConfirm(proposal.id)}
+                    disabled={applyMutation.isPending}
+                  >
+                    Apply
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => setShowRejectConfirm(proposal.id)}
+                    disabled={rejectMutation.isPending}
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
 
           {selected && (
@@ -163,6 +169,7 @@ export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
                 <h3>Preview: {selected.title}</h3>
                 <button
                   className="btn-close"
+                  aria-label="Close preview"
                   onClick={() => setSelectedProposal(null)}
                 >
                   ✕
@@ -180,52 +187,62 @@ export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
                   {selected.changes.map((change, idx) => (
                     <div key={idx} className="change-item">
                       <div className="change-header">
-                        <span className="change-file">{change.file}</span>
-                        <span className={`change-type type-${change.type}`}>
+                        <span className={`change-operation ${change.type}`}>
                           {change.type}
                         </span>
+                        <span className="change-path">{change.file}</span>
                       </div>
-                      {change.diff && (
-                        <pre className="change-diff">{change.diff}</pre>
-                      )}
-                      {change.before && change.after && (
-                        <div className="change-comparison">
-                          <div className="before">
-                            <strong>Before:</strong>
-                            <pre>{change.before}</pre>
-                          </div>
-                          <div className="after">
-                            <strong>After:</strong>
-                            <pre>{change.after}</pre>
-                          </div>
-                        </div>
+                      {change.after && (
+                        <pre className="change-content">{change.after}</pre>
                       )}
                     </div>
                   ))}
                 </div>
-              </div>
 
-              {selected.status === 'pending' && (
                 <div className="preview-actions">
                   <button
-                    className="btn-primary btn-apply"
-                    onClick={() => handleApply(selected.id)}
-                    disabled={applyMutation.isPending}
+                    className="btn btn-secondary"
+                    onClick={() => setSelectedProposal(null)}
                   >
-                    {applyMutation.isPending ? 'Applying...' : 'Apply Proposal'}
+                    Close
                   </button>
                   <button
-                    className="btn-secondary btn-reject"
-                    onClick={() => handleReject(selected.id)}
-                    disabled={rejectMutation.isPending}
+                    className="btn btn-primary"
+                    onClick={() => {
+                      setSelectedProposal(null);
+                      setShowApplyConfirm(selected.id);
+                    }}
+                    disabled={applyMutation.isPending}
                   >
-                    {rejectMutation.isPending ? 'Rejecting...' : 'Reject'}
+                    Apply This Proposal
                   </button>
                 </div>
-              )}
+              </div>
             </div>
           )}
-        </div>
+        </>
+      )}
+
+      {showApplyConfirm && (
+        <ConfirmDialog
+          title="Apply Proposal"
+          message="Are you sure you want to apply this proposal? This will make changes to the project."
+          onConfirm={() => handleApply(showApplyConfirm)}
+          onCancel={() => setShowApplyConfirm(null)}
+          confirmText="Apply"
+          confirmButtonStyle="primary"
+        />
+      )}
+
+      {showRejectConfirm && (
+        <ConfirmDialog
+          title="Reject Proposal"
+          message="Are you sure you want to reject this proposal? This action cannot be undone."
+          onConfirm={() => handleReject(showRejectConfirm)}
+          onCancel={() => setShowRejectConfirm(null)}
+          confirmText="Reject"
+          confirmButtonStyle="danger"
+        />
       )}
     </div>
   );

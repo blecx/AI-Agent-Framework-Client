@@ -5,13 +5,21 @@
 
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useToast } from '../hooks/useToast';
+import ConfirmDialog from './ConfirmDialog';
 import apiClient from '../services/apiClient';
 import type { Change, ApiError } from '../services/apiClient';
 import './ProposePanel.css';
 
+// Type guard for operation validation
+function isValidOperation(value: string): value is 'create' | 'update' | 'delete' {
+  return value === 'create' || value === 'update' || value === 'delete';
+}
+
 export default function ProposePanel() {
   const { projectKey } = useParams<{ projectKey: string }>();
   const navigate = useNavigate();
+  const toast = useToast();
   const [description, setDescription] = useState('');
   const [changes, setChanges] = useState<Change[]>([{
     path: '',
@@ -20,6 +28,7 @@ export default function ProposePanel() {
   }]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const handleAddChange = () => {
     setChanges([...changes, {
@@ -35,10 +44,17 @@ export default function ProposePanel() {
 
   const handleChangeUpdate = (index: number, field: keyof Change, value: string) => {
     const updatedChanges = [...changes];
-    updatedChanges[index] = {
-      ...updatedChanges[index],
-      [field]: value,
-    };
+    if (field === 'operation' && isValidOperation(value)) {
+      updatedChanges[index] = {
+        ...updatedChanges[index],
+        operation: value,
+      };
+    } else if (field !== 'operation') {
+      updatedChanges[index] = {
+        ...updatedChanges[index],
+        [field]: value,
+      };
+    }
     setChanges(updatedChanges);
   };
 
@@ -60,26 +76,27 @@ export default function ProposePanel() {
         description: description || undefined,
         changes: validChanges,
       });
-      alert('Proposal submitted successfully!');
+      toast.showSuccess('Proposal submitted successfully!');
       navigate(`/projects/${projectKey}`);
     } catch (err) {
       const apiError = err as ApiError;
-      setError(apiError.message || 'Failed to submit proposal');
+      const errorMsg = apiError.message || 'Failed to submit proposal';
+      console.error('Failed to submit proposal:', errorMsg, err);
+      setError(errorMsg);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleCancel = () => {
-    if (confirm('Discard changes and go back?')) {
-      navigate(`/projects/${projectKey}`);
-    }
+  const handleCancelConfirm = () => {
+    setShowCancelConfirm(false);
+    navigate(`/projects/${projectKey}`);
   };
 
   return (
     <div className="propose-panel-container">
       <div className="propose-panel-header">
-        <button className="btn-back" onClick={handleCancel}>
+        <button className="btn-back" onClick={() => setShowCancelConfirm(true)}>
           ← Back to Project
         </button>
         <h1>Propose Changes</h1>
@@ -89,7 +106,7 @@ export default function ProposePanel() {
       {error && (
         <div className="error-message">
           {error}
-          <button onClick={() => setError(null)}>×</button>
+          <button aria-label="Dismiss error" onClick={() => setError(null)}>×</button>
         </div>
       )}
 
@@ -126,6 +143,7 @@ export default function ProposePanel() {
                     type="button"
                     className="btn-remove"
                     onClick={() => handleRemoveChange(index)}
+                    aria-label={`Remove change ${index + 1}`}
                   >
                     ×
                   </button>
@@ -151,7 +169,7 @@ export default function ProposePanel() {
                     <select
                       id={`operation-${index}`}
                       value={change.operation}
-                      onChange={(e) => handleChangeUpdate(index, 'operation', e.target.value as 'create' | 'update' | 'delete')}
+                      onChange={(e) => handleChangeUpdate(index, 'operation', e.target.value)}
                       required
                     >
                       <option value="create">Create</option>
@@ -183,7 +201,7 @@ export default function ProposePanel() {
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={handleCancel}
+            onClick={() => setShowCancelConfirm(true)}
             disabled={submitting}
           >
             Cancel
@@ -197,6 +215,18 @@ export default function ProposePanel() {
           </button>
         </div>
       </form>
+
+      {showCancelConfirm && (
+        <ConfirmDialog
+          title="Discard Changes"
+          message="Are you sure you want to discard your changes and go back?"
+          onConfirm={handleCancelConfirm}
+          onCancel={() => setShowCancelConfirm(false)}
+          confirmText="Discard"
+          cancelText="Keep Editing"
+          confirmButtonStyle="danger"
+        />
+      )}
     </div>
   );
 }

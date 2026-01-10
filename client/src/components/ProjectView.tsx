@@ -5,6 +5,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useToast } from '../hooks/useToast';
+import ConfirmDialog from './ConfirmDialog';
 import apiClient from '../services/apiClient';
 import type { Project, Proposal, ApiError } from '../services/apiClient';
 import './ProjectView.css';
@@ -12,11 +14,13 @@ import './ProjectView.css';
 export default function ProjectView() {
   const { projectKey } = useParams<{ projectKey: string }>();
   const navigate = useNavigate();
+  const toast = useToast();
   const [project, setProject] = useState<Project | null>(null);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'details' | 'history'>('details');
+  const [showApplyConfirm, setShowApplyConfirm] = useState<string | null>(null);
 
   const loadProject = useCallback(async () => {
     if (!projectKey) return;
@@ -27,7 +31,9 @@ export default function ProjectView() {
       setProject(data);
     } catch (err) {
       const apiError = err as ApiError;
-      setError(apiError.message || 'Failed to load project');
+      const errorMsg = apiError.message || 'Failed to load project';
+      console.error('Failed to load project:', errorMsg, err);
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -59,16 +65,18 @@ export default function ProjectView() {
 
   const handleApplyProposal = async (proposalId: string) => {
     if (!projectKey) return;
-    if (!confirm('Are you sure you want to apply this proposal?')) return;
+    setShowApplyConfirm(null);
 
     try {
       await apiClient.applyProposal(projectKey, proposalId);
-      alert('Proposal applied successfully!');
+      toast.showSuccess('Proposal applied successfully!');
       loadProject();
       loadProposals();
     } catch (err) {
       const apiError = err as ApiError;
-      alert(apiError.message || 'Failed to apply proposal');
+      const errorMsg = apiError.message || 'Failed to apply proposal';
+      console.error('Failed to apply proposal:', errorMsg, err);
+      toast.showError(errorMsg);
     }
   };
 
@@ -85,7 +93,7 @@ export default function ProjectView() {
       <div className="project-view-container">
         <div className="error-message">
           {error || 'Project not found'}
-          <button onClick={() => navigate('/projects')}>← Back to Projects</button>
+          <button aria-label="Back to projects" onClick={() => navigate('/projects')}>← Back to Projects</button>
         </div>
       </div>
     );
@@ -190,7 +198,7 @@ export default function ProjectView() {
                     <div className="proposal-actions">
                       <button
                         className="btn btn-primary btn-sm"
-                        onClick={() => handleApplyProposal(proposal.id)}
+                        onClick={() => setShowApplyConfirm(proposal.id)}
                       >
                         Apply
                       </button>
@@ -203,6 +211,17 @@ export default function ProjectView() {
             <p className="empty-message">No proposals yet. Create your first proposal!</p>
           )}
         </div>
+      )}
+
+      {showApplyConfirm && (
+        <ConfirmDialog
+          title="Apply Proposal"
+          message="Are you sure you want to apply this proposal? This action will modify the project."
+          onConfirm={() => handleApplyProposal(showApplyConfirm)}
+          onCancel={() => setShowApplyConfirm(null)}
+          confirmText="Apply"
+          confirmButtonStyle="primary"
+        />
       )}
     </div>
   );
