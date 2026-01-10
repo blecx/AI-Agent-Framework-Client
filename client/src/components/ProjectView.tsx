@@ -3,9 +3,10 @@
  * Displays detailed information about a specific project
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import apiClient, { Project, Proposal, ApiError } from '../services/apiClient';
+import apiClient from '../services/apiClient';
+import type { Project, Proposal, ApiError } from '../services/apiClient';
 import './ProjectView.css';
 
 export default function ProjectView() {
@@ -17,14 +18,7 @@ export default function ProjectView() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'details' | 'history'>('details');
 
-  useEffect(() => {
-    if (projectKey) {
-      loadProject();
-      loadProposals();
-    }
-  }, [projectKey]);
-
-  const loadProject = async () => {
+  const loadProject = useCallback(async () => {
     if (!projectKey) return;
     try {
       setLoading(true);
@@ -37,18 +31,27 @@ export default function ProjectView() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectKey]);
 
-  const loadProposals = async () => {
+  const loadProposals = useCallback(async () => {
     if (!projectKey) return;
     try {
-      const data = await apiClient.getProposals(projectKey);
-      setProposals(data);
+      const response = await apiClient.getProposals(projectKey);
+      if (response.success && response.data) {
+        setProposals(response.data);
+      }
     } catch (err) {
       // Silently fail for proposals if endpoint doesn't exist
       console.error('Failed to load proposals:', err);
     }
-  };
+  }, [projectKey]);
+
+  useEffect(() => {
+    if (projectKey) {
+      loadProject();
+      loadProposals();
+    }
+  }, [projectKey, loadProject, loadProposals]);
 
   const handleProposeChanges = () => {
     navigate(`/projects/${projectKey}/propose`);

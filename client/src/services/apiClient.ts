@@ -3,32 +3,18 @@
  * Handles all API calls for projects, proposals, and workflow operations
  */
 
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios from 'axios';
+import type { AxiosInstance, AxiosError } from 'axios';
+import type { Project, Proposal, ApiResponse } from '../types';
 
-// Types
-export interface Project {
-  key: string;
-  name: string;
-  status: string;
-  documents?: Document[];
-  createdAt?: string;
-  updatedAt?: string;
-}
-
+// Document type (keep local as it's API-specific)
 export interface Document {
   path: string;
   content: string;
   type?: string;
 }
 
-export interface Proposal {
-  id: string;
-  projectKey: string;
-  changes: Change[];
-  status: 'pending' | 'applied' | 'rejected';
-  createdAt: string;
-}
-
+// Change type for proposals (keep local for API compatibility)
 export interface Change {
   path: string;
   operation: 'create' | 'update' | 'delete';
@@ -41,6 +27,9 @@ export interface ApiError {
   status?: number;
   code?: string;
 }
+
+// Re-export types for convenience
+export type { Project, Proposal, ApiResponse };
 
 class ApiClient {
   private client: AxiosInstance;
@@ -79,10 +68,11 @@ class ApiClient {
   private handleError(error: AxiosError): ApiError {
     if (error.response) {
       // Server responded with error status
+      const data = error.response.data as { message?: string; code?: string } | undefined;
       return {
-        message: (error.response.data as any)?.message || error.message || 'An error occurred',
+        message: data?.message || error.message || 'An error occurred',
         status: error.response.status,
-        code: (error.response.data as any)?.code,
+        code: data?.code,
       };
     } else if (error.request) {
       // Request made but no response received
@@ -200,11 +190,16 @@ class ApiClient {
    * Get all proposals for a project
    * GET /projects/{key}/proposals
    */
-  async getProposals(projectKey: string): Promise<Proposal[]> {
-    const response = await this.client.get<Proposal[]>(
-      `/projects/${projectKey}/proposals`
-    );
-    return response.data;
+  async getProposals(projectKey: string): Promise<ApiResponse<Proposal[]>> {
+    try {
+      const response = await this.client.get<Proposal[]>(
+        `/projects/${projectKey}/proposals`
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      const apiError = error as ApiError;
+      return { success: false, error: apiError.message };
+    }
   }
 
   /**
@@ -222,19 +217,30 @@ class ApiClient {
    * Apply a proposal to a project
    * POST /projects/{key}/apply/{proposalId}
    */
-  async applyProposal(projectKey: string, proposalId: string): Promise<{ success: boolean; message: string }> {
-    const response = await this.client.post<{ success: boolean; message: string }>(
-      `/projects/${projectKey}/apply/${proposalId}`
-    );
-    return response.data;
+  async applyProposal(projectKey: string, proposalId: string): Promise<ApiResponse<{ message: string }>> {
+    try {
+      const response = await this.client.post<{ success: boolean; message: string }>(
+        `/projects/${projectKey}/apply/${proposalId}`
+      );
+      return { success: true, data: { message: response.data.message } };
+    } catch (error) {
+      const apiError = error as ApiError;
+      return { success: false, error: apiError.message };
+    }
   }
 
   /**
    * Reject a proposal
    * POST /projects/{key}/proposals/{proposalId}/reject
    */
-  async rejectProposal(projectKey: string, proposalId: string): Promise<void> {
-    await this.client.post(`/projects/${projectKey}/proposals/${proposalId}/reject`);
+  async rejectProposal(projectKey: string, proposalId: string): Promise<ApiResponse<void>> {
+    try {
+      await this.client.post(`/projects/${projectKey}/proposals/${proposalId}/reject`);
+      return { success: true };
+    } catch (error) {
+      const apiError = error as ApiError;
+      return { success: false, error: apiError.message };
+    }
   }
 
   // ==================== Health & Status ====================

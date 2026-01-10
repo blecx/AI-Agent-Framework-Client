@@ -5,7 +5,8 @@
 
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import apiClient, { Change, ApiError } from '../services/apiClient';
+import apiClient from '../services/apiClient';
+import type { Change, ApiError } from '../services/apiClient';
 import './ProposePanel.css';
 
 export default function ProposePanel() {

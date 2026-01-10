@@ -5,7 +5,8 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient, { ApiError } from '../services/apiClient';
+import apiClient from '../services/apiClient';
+import type { ApiError } from '../services/apiClient';
 import './CommandPanel.css';
 
 interface CommandHistory {
