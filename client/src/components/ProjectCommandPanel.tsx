@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../services/apiClient';
 import type { Command } from '../types';
+import { useToast } from '../hooks/useToast';
 import './ProjectCommandPanel.css';
 
 interface ProjectCommandPanelProps {
@@ -10,6 +11,7 @@ interface ProjectCommandPanelProps {
 
 export default function ProjectCommandPanel({ projectKey }: ProjectCommandPanelProps) {
   const queryClient = useQueryClient();
+  const toast = useToast();
   const [commandInput, setCommandInput] = useState('');
   const [argsInput, setArgsInput] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -41,9 +43,12 @@ export default function ProjectCommandPanel({ projectKey }: ProjectCommandPanelP
       setCommandInput('');
       setArgsInput('');
       setError(null);
+      toast.showSuccess('Command executed successfully');
     },
     onError: (error: Error) => {
+      console.error('Error executing command:', error);
       setError(error.message);
+      toast.showError(`Failed to execute command: ${error.message}`);
     },
   });
 

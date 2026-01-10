@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import apiClient from '../services/apiClient';
+import { useToast } from '../hooks/useToast';
 import './ProposePanel.css';
 
 interface ProposePanelProps {
@@ -12,6 +13,7 @@ export default function ProposePanel({ projectKey: propProjectKey }: ProposePane
   const { projectKey: paramProjectKey } = useParams<{ projectKey: string }>();
   const projectKey = propProjectKey || paramProjectKey;
   const queryClient = useQueryClient();
+  const toast = useToast();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [changesJson, setChangesJson] = useState('');
@@ -31,13 +33,16 @@ export default function ProposePanel({ projectKey: propProjectKey }: ProposePane
       queryClient.invalidateQueries({ queryKey: ['proposals', projectKey] });
       setProposalId(data?.id || null);
       setError(null);
+      toast.showSuccess('Proposal created successfully!');
       // Reset form
       setTitle('');
       setDescription('');
       setChangesJson('');
     },
     onError: (error: Error) => {
+      console.error('Error creating proposal:', error);
       setError(error.message);
+      toast.showError(`Failed to create proposal: ${error.message}`);
       setProposalId(null);
     },
   });

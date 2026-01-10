@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../services/apiClient';
 import type { Project } from '../types';
+import { useToast } from '../hooks/useToast';
 import './ProjectList.css';
 
 export default function ProjectList() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const toast = useToast();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newProject, setNewProject] = useState({ key: '', name: '', description: '' });
   const [error, setError] = useState<string | null>(null);
@@ -42,10 +44,12 @@ export default function ProjectList() {
       setShowCreateForm(false);
       setNewProject({ key: '', name: '', description: '' });
       setError(null);
+      toast.showSuccess('Project created successfully!');
     },
     onError: (error: Error) => {
       console.error('Error creating project:', error);
       setError(error.message);
+      toast.showError(`Failed to create project: ${error.message}`);
     },
   });
 
