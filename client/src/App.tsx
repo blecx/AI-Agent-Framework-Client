@@ -7,6 +7,8 @@ import ProposePanel from './components/ProposePanel'
 import ApplyPanel from './components/ApplyPanel'
 import CommandPanel from './components/CommandPanel'
 import ApiTester from './components/ApiTester'
+import { ToastProvider } from './components/ToastContext'
+import ToastContainer from './components/ToastContainer'
 import apiClient from './services/apiClient'
 import './App.css'
 
@@ -45,10 +47,19 @@ function Navigation() {
       }
     }
 
+    // Initial check
     checkConnection()
+
+    // Periodic health checks every 30 seconds
+    const healthCheckInterval = parseInt(
+      import.meta.env.VITE_HEALTH_CHECK_INTERVAL || '30000',
+      10
+    )
+    const intervalId = setInterval(checkConnection, healthCheckInterval)
 
     return () => {
       mounted = false
+      clearInterval(intervalId)
     }
   }, [])
 
@@ -68,8 +79,11 @@ function Navigation() {
           API Tester
         </Link>
       </div>
-      <div className="nav-status">
-        <span className={`status-indicator status-${connectionStatus}`}>
+      <div className="nav-status" role="status" aria-live="polite">
+        <span 
+          className={`status-indicator status-${connectionStatus}`}
+          aria-label={`Connection status: ${connectionStatus}`}
+        >
           {connectionStatus === 'checking' && '⏳'}
           {connectionStatus === 'connected' && '✓'}
           {connectionStatus === 'disconnected' && '✗'}
@@ -87,23 +101,26 @@ function Navigation() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <div className="App">
-          <Navigation />
-          <main className="app-main">
-            <Routes>
-              <Route path="/" element={<ProjectList />} />
-              <Route path="/projects" element={<ProjectList />} />
-              <Route path="/projects/:projectKey" element={<ProjectView />} />
-              <Route path="/projects/:projectKey/propose" element={<ProposePanel />} />
-              <Route path="/projects/:projectKey/apply" element={<ApplyPanelWrapper />} />
-              <Route path="/project/:key" element={<ProjectView />} />
-              <Route path="/commands" element={<CommandPanel />} />
-              <Route path="/api-tester" element={<ApiTester />} />
-            </Routes>
-          </main>
-        </div>
-      </Router>
+      <ToastProvider>
+        <Router>
+          <div className="App">
+            <Navigation />
+            <main className="app-main">
+              <Routes>
+                <Route path="/" element={<ProjectList />} />
+                <Route path="/projects" element={<ProjectList />} />
+                <Route path="/projects/:projectKey" element={<ProjectView />} />
+                <Route path="/projects/:projectKey/propose" element={<ProposePanel />} />
+                <Route path="/projects/:projectKey/apply" element={<ApplyPanelWrapper />} />
+                <Route path="/project/:key" element={<ProjectView />} />
+                <Route path="/commands" element={<CommandPanel />} />
+                <Route path="/api-tester" element={<ApiTester />} />
+              </Routes>
+            </main>
+            <ToastContainer />
+          </div>
+        </Router>
+      </ToastProvider>
     </QueryClientProvider>
   )
 }

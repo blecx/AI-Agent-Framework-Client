@@ -44,6 +44,7 @@ export default function ProjectList() {
       setError(null);
     },
     onError: (error: Error) => {
+      console.error('Error creating project:', error);
       setError(error.message);
     },
   });
