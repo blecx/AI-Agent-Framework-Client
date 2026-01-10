@@ -459,18 +459,6 @@ Remember that Vite environment variables are injected at **build time**, not run
 2. Rebuild: `npm run build` or `docker compose up -d --build`
 3. For development: restart dev server after changing `.env`
 
-## Contributing
-
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Run linter and tests: `npm run lint && npm run build`
-4. Commit your changes (`git commit -m 'Add amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
-
-See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for development setup and guidelines.
-
 ## 📖 Additional Resources
 
 ### Setup and Deployment
