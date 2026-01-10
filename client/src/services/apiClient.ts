@@ -339,6 +339,24 @@ class ApiClient {
       };
     }
   }
+
+  /**
+   * Check API health
+   * GET /health
+   */
+  async checkHealth(): Promise<{ status: string; timestamp?: string }> {
+    const response = await this.client.get<{ status: string; timestamp?: string }>('/health');
+    return response.data;
+  }
+
+  /**
+   * Get API information
+   * GET /info
+   */
+  async getInfo(): Promise<{ version: string; name: string }> {
+    const response = await this.client.get<{ version: string; name: string }>('/info');
+    return response.data;
+  }
 }
 
 // Export singleton instance

@@ -1,8 +1,10 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useState, useEffect } from 'react'
 import ProjectList from './components/ProjectList'
 import ProjectView from './components/ProjectView'
 import ApiTester from './components/ApiTester'
+import apiClient from './services/apiClient'
 import './App.css'
 
 // Create a QueryClient instance
@@ -15,16 +17,76 @@ const queryClient = new QueryClient({
   },
 })
 
+function Navigation() {
+  const location = useLocation()
+  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking')
+
+  useEffect(() => {
+    let mounted = true
+    
+    const checkConnection = async () => {
+      try {
+        await apiClient.checkHealth()
+        if (mounted) {
+          setConnectionStatus('connected')
+        }
+      } catch {
+        if (mounted) {
+          setConnectionStatus('disconnected')
+        }
+      }
+    }
+
+    checkConnection()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  return (
+    <nav className="app-nav">
+      <div className="nav-brand">
+        <h1>AI Agent Framework</h1>
+      </div>
+      <div className="nav-links">
+        <Link to="/projects" className={location.pathname.startsWith('/project') ? 'active' : ''}>
+          Projects
+        </Link>
+        <Link to="/api-tester" className={location.pathname === '/api-tester' ? 'active' : ''}>
+          API Tester
+        </Link>
+      </div>
+      <div className="nav-status">
+        <span className={`status-indicator status-${connectionStatus}`}>
+          {connectionStatus === 'checking' && '⏳'}
+          {connectionStatus === 'connected' && '✓'}
+          {connectionStatus === 'disconnected' && '✗'}
+        </span>
+        <span className="status-text">
+          {connectionStatus === 'checking' && 'Checking...'}
+          {connectionStatus === 'connected' && 'Connected'}
+          {connectionStatus === 'disconnected' && 'Disconnected'}
+        </span>
+      </div>
+    </nav>
+  )
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
         <div className="App">
-          <Routes>
-            <Route path="/" element={<ProjectList />} />
-            <Route path="/project/:key" element={<ProjectView />} />
-            <Route path="/api-tester" element={<ApiTester />} />
-          </Routes>
+          <Navigation />
+          <main className="app-main">
+            <Routes>
+              <Route path="/" element={<ProjectList />} />
+              <Route path="/projects" element={<ProjectList />} />
+              <Route path="/project/:key" element={<ProjectView />} />
+              <Route path="/api-tester" element={<ApiTester />} />
+            </Routes>
+          </main>
         </div>
       </Router>
     </QueryClientProvider>
