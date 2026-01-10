@@ -1,0 +1,23 @@
+.input-modal {
+  max-width: 500px;
+}
+
+.input-modal-field {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  margin-top: 0.75rem;
+}
+
+.input-modal-field:focus {
+  outline: none;
+  border-color: #646cff;
+  box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.1);
+}
+
+.input-modal .modal-body p {
+  margin-bottom: 0;
+}

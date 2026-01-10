@@ -5,9 +5,6 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '../hooks/useToast';
-import InputModal from './InputModal';
-import ConfirmDialog from './ConfirmDialog';
 import apiClient from '../services/apiClient';
 import type { ApiError } from '../services/apiClient';
 import './CommandPanel.css';
@@ -23,15 +20,13 @@ interface CommandHistory {
 
 export default function CommandPanel() {
   const navigate = useNavigate();
-  const toast = useToast();
   const [history, setHistory] = useState<CommandHistory[]>([]);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const addToHistory = (command: string, status: 'success' | 'error' | 'pending', result?: string, error?: string) => {
     const entry: CommandHistory = {
-      id: crypto.randomUUID(),
+      id: Date.now().toString(),
       command,
       status,
       result,
@@ -41,14 +36,16 @@ export default function CommandPanel() {
     setHistory([entry, ...history]);
   };
 
-  const handleCreateProject = async (name: string) => {
-    setShowCreateModal(false);
+  const handleCreateProject = async () => {
+    const name = prompt('Enter project name:');
+    if (!name) return;
+
     setIsLoading(true);
     addToHistory(`Create project: ${name}`, 'pending');
 
     try {
       const project = await apiClient.createProject({ name });
-      toast.showSuccess(`Project "${project.name}" created successfully!`);
+      setStatusMessage(`✓ Project "${project.name}" created successfully!`);
       addToHistory(`Create project: ${name}`, 'success', `Project key: ${project.key}`);
       
       // Navigate to the new project
@@ -58,8 +55,7 @@ export default function CommandPanel() {
     } catch (err) {
       const apiError = err as ApiError;
       const errorMsg = apiError.message || 'Failed to create project';
-      console.error('Failed to create project:', errorMsg, err);
-      toast.showError(errorMsg);
+      setStatusMessage(`✗ ${errorMsg}`);
       addToHistory(`Create project: ${name}`, 'error', undefined, errorMsg);
     } finally {
       setIsLoading(false);
@@ -72,7 +68,7 @@ export default function CommandPanel() {
 
     try {
       const projects = await apiClient.fetchProjects();
-      toast.showSuccess(`Found ${projects.length} project(s)`);
+      setStatusMessage(`✓ Found ${projects.length} project(s)`);
       addToHistory('List projects', 'success', `${projects.length} project(s) found`);
       
       // Navigate to projects list
@@ -82,8 +78,7 @@ export default function CommandPanel() {
     } catch (err) {
       const apiError = err as ApiError;
       const errorMsg = apiError.message || 'Failed to list projects';
-      console.error('Failed to list projects:', errorMsg, err);
-      toast.showError(errorMsg);
+      setStatusMessage(`✗ ${errorMsg}`);
       addToHistory('List projects', 'error', undefined, errorMsg);
     } finally {
       setIsLoading(false);
@@ -96,13 +91,12 @@ export default function CommandPanel() {
 
     try {
       const health = await apiClient.checkHealth();
-      toast.showSuccess(`API is ${health.status}`);
+      setStatusMessage(`✓ API is ${health.status}`);
       addToHistory('Check API health', 'success', `Status: ${health.status}`);
     } catch (err) {
       const apiError = err as ApiError;
       const errorMsg = apiError.message || 'API health check failed';
-      console.error('API health check failed:', errorMsg, err);
-      toast.showError(errorMsg);
+      setStatusMessage(`✗ ${errorMsg}`);
       addToHistory('Check API health', 'error', undefined, errorMsg);
     } finally {
       setIsLoading(false);
@@ -115,23 +109,23 @@ export default function CommandPanel() {
 
     try {
       const info = await apiClient.getInfo();
-      toast.showInfo(`${info.name} v${info.version}`);
+      setStatusMessage(`✓ ${info.name} v${info.version}`);
       addToHistory('Get API info', 'success', `${info.name} v${info.version}`);
     } catch (err) {
       const apiError = err as ApiError;
       const errorMsg = apiError.message || 'Failed to get API info';
-      console.error('Failed to get API info:', errorMsg, err);
-      toast.showError(errorMsg);
+      setStatusMessage(`✗ ${errorMsg}`);
       addToHistory('Get API info', 'error', undefined, errorMsg);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleClearHistory = () => {
-    setHistory([]);
-    setShowClearConfirm(false);
-    toast.showInfo('Command history cleared');
+  const clearHistory = () => {
+    if (confirm('Clear all command history?')) {
+      setHistory([]);
+      setStatusMessage(null);
+    }
   };
 
   return (
@@ -141,16 +135,22 @@ export default function CommandPanel() {
         <p>Quick actions and command history</p>
       </div>
 
+      {statusMessage && (
+        <div className={`status-message ${statusMessage.startsWith('✓') ? 'success' : 'error'}`}>
+          {statusMessage}
+          <button onClick={() => setStatusMessage(null)}>×</button>
+        </div>
+      )}
+
       <div className="quick-actions">
         <h2>Quick Actions</h2>
         <div className="actions-grid">
           <button
             className="action-card"
-            onClick={() => setShowCreateModal(true)}
+            onClick={handleCreateProject}
             disabled={isLoading}
-            aria-label="Create new project"
           >
-            <span className="action-icon" aria-hidden="true">➕</span>
+            <span className="action-icon">➕</span>
             <span className="action-label">Create Project</span>
           </button>
 
@@ -158,9 +158,8 @@ export default function CommandPanel() {
             className="action-card"
             onClick={handleListProjects}
             disabled={isLoading}
-            aria-label="List all projects"
           >
-            <span className="action-icon" aria-hidden="true">📋</span>
+            <span className="action-icon">📋</span>
             <span className="action-label">List Projects</span>
           </button>
 
@@ -168,9 +167,8 @@ export default function CommandPanel() {
             className="action-card"
             onClick={handleCheckHealth}
             disabled={isLoading}
-            aria-label="Check API health"
           >
-            <span className="action-icon" aria-hidden="true">🏥</span>
+            <span className="action-icon">🏥</span>
             <span className="action-label">Check Health</span>
           </button>
 
@@ -178,9 +176,8 @@ export default function CommandPanel() {
             className="action-card"
             onClick={handleGetInfo}
             disabled={isLoading}
-            aria-label="Get API information"
           >
-            <span className="action-icon" aria-hidden="true">ℹ️</span>
+            <span className="action-icon">ℹ️</span>
             <span className="action-label">API Info</span>
           </button>
         </div>
@@ -192,7 +189,7 @@ export default function CommandPanel() {
           {history.length > 0 && (
             <button
               className="btn btn-secondary btn-sm"
-              onClick={() => setShowClearConfirm(true)}
+              onClick={clearHistory}
             >
               Clear History
             </button>
@@ -226,28 +223,6 @@ export default function CommandPanel() {
           </div>
         )}
       </div>
-
-      {showCreateModal && (
-        <InputModal
-          title="Create New Project"
-          message="Enter a name for your new project:"
-          placeholder="Project name"
-          onSubmit={handleCreateProject}
-          onCancel={() => setShowCreateModal(false)}
-          submitText="Create"
-        />
-      )}
-
-      {showClearConfirm && (
-        <ConfirmDialog
-          title="Clear Command History"
-          message="Are you sure you want to clear all command history? This action cannot be undone."
-          onConfirm={handleClearHistory}
-          onCancel={() => setShowClearConfirm(false)}
-          confirmText="Clear"
-          confirmButtonStyle="danger"
-        />
-      )}
     </div>
   );
 }

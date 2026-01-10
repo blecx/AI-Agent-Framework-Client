@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ToastProvider } from './components/ToastContext'
 import ProjectList from './components/ProjectList'
 import ProjectView from './components/ProjectView'
 import ProposePanel from './components/ProposePanel'
@@ -30,16 +31,31 @@ function Navigation() {
   const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking')
 
   useEffect(() => {
+    let isMounted = true
+
     const checkConnection = async () => {
       try {
         await apiClient.checkHealth()
+        if (!isMounted) return
         setConnectionStatus('connected')
-      } catch {
+      } catch (error) {
+        console.error('Failed to check API health:', error)
+        if (!isMounted) return
         setConnectionStatus('disconnected')
       }
     }
+
+    // Initial check on mount and on route change
     checkConnection()
-  }, [])
+
+    // Periodic health checks every 30 seconds
+    const intervalId = window.setInterval(checkConnection, 30000)
+
+    return () => {
+      isMounted = false
+      window.clearInterval(intervalId)
+    }
+  }, [location.pathname])
 
   return (
     <nav className="app-nav">
@@ -58,7 +74,7 @@ function Navigation() {
         </Link>
       </div>
       <div className="nav-status">
-        <span className={`status-indicator status-${connectionStatus}`}>
+        <span className={`status-indicator status-${connectionStatus}`} aria-label={`Connection status: ${connectionStatus}`}>
           {connectionStatus === 'checking' && '⏳'}
           {connectionStatus === 'connected' && '✓'}
           {connectionStatus === 'disconnected' && '✗'}
@@ -76,22 +92,24 @@ function Navigation() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <div className="App">
-          <Navigation />
-          <main className="app-main">
-            <Routes>
-              <Route path="/" element={<ProjectList />} />
-              <Route path="/projects" element={<ProjectList />} />
-              <Route path="/projects/:projectKey" element={<ProjectView />} />
-              <Route path="/projects/:projectKey/propose" element={<ProposePanel />} />
-              <Route path="/projects/:projectKey/apply" element={<ApplyPanelWrapper />} />
-              <Route path="/commands" element={<CommandPanel />} />
-              <Route path="/api-tester" element={<ApiTester />} />
-            </Routes>
-          </main>
-        </div>
-      </Router>
+      <ToastProvider>
+        <Router>
+          <div className="App">
+            <Navigation />
+            <main className="app-main">
+              <Routes>
+                <Route path="/" element={<ProjectList />} />
+                <Route path="/projects" element={<ProjectList />} />
+                <Route path="/projects/:projectKey" element={<ProjectView />} />
+                <Route path="/projects/:projectKey/propose" element={<ProposePanel />} />
+                <Route path="/projects/:projectKey/apply" element={<ApplyPanelWrapper />} />
+                <Route path="/commands" element={<CommandPanel />} />
+                <Route path="/api-tester" element={<ApiTester />} />
+              </Routes>
+            </main>
+          </div>
+        </Router>
+      </ToastProvider>
     </QueryClientProvider>
   )
 }
