@@ -2,7 +2,87 @@
 
 A modern web client that connects to the AI-Agent-Framework API, providing project management capabilities, document change proposals, command execution, and API testing.
 
-## Features
+## ⚡ Quick Start
+
+Get the full stack running in under 5 minutes! See **[QUICKSTART.md](QUICKSTART.md)** for the fastest way to deploy.
+
+```bash
+# Automated production setup (Linux/Mac)
+curl -fsSL https://raw.githubusercontent.com/blecx/AI-Agent-Framework-Client/main/production-setup.sh | bash
+
+# Or manual Docker Compose
+docker compose -f docker-compose.production.yml up -d
+```
+
+**Access**: Client at [http://localhost:3000](http://localhost:3000) • API at [http://localhost:8000](http://localhost:8000)
+
+## 📚 Documentation
+
+- **[Quick Start Guide](QUICKSTART.md)** - Get running in 5 minutes
+- **[Development Setup](docs/DEVELOPMENT.md)** - Full development environment guide
+- **[Testing Guide](docs/TESTING.md)** - Manual testing workflows and validation
+- **[Production Deployment](docs/PRODUCTION.md)** - Production setup, security, and scaling
+- **[Deployment Guide](DEPLOYMENT.md)** - Docker and environment configuration
+
+## 🏗️ Architecture
+
+The AI-Agent-Framework consists of two main components that work together:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     User Browser                            │
+│                    http://localhost:3000                    │
+└───────────────────────────┬─────────────────────────────────┘
+                            │
+                            │ HTTP Requests
+                            │
+┌───────────────────────────▼─────────────────────────────────┐
+│              AI-Agent-Framework-Client                      │
+│                   (This Repository)                          │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  React 19 + TypeScript + Vite                        │  │
+│  │  Port: 3000 (prod) / 5173 (dev)                      │  │
+│  │  - API Testing Interface                              │  │
+│  │  - Project Management UI                              │  │
+│  │  - Document Proposal Interface                        │  │
+│  │  - Command Execution Panel                            │  │
+│  └──────────────────────────────────────────────────────┘  │
+└───────────────────────────┬─────────────────────────────────┘
+                            │
+                            │ REST API Calls
+                            │ /api/health, /api/info
+                            │ /api/agents, /api/execute
+                            │
+┌───────────────────────────▼─────────────────────────────────┐
+│              AI-Agent-Framework API                         │
+│            (blecx/AI-Agent-Framework)                       │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  FastAPI + Python                                     │  │
+│  │  Port: 8000                                           │  │
+│  │  - Agent Management                                   │  │
+│  │  - LLM Integration                                    │  │
+│  │  - Project/Document Management                        │  │
+│  │  - Command Execution                                  │  │
+│  └──────────────────────────────────────────────────────┘  │
+└───────────────────────────┬─────────────────────────────────┘
+                            │
+                            │ LLM API Calls
+                            │
+                    ┌───────▼────────┐
+                    │   LLM Provider  │
+                    │  (LM Studio,    │
+                    │  OpenAI, etc)   │
+                    └─────────────────┘
+```
+
+### Integration Points
+
+- **Client** makes HTTP requests to API endpoints
+- **API** processes requests and coordinates with LLM providers
+- **Docker networking** enables seamless container-to-container communication
+- **CORS** configured for secure cross-origin requests
+
+## ✨ Features
 
 - 📁 **Project Management**: Create and manage projects with Git repository integration
 - 📝 **Document Proposals**: Submit and review document change proposals
@@ -334,6 +414,111 @@ Contributions are welcome! Please:
 4. Commit your changes (`git commit -m 'Add amazing feature'`)
 5. Push to the branch (`git push origin feature/amazing-feature`)
 6. Open a Pull Request
+
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for development setup and guidelines.
+
+## 📖 Additional Resources
+
+### Setup and Deployment
+- **[Quick Start Guide](QUICKSTART.md)** - Get running in 5 minutes with automated scripts
+- **[Production Setup Script (Bash)](production-setup.sh)** - Automated Linux/Mac setup
+- **[Production Setup Script (PowerShell)](production-setup.ps1)** - Automated Windows setup
+- **[Production Docker Compose](docker-compose.production.yml)** - Full stack deployment config
+- **[Validation Script](scripts/validate-setup.sh)** - Verify deployment health
+
+### Documentation
+- **[Development Guide](docs/DEVELOPMENT.md)** - Complete dev environment setup, workflows, debugging
+- **[Testing Guide](docs/TESTING.md)** - Manual testing, integration testing, validation checklists
+- **[Production Guide](docs/PRODUCTION.md)** - Security, monitoring, scaling, backups
+- **[Deployment Guide](DEPLOYMENT.md)** - Docker deployment and configuration
+
+### API Repository
+- **[AI-Agent-Framework API](https://github.com/blecx/AI-Agent-Framework)** - The backend API this client connects to
+
+### Configuration
+- **[Client Environment Config](client/.env.example)** - Client-side environment variables
+- **[Production Environment Config](.env.production.example)** - Full stack production config
+
+## 🚀 Deployment Options
+
+### 1. Automated Production Setup (Recommended)
+```bash
+# Linux/macOS - Full stack in one command
+./production-setup.sh
+
+# Windows PowerShell
+.\production-setup.ps1
+```
+
+### 2. Docker Compose (Manual)
+```bash
+# Full stack (Client + API)
+docker compose -f docker-compose.production.yml up -d
+
+# Client only
+docker compose up -d
+```
+
+### 3. Local Development
+```bash
+# Install and run
+cd client
+npm install
+npm run dev
+```
+
+See [QUICKSTART.md](QUICKSTART.md) for detailed instructions.
+
+## 🔧 System Requirements
+
+- **Node.js**: 20+ (tested with v20.19.6)
+- **npm**: 10+ (tested with v10.8.2)
+- **Docker**: 28+ with Compose v2 (for containerized deployment)
+- **RAM**: 2GB minimum, 4GB recommended
+- **Ports**: 3000 (client), 8000 (API)
+
+## 🛡️ Security
+
+For production deployments:
+- Use HTTPS with SSL certificates (Let's Encrypt recommended)
+- Configure firewall to block direct access to ports 3000 and 8000
+- Set up API authentication with secure API keys
+- Configure CORS with specific allowed origins
+- Keep Docker images and dependencies updated
+- Implement monitoring and log aggregation
+
+See [docs/PRODUCTION.md](docs/PRODUCTION.md) for comprehensive security guidelines.
+
+## 📊 Monitoring
+
+### Health Checks
+```bash
+# API health
+curl http://localhost:8000/health
+
+# Client accessibility
+curl http://localhost:3000
+
+# Run validation script
+./scripts/validate-setup.sh
+```
+
+### View Logs
+```bash
+# All services
+docker compose logs -f
+
+# Specific service
+docker compose logs -f ai-agent-client
+docker compose logs -f ai-agent-api
+```
+
+## 🤝 Support
+
+- **Issues**: [GitHub Issues](https://github.com/blecx/AI-Agent-Framework-Client/issues)
+- **API Documentation**: http://localhost:8000/docs (when API is running)
+- **Development Questions**: See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)
+- **Production Issues**: See [docs/PRODUCTION.md#troubleshooting](docs/PRODUCTION.md#troubleshooting)
 
 ## License
 
