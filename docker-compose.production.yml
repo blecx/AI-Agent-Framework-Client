@@ -1,0 +1,285 @@
+version: '3.8'
+
+# ==============================================================================
+# AI Agent Framework - Production Docker Compose Configuration
+# ==============================================================================
+# This configuration sets up both the Client and API services for production
+# deployment with proper networking, health checks, and restart policies.
+#
+# Usage:
+#   docker compose -f docker-compose.production.yml up -d
+#
+# Requirements:
+#   - Docker 28+
+#   - Docker Compose v2
+#   - AI-Agent-Framework repository cloned adjacent to this repo
+#   - Or modify build context paths below
+# ==============================================================================
+
+services:
+  # ============================================================================
+  # AI Agent Framework API Service
+  # ============================================================================
+  ai-agent-api:
+    # Build from local API repository
+    # Assumes AI-Agent-Framework is cloned in ../AI-Agent-Framework
+    # Adjust the path if your setup differs
+    build:
+      context: ../AI-Agent-Framework
+      dockerfile: Dockerfile
+    
+    # Alternative: Use pre-built image from registry
+    # Uncomment to use published image instead of building locally
+    # image: ghcr.io/blecx/ai-agent-framework:latest
+    
+    container_name: ai-agent-api
+    
+    # Environment variables for the API
+    environment:
+      # Required: Path for project documents
+      - PROJECT_DOCS_PATH=/app/projectDocs
+      
+      # Optional: Path for LLM configuration
+      - LLM_CONFIG_PATH=/app/config/llm.json
+      
+      # Server configuration
+      - PORT=8000
+      - HOST=0.0.0.0
+      
+      # Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      
+      # Optional: API authentication
+      # - API_KEY=${API_KEY}
+      
+      # Optional: CORS configuration
+      # - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+    
+    # Volume mounts for persistent data
+    volumes:
+      # Project documents storage
+      - projectDocs:/app/projectDocs
+      
+      # LLM configuration
+      - api-config:/app/config
+      
+      # Alternative: Use host directories
+      # - ./data/projectDocs:/app/projectDocs
+      # - ./data/api-config:/app/config
+    
+    # Port mapping (host:container)
+    ports:
+      - "${API_PORT:-8000}:8000"
+    
+    # Health check configuration
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Resource limits (optional but recommended for production)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    
+    # Network configuration
+    networks:
+      - ai-agent-network
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================================================
+  # AI Agent Framework Client Service
+  # ============================================================================
+  ai-agent-client:
+    # Build from current repository
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Pass API URL at build time (required for Vite)
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://ai-agent-api:8000/api}
+    
+    # Alternative: Use pre-built image from registry
+    # Uncomment to use published image instead of building locally
+    # image: ghcr.io/blecx/ai-agent-framework-client:latest
+    
+    container_name: ai-agent-client
+    
+    # Environment variables for the client
+    # Note: VITE_ variables are injected at BUILD TIME, not runtime
+    environment:
+      # API URL (for documentation, actual value set at build time)
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://ai-agent-api:8000/api}
+    
+    # Port mapping (host:container)
+    # Container runs Nginx on port 80
+    ports:
+      - "${CLIENT_PORT:-3000}:80"
+    
+    # Dependency configuration
+    # Wait for API to be healthy before starting client
+    depends_on:
+      ai-agent-api:
+        condition: service_healthy
+    
+    # Health check configuration
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Resource limits (optional but recommended for production)
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    
+    # Network configuration
+    networks:
+      - ai-agent-network
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ==============================================================================
+# Networks
+# ==============================================================================
+networks:
+  ai-agent-network:
+    driver: bridge
+    # Optional: Custom network configuration
+    # ipam:
+    #   config:
+    #     - subnet: 172.20.0.0/16
+
+# ==============================================================================
+# Volumes
+# ==============================================================================
+volumes:
+  # Persistent storage for project documents
+  projectDocs:
+    driver: local
+    # Optional: Use a specific mount point
+    # driver_opts:
+    #   type: none
+    #   o: bind
+    #   device: /data/projectDocs
+  
+  # Persistent storage for API configuration
+  api-config:
+    driver: local
+    # Optional: Use a specific mount point
+    # driver_opts:
+    #   type: none
+    #   o: bind
+    #   device: /data/api-config
+
+# ==============================================================================
+# Usage Examples
+# ==============================================================================
+#
+# Start services:
+#   docker compose -f docker-compose.production.yml up -d
+#
+# View logs:
+#   docker compose -f docker-compose.production.yml logs -f
+#
+# Stop services:
+#   docker compose -f docker-compose.production.yml down
+#
+# Rebuild and restart:
+#   docker compose -f docker-compose.production.yml down
+#   docker compose -f docker-compose.production.yml build --no-cache
+#   docker compose -f docker-compose.production.yml up -d
+#
+# Scale client (requires load balancer):
+#   docker compose -f docker-compose.production.yml up -d --scale ai-agent-client=3
+#
+# ==============================================================================
+# Environment Variables
+# ==============================================================================
+#
+# Create a .env file in the same directory with:
+#
+#   # Ports
+#   API_PORT=8000
+#   CLIENT_PORT=3000
+#
+#   # API URL for client (Docker internal)
+#   VITE_API_BASE_URL=http://ai-agent-api:8000/api
+#
+#   # Logging
+#   LOG_LEVEL=INFO
+#
+#   # Optional: Security
+#   # API_KEY=your-secure-key
+#   # ALLOWED_ORIGINS=https://yourdomain.com
+#
+# ==============================================================================
+# Troubleshooting
+# ==============================================================================
+#
+# If containers fail to start:
+#   1. Check logs: docker compose logs
+#   2. Verify ports are available: lsof -i :3000 && lsof -i :8000
+#   3. Check Docker resources: docker system df
+#   4. Verify API repository exists: ls -la ../AI-Agent-Framework
+#
+# If API is not accessible from client:
+#   1. Check network: docker network inspect ai-agent-network
+#   2. Verify service names: docker compose ps
+#   3. Test from client container: 
+#      docker exec ai-agent-client wget -O- http://ai-agent-api:8000/health
+#
+# If health checks fail:
+#   1. Increase start_period in healthcheck configuration
+#   2. Check service logs for startup errors
+#   3. Manually test health endpoint:
+#      docker exec ai-agent-api curl http://localhost:8000/health
+#
+# ==============================================================================
+# Security Notes
+# ==============================================================================
+#
+# For production deployments:
+#   1. Use HTTPS with a reverse proxy (Nginx, Traefik, Caddy)
+#   2. Set up proper firewall rules
+#   3. Use Docker secrets for sensitive data
+#   4. Enable API authentication with API_KEY
+#   5. Configure ALLOWED_ORIGINS for CORS
+#   6. Keep Docker images updated
+#   7. Implement log monitoring and alerting
+#   8. Set up automated backups for volumes
+#   9. Use resource limits to prevent resource exhaustion
+#   10. Regularly update dependencies and security patches
+#
+# ==============================================================================
