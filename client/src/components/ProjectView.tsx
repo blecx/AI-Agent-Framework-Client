@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import apiClient from '../services/apiClient';
 import ProposePanel from './ProposePanel';
 import ApplyPanel from './ApplyPanel';
-import CommandPanel from './CommandPanel';
+import CommandPanel from './ProjectCommandPanel';
 import './ProjectView.css';
 
 type TabType = 'overview' | 'propose' | 'apply' | 'commands';

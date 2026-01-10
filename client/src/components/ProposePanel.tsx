@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
 import apiClient from '../services/apiClient';
 import './ProposePanel.css';
 
 interface ProposePanelProps {
-  projectKey: string;
+  projectKey?: string;
 }
 
-export default function ProposePanel({ projectKey }: ProposePanelProps) {
+export default function ProposePanel({ projectKey: propProjectKey }: ProposePanelProps = {}) {
+  const { projectKey: paramProjectKey } = useParams<{ projectKey: string }>();
+  const projectKey = propProjectKey || paramProjectKey;
   const queryClient = useQueryClient();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -17,6 +20,7 @@ export default function ProposePanel({ projectKey }: ProposePanelProps) {
 
   const proposeMutation = useMutation({
     mutationFn: async (changes: object) => {
+      if (!projectKey) throw new Error('Project key is required');
       const response = await apiClient.propose(projectKey, changes);
       if (!response.success) {
         throw new Error(response.error || 'Failed to create proposal');

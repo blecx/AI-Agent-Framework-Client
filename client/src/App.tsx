@@ -1,8 +1,11 @@
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useParams } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState, useEffect } from 'react'
 import ProjectList from './components/ProjectList'
 import ProjectView from './components/ProjectView'
+import ProposePanel from './components/ProposePanel'
+import ApplyPanel from './components/ApplyPanel'
+import CommandPanel from './components/CommandPanel'
 import ApiTester from './components/ApiTester'
 import apiClient from './services/apiClient'
 import './App.css'
@@ -16,6 +19,11 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+function ApplyPanelWrapper() {
+  const { projectKey } = useParams<{ projectKey: string }>()
+  return <ApplyPanel projectKey={projectKey || ''} />
+}
 
 function Navigation() {
   const location = useLocation()
@@ -53,6 +61,9 @@ function Navigation() {
         <Link to="/projects" className={location.pathname.startsWith('/project') ? 'active' : ''}>
           Projects
         </Link>
+        <Link to="/commands" className={location.pathname === '/commands' ? 'active' : ''}>
+          Commands
+        </Link>
         <Link to="/api-tester" className={location.pathname === '/api-tester' ? 'active' : ''}>
           API Tester
         </Link>
@@ -83,7 +94,11 @@ function App() {
             <Routes>
               <Route path="/" element={<ProjectList />} />
               <Route path="/projects" element={<ProjectList />} />
+              <Route path="/projects/:projectKey" element={<ProjectView />} />
+              <Route path="/projects/:projectKey/propose" element={<ProposePanel />} />
+              <Route path="/projects/:projectKey/apply" element={<ApplyPanelWrapper />} />
               <Route path="/project/:key" element={<ProjectView />} />
+              <Route path="/commands" element={<CommandPanel />} />
               <Route path="/api-tester" element={<ApiTester />} />
             </Routes>
           </main>
