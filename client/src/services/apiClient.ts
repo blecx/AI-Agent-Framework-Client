@@ -3,7 +3,7 @@
  * Handles all API calls for projects, proposals, and workflow operations
  */
 
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios, { type AxiosInstance, AxiosError } from 'axios';
 
 // Types
 export interface Project {
@@ -79,10 +79,11 @@ class ApiClient {
   private handleError(error: AxiosError): ApiError {
     if (error.response) {
       // Server responded with error status
+      const responseData = error.response.data as { message?: string; code?: string } | undefined;
       return {
-        message: (error.response.data as any)?.message || error.message || 'An error occurred',
+        message: responseData?.message || error.message || 'An error occurred',
         status: error.response.status,
-        code: (error.response.data as any)?.code,
+        code: responseData?.code,
       };
     } else if (error.request) {
       // Request made but no response received

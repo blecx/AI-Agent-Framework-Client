@@ -13,17 +13,16 @@ function Navigation() {
   const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking')
 
   useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        await apiClient.checkHealth()
+        setConnectionStatus('connected')
+      } catch {
+        setConnectionStatus('disconnected')
+      }
+    }
     checkConnection()
   }, [])
-
-  const checkConnection = async () => {
-    try {
-      await apiClient.checkHealth()
-      setConnectionStatus('connected')
-    } catch {
-      setConnectionStatus('disconnected')
-    }
-  }
 
   return (
     <nav className="app-nav">
