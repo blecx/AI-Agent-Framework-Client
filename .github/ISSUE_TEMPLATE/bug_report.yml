@@ -1,0 +1,164 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in the AI Agent Framework Client
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thank you for reporting a bug!
+        
+        This template helps collect the information needed to reproduce and fix the issue efficiently.
+        
+        **Before submitting:**
+        - Search existing issues to avoid duplicates
+        - Verify the bug exists in the latest version
+        - Test with a clean environment if possible
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: "Example: API health check fails with 404 error when using Docker deployment"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the behavior. Be specific.
+      placeholder: |
+        1. Start the client with `cd client && npm run dev`
+        2. Navigate to API Tester page
+        3. Click "Test Health Check" button
+        4. Observe error in console
+      value: |
+        1. 
+        2. 
+        3. 
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen.
+      placeholder: "Example: Health check should return 200 OK with {\"status\":\"healthy\"}"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened. Include error messages, screenshots, or logs.
+      placeholder: "Example: Returns 404 Not Found. Console shows: 'Error: Network request failed'"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Where is the bug occurring?
+      multiple: true
+      options:
+        - Development (npm run dev)
+        - Production (Docker)
+        - Browser (specify in details below)
+        - Node.js environment
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment_details
+    attributes:
+      label: Environment Details
+      description: Provide specific version information.
+      placeholder: |
+        - OS: macOS 14.1
+        - Browser: Chrome 120.0.6099.129
+        - Node.js: 20.19.6
+        - npm: 10.8.2
+        - Docker: 28.0.0 (if applicable)
+      value: |
+        - OS: 
+        - Browser: 
+        - Node.js: 
+        - npm: 
+        - Docker: 
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and Screenshots
+      description: |
+        Attach relevant logs, screenshots, or error output.
+        - Browser console logs (F12 → Console tab)
+        - Network tab errors (F12 → Network tab)
+        - Terminal output from `npm run dev` or Docker logs
+        - Screenshots showing the issue
+      placeholder: |
+        Paste logs here or drag-and-drop screenshots.
+        
+        ```
+        Error: Connection refused
+        at apiClient.get (api.ts:45)
+        ```
+
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation Checklist
+      description: Help us understand if this affects the build process.
+      value: |
+        **Have you verified the following?**
+        - [ ] `cd client && npm run lint` - passes without errors
+        - [ ] `cd client && npm run build` - completes successfully
+        - [ ] Issue persists after clearing cache: `rm -rf client/node_modules/.vite && cd client && npm install`
+        - [ ] Issue persists with clean install: `rm -rf client/node_modules client/package-lock.json && cd client && npm install`
+
+  - type: textarea
+    id: cross_repo
+    attributes:
+      label: Cross-Repo Coordination
+      description: |
+        This client interacts with the **AI-Agent-Framework** backend API.
+        Determine if this bug involves backend changes.
+      value: |
+        **Backend involvement:**
+        - [ ] This bug likely involves the backend API (blecx/AI-Agent-Framework)
+        - [ ] I have checked the backend API health: `curl http://localhost:8000/health`
+        - [ ] Backend API is responding correctly
+        
+        **Related backend issue (if any):**
+        - Link: 
+        
+        **API endpoints affected (if known):**
+        - 
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context about the problem (workarounds tried, related issues, etc.).
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        
+        ## Next Steps
+        
+        After submitting this issue:
+        1. A maintainer will review and may request additional information
+        2. The issue will be triaged and prioritized
+        3. Once accepted, a PR can be created following the **Plan → Issues → PRs** workflow
+        4. Keep the scope small (1-2 hours of work) for the fix
+        
+        Thank you for helping improve the AI Agent Framework Client!

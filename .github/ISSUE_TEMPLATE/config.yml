@@ -1,0 +1,20 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentation
+    url: https://github.com/blecx/AI-Agent-Framework-Client/blob/main/README.md
+    about: View the complete documentation and setup guides
+  - name: 🚀 Quick Start Guide
+    url: https://github.com/blecx/AI-Agent-Framework-Client/blob/main/QUICKSTART.md
+    about: Get started quickly with automated setup scripts
+  - name: 🔧 Development Guide
+    url: https://github.com/blecx/AI-Agent-Framework-Client/blob/main/docs/DEVELOPMENT.md
+    about: Learn about the development environment and workflow
+  - name: 🤖 Copilot Instructions
+    url: https://github.com/blecx/AI-Agent-Framework-Client/blob/main/.github/copilot-instructions.md
+    about: Review development workflow and coding conventions
+  - name: 🐛 Backend API Issues
+    url: https://github.com/blecx/AI-Agent-Framework/issues
+    about: Report issues with the AI-Agent-Framework backend API
+  - name: 💬 Discussions
+    url: https://github.com/blecx/AI-Agent-Framework-Client/discussions
+    about: Ask questions or discuss ideas with the community
