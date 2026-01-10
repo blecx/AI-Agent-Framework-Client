@@ -1,0 +1,249 @@
+name: Feature Request
+description: Propose a new feature or enhancement for the AI Agent Framework Client
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thank you for proposing a feature!
+        
+        This template helps collect the information needed to design and implement features efficiently.
+        
+        **Before submitting:**
+        - Search existing issues/PRs to avoid duplicates
+        - Consider if this is a bug fix (use Bug Report template instead)
+        - Think about the smallest valuable increment of this feature
+        
+        **Remember:** Follow the **Plan → Issues → PRs** workflow
+        - Start with a clear plan/spec
+        - Break work into small issues (1-2 hours each)
+        - One issue per PR
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal / Problem Statement
+      description: What problem does this feature solve? What value does it provide?
+      placeholder: "Example: Users need to filter agents by capability to find the right agent for their task faster."
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope_in
+    attributes:
+      label: "Scope: What's Included"
+      description: What specific functionality will be implemented?
+      placeholder: |
+        - Add a dropdown filter in the API Tester UI
+        - Filter agents by capability type (code, documentation, etc.)
+        - Preserve filter state during session
+      value: |
+        - 
+        - 
+        - 
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope_out
+    attributes:
+      label: "Scope: What's NOT Included"
+      description: What is explicitly out of scope? This prevents scope creep.
+      placeholder: |
+        - Advanced search/regex filtering
+        - Saving filter preferences to backend
+        - Multi-select capability filtering
+      value: |
+        - 
+        - 
+        - 
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: |
+        Clear, testable conditions that must be met for this feature to be complete.
+        Use a checklist format.
+      placeholder: |
+        - [ ] Dropdown filter appears above agent list
+        - [ ] Filtering updates agent list in real-time
+        - [ ] "All" option shows all agents
+        - [ ] Filter state persists during browser session
+        - [ ] No console errors when filtering
+        - [ ] Lint and build pass
+      value: |
+        - [ ] 
+        - [ ] 
+        - [ ] 
+        - [ ] 
+    validations:
+      required: true
+
+  - type: textarea
+    id: ux_notes
+    attributes:
+      label: UX / Design Notes
+      description: |
+        Describe the user experience or interface changes.
+        Include mockups, wireframes, or examples if helpful.
+      placeholder: |
+        - Add a styled dropdown in the top-right of API Tester
+        - Use existing component styling (ApiTester.css)
+        - Show agent count next to each filter option
+        - Example: "Code Agents (3)"
+
+  - type: textarea
+    id: cross_repo
+    attributes:
+      label: Cross-Repo Coordination
+      description: |
+        **CRITICAL:** Does this feature require backend API changes?
+        This client depends on the **AI-Agent-Framework** backend API.
+      value: |
+        **Backend API changes required:**
+        - [ ] Yes - new endpoints, request/response formats, or behavior changes needed
+        - [ ] No - client-only changes
+        
+        **If YES, backend coordination:**
+        - [ ] Backend issue created in blecx/AI-Agent-Framework: 
+        - [ ] Backend PR link (if started): 
+        - [ ] API contract documented (request/response examples): 
+        
+        **Implementation order (if backend changes required):**
+        1. Backend API issue → Backend PR → Backend merge
+        2. Client issue (this one) → Client PR → Client merge
+        
+        **If NO backend changes:**
+        Confirm this feature can be implemented using existing API endpoints:
+        - Endpoints used: 
+        - No contract changes needed: [ ]
+    validations:
+      required: true
+
+  - type: textarea
+    id: breakdown
+    attributes:
+      label: Suggested Issue Breakdown
+      description: |
+        Break this feature into small, focused issues (1-2 hours each).
+        This promotes incremental progress and easier reviews.
+      placeholder: |
+        **Issue 1:** Add filter dropdown UI component (1h)
+        - Create FilterDropdown component
+        - Add to ApiTester layout
+        - Style to match existing UI
+        
+        **Issue 2:** Implement filter logic (1.5h)
+        - Add filter state management
+        - Implement filtering algorithm
+        - Connect to agent list
+        
+        **Issue 3:** Add agent count badges (0.5h)
+        - Calculate counts per category
+        - Display in dropdown options
+      value: |
+        **Issue 1:** 
+        - 
+        - 
+        
+        **Issue 2:** 
+        - 
+        - 
+
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation Expectations
+      description: |
+        How should this feature be validated?
+        Include commands and manual test scenarios.
+      value: |
+        **Automated validation:**
+        - [ ] `cd client && npm run lint` - passes with 0 errors
+        - [ ] `cd client && npm run build` - completes successfully
+        - [ ] No TypeScript errors introduced
+        
+        **Manual testing:**
+        1. Start dev server: `cd client && npm run dev`
+        2. Navigate to feature area in browser
+        3. Test all acceptance criteria
+        4. Verify no console errors (F12)
+        5. Test responsive design (resize window)
+        
+        **Browser testing:**
+        - [ ] Chrome/Edge
+        - [ ] Firefox
+        - [ ] Safari (if available)
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical_notes
+    attributes:
+      label: Technical Notes
+      description: |
+        Implementation hints, constraints, or considerations.
+        Reference key files if known.
+      placeholder: |
+        **Key files:**
+        - `client/src/components/ApiTester.tsx` - Add filter UI here
+        - `client/src/services/api.ts` - API client methods
+        
+        **Constraints:**
+        - VITE_API_BASE_URL is build-time (requires rebuild if changed)
+        - All npm commands must run from `client/` directory
+        - Follow existing TypeScript strict mode
+        
+        **Considerations:**
+        - Maintain existing component patterns (functional components, hooks)
+        - Use component .css files for styling
+        - Follow existing error handling patterns
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies / Blockers
+      description: Are there any dependencies or blockers?
+      placeholder: |
+        - Depends on: Issue #123 (backend API support)
+        - Blocked by: PR #456 (refactor agent list)
+        - Requires: New npm package (specify if needed)
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context, mockups, examples, or research.
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        
+        ## Next Steps
+        
+        After submitting this feature request:
+        1. **Planning Phase** (5-10 min per issue)
+           - Review and refine the scope
+           - Confirm cross-repo coordination
+           - Break into small issues if not already done
+        
+        2. **Implementation Phase**
+           - Create focused issues for each work slice
+           - One issue per PR
+           - Keep changes surgical and focused
+           - Reference this feature request in child issues
+        
+        3. **Validation Phase**
+           - Ensure lint and build pass
+           - Manual testing against acceptance criteria
+           - Update documentation if needed
+        
+        **Workflow reminder:** Plan → Issues → PRs
+        - Each issue: 1-2 hours of work
+        - Each PR: addresses one issue
+        - Strong traceability: Feature → Issues → PRs → Commits
+        
+        Thank you for helping improve the AI Agent Framework Client!
