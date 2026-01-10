@@ -1,5 +1,62 @@
 # Copilot Coding Agent Instructions
 
+## Development Workflow (REQUIRED)
+
+### Plan → Issues → PRs Process
+**ALWAYS** follow this workflow for new features, bug fixes, and changes:
+
+1. **Start with a Plan/Spec** (10-15 min)
+   - Define clear goal and scope
+   - List acceptance criteria
+   - Identify constraints and dependencies
+   - Consider cross-repo impacts (see Cross-Repo Coordination below)
+   - Document in issue description or linked document
+
+2. **Break Work into Small Issues** (5-10 min per issue)
+   - Create one issue per logical unit of work
+   - Each issue should be completable in 1-2 hours
+   - Include acceptance criteria in issue description
+   - Reference the original plan/spec
+   - Link related issues (dependencies, blockers)
+
+3. **Implement One Issue Per PR** (focus on small diffs)
+   - Create branch from issue (e.g., `fix/issue-123-api-timeout`)
+   - Keep changes surgical and focused
+   - Include validation steps in PR description
+   - Reference issue number in PR title and description
+   - Ensure lint and build pass before opening PR
+
+4. **PR Best Practices**
+   - Use descriptive titles: "Fix API timeout in health check endpoint"
+   - Include validation checklist in description
+   - Link to issue(s) being addressed
+   - Prefer squash merges for clean history
+   - Ensure strong traceability: Plan → Issue → PR → Commit
+
+### Cross-Repo Coordination (Client ↔ Backend API)
+
+**Before making changes that affect API contracts:**
+
+1. **Check if backend API changes are needed**
+   - New endpoints, request/response formats, or behavior changes
+   - If yes, create/link an issue in `blecx/AI-Agent-Framework` FIRST
+   - Document the required API changes clearly
+
+2. **Coordination Strategy**
+   - **Preferred**: Wait for backend API changes to be merged before updating client
+   - **Alternative**: Make compatible changes that work with both old and new API
+   - Always include API version/compatibility notes in PR description
+
+3. **Common Scenarios**
+   - **New Feature**: Backend API issue → Backend PR → Client issue → Client PR
+   - **Bug Fix**: Determine if API or client-side, fix in appropriate repo
+   - **API Contract Change**: Backend issue + PR first, then client issue + PR
+
+**Key Files for API Integration:**
+- `client/src/services/api.ts` - API client methods
+- `client/src/services/apiClient.ts` - Base API configuration
+- Backend: `blecx/AI-Agent-Framework` endpoints
+
 ## Repository Overview
 **AI-Agent-Framework-Client** - React/TypeScript web app built with Vite for testing AI-Agent-Framework API without workflows.
 - **Stack**: React 19.2.0, TypeScript 5.9.3, Vite 7.2.4, Node.js 18+ (tested: 20.19.6, npm 10.8.2)
@@ -729,3 +786,75 @@ docker compose down && docker compose build --no-cache && docker compose up -d
 - `docs/TESTING.md` - Testing guide
 - `docs/PRODUCTION.md` - Production guide
 - `QUICKSTART.md` - Quick start guide
+
+---
+
+# Path-Specific Guidance
+
+## `client/src/services/api.ts` - API Client
+**Purpose**: Central API client with all backend endpoint methods.
+
+**When modifying:**
+- **ALWAYS** verify backend API endpoint exists and matches contract
+- **ALWAYS** update TypeScript types for request/response
+- **ALWAYS** handle errors consistently (use existing patterns)
+- **ALWAYS** test against running backend API (`http://localhost:8000`)
+- Consider backward compatibility if API version changes
+- Update corresponding UI components that call these methods
+
+**Common Tasks:**
+- Adding new endpoint: Check backend API docs (`http://localhost:8000/docs`)
+- Changing request format: Coordinate with backend team/issue
+- Error handling: Follow existing `try/catch` patterns with toast notifications
+
+**Validation:**
+```bash
+cd client
+npm run lint         # Must pass
+npm run build        # Must succeed
+npm run dev          # Test against live API
+```
+
+## `client/src/components/` - UI Components
+**Purpose**: React components for user interface.
+
+**When modifying:**
+- **ALWAYS** follow existing component patterns (functional components, hooks)
+- **ALWAYS** maintain consistent styling (use component `.css` files)
+- **ALWAYS** preserve TypeScript strict typing
+- Consider accessibility (ARIA labels, keyboard navigation)
+- Test with browser DevTools (responsive design, console errors)
+
+**Key Components:**
+- `ApiTester.tsx` - Main API testing interface (~250 lines)
+- `ProjectView.tsx` - Project management UI
+- `ProposePanel.tsx` - Document proposal interface
+- `CommandPanel.tsx` - Command execution panel
+
+**Common Tasks:**
+- Adding new component: Place in `client/src/components/`, create paired `.css` file
+- Modifying existing UI: Keep changes minimal, test in browser
+- State management: Use React hooks or React Query for API data
+
+**Validation:**
+```bash
+cd client
+npm run lint         # Must pass
+npm run build        # Must succeed
+npm run dev          # Visual testing in browser at http://localhost:5173
+```
+
+**Testing in Browser:**
+1. Open http://localhost:5173
+2. Navigate to modified component
+3. Test all interactive elements
+4. Check browser console for errors (F12)
+5. Verify responsive design (resize window)
+
+## General Path Rules
+- **`client/src/`**: All source code, ALWAYS `cd client` before npm commands
+- **`client/dist/`**: Build output, NEVER commit (gitignored)
+- **`client/node_modules/`**: Dependencies, NEVER commit (gitignored)
+- **`client/.env`**: Local config, NEVER commit (gitignored, use `.env.example`)
+- **`docs/`**: Documentation, update if changes affect setup/usage
+- **`.github/`**: Workflow and prompt templates, update for process changes

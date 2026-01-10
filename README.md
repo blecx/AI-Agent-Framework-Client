@@ -24,6 +24,60 @@ docker compose -f docker-compose.production.yml up -d
 - **[Production Deployment](docs/PRODUCTION.md)** - Production setup, security, and scaling
 - **[Deployment Guide](DEPLOYMENT.md)** - Docker and environment configuration
 
+## 🤝 Contributing
+
+We follow a structured workflow for all contributions: **Plan → Issues → PRs**
+
+### Development Workflow
+
+1. **Start with a Plan** - Define clear goals, scope, and acceptance criteria
+2. **Break into Small Issues** - Create focused issues (1-2 hours each)
+3. **One Issue Per PR** - Keep changes surgical and diffs small
+4. **Include Validation** - Always run lint and build before committing
+
+### Resources for Contributors
+
+- **[Copilot Instructions](.github/copilot-instructions.md)** - Complete development workflow and best practices
+- **[Prompt Templates](.github/prompts/)** - Reusable templates for planning, issues, and PRs
+  - [Feature Planning](.github/prompts/feature-planning.md) - Plan new features
+  - [Implementation Issue](.github/prompts/implementation-issue.md) - Create detailed issues
+  - [PR Description](.github/prompts/pr-description.md) - Write comprehensive PR descriptions
+  - [Cross-Repo Coordination](.github/prompts/cross-repo-coordination.md) - Coordinate with backend API
+
+### Quick Contribution Guide
+
+```bash
+# 1. Fork and clone the repository
+git clone https://github.com/YOUR-USERNAME/AI-Agent-Framework-Client.git
+cd AI-Agent-Framework-Client
+
+# 2. Create a feature branch
+git checkout -b feature/your-feature-name
+
+# 3. Make changes in the client directory
+cd client
+npm install
+npm run dev  # Test your changes
+
+# 4. Validate before committing
+npm run lint   # Must pass
+npm run build  # Must succeed
+
+# 5. Commit and push
+git add .
+git commit -m "Description of changes"
+git push origin feature/your-feature-name
+
+# 6. Open PR with detailed description (use prompt template)
+```
+
+### Cross-Repo Coordination
+
+If your changes require backend API modifications:
+1. Create/link an issue in [`blecx/AI-Agent-Framework`](https://github.com/blecx/AI-Agent-Framework) first
+2. Wait for backend changes to merge (or coordinate compatible changes)
+3. Use the [Cross-Repo Coordination template](.github/prompts/cross-repo-coordination.md)
+
 ## 🏗️ Architecture
 
 The AI-Agent-Framework consists of two main components that work together:
@@ -404,18 +458,6 @@ Remember that Vite environment variables are injected at **build time**, not run
 1. Update `.env` file
 2. Rebuild: `npm run build` or `docker compose up -d --build`
 3. For development: restart dev server after changing `.env`
-
-## Contributing
-
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Run linter and tests: `npm run lint && npm run build`
-4. Commit your changes (`git commit -m 'Add amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
-
-See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for development setup and guidelines.
 
 ## 📖 Additional Resources
 
