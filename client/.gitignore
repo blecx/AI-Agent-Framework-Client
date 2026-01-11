@@ -12,7 +12,9 @@ dist
 dist-ssr
 *.local
 
-# Playwright
+# Testing
+coverage/
+.nyc_output/
 test-results/
 playwright-report/
 playwright/.cache/
