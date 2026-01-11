@@ -23,12 +23,21 @@ jobs:
       working-directory: client
       run: npm ci
     
-    - name:  Run tests
+    - name: Run lint
+      working-directory: client
+      run: npm run lint
+    
+    - name: Build
+      working-directory: client
+      run: npm run build
+    
+    - name: Run tests
       working-directory: client
       run: npm test
 
   client-e2e:
     runs-on: ubuntu-latest
+    needs: client-ci
     
     steps:
     - uses: actions/checkout@v4

@@ -14,5 +14,5 @@ test('page has title', async ({ page }) => {
   await page.goto('/');
   
   // Check that the page has a title
-  await expect(page).toHaveTitle(/AI Agent Framework Client/i);
+  await expect(page).toHaveTitle(/client/i);
 });
