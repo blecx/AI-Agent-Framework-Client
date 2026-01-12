@@ -1,0 +1,139 @@
+/**
+ * API helper functions for E2E tests
+ * Direct API calls for setup and teardown
+ */
+
+import axios, { AxiosInstance } from 'axios';
+
+export class E2EApiHelper {
+  private client: AxiosInstance;
+  private baseUrl: string;
+
+  constructor(baseUrl?: string) {
+    this.baseUrl = baseUrl || process.env.API_BASE_URL || 'http://localhost:8000';
+    this.client = axios.create({
+      baseURL: this.baseUrl,
+      timeout: 30000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+
+  /**
+   * Check if API is healthy
+   */
+  async checkHealth(): Promise<boolean> {
+    try {
+      const response = await this.client.get('/health');
+      return response.status === 200 && response.data.status === 'healthy';
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Wait for API to be ready
+   */
+  async waitForApi(timeoutMs: number = 30000): Promise<boolean> {
+    const startTime = Date.now();
+    while (Date.now() - startTime < timeoutMs) {
+      if (await this.checkHealth()) {
+        return true;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+    return false;
+  }
+
+  /**
+   * Create a project directly via API (for test setup)
+   */
+  async createProject(key: string, name: string, description?: string) {
+    const response = await this.client.post('/projects', {
+      key,
+      name,
+      description,
+    });
+    return response.data;
+  }
+
+  /**
+   * Delete a project (for test cleanup)
+   */
+  async deleteProject(key: string) {
+    try {
+      await this.client.delete(`/projects/${key}`);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Get project
+   */
+  async getProject(key: string) {
+    const response = await this.client.get(`/projects/${key}`);
+    return response.data;
+  }
+
+  /**
+   * List all projects
+   */
+  async listProjects() {
+    const response = await this.client.get('/projects');
+    return response.data;
+  }
+
+  /**
+   * Create a proposal
+   */
+  async createProposal(projectKey: string, proposalData: object) {
+    const response = await this.client.post(
+      `/projects/${projectKey}/proposals`,
+      proposalData
+    );
+    return response.data;
+  }
+
+  /**
+   * Get proposals for a project
+   */
+  async getProposals(projectKey: string) {
+    const response = await this.client.get(`/projects/${projectKey}/proposals`);
+    return response.data;
+  }
+
+  /**
+   * Apply a proposal
+   */
+  async applyProposal(projectKey: string, proposalId: string) {
+    const response = await this.client.post(
+      `/projects/${projectKey}/proposals/${proposalId}/apply`
+    );
+    return response.data;
+  }
+
+  /**
+   * Clean up test projects (remove all projects with test prefix)
+   */
+  async cleanupTestProjects(prefix: string = 'e2e-') {
+    try {
+      const projects = await this.listProjects();
+      const testProjects = projects.filter((p: { key: string }) =>
+        p.key.startsWith(prefix)
+      );
+      
+      for (const project of testProjects) {
+        await this.deleteProject(project.key);
+      }
+      return true;
+    } catch (error) {
+      console.error('Error cleaning up test projects:', error);
+      return false;
+    }
+  }
+}
+
+export const createApiHelper = (baseUrl?: string) => new E2EApiHelper(baseUrl);
