@@ -28,7 +28,7 @@ export function generateProjectData(suffix?: string) {
 /**
  * Generate unique proposal data
  */
-export function generateProposalData(projectKey: string) {
+export function generateProposalData() {
   const timestamp = Date.now();
   return {
     title: `E2E Test Proposal ${timestamp}`,

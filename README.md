@@ -21,6 +21,7 @@ docker compose -f docker-compose.production.yml up -d
 - **[Quick Start Guide](QUICKSTART.md)** - Get running in 5 minutes
 - **[Development Setup](docs/DEVELOPMENT.md)** - Full development environment guide
 - **[Testing Guide](docs/TESTING.md)** - Manual testing workflows and validation
+- **[E2E Testing Guide](client/e2e/README.md)** - Playwright E2E test setup and usage
 - **[Production Deployment](docs/PRODUCTION.md)** - Production setup, security, and scaling
 - **[Deployment Guide](DEPLOYMENT.md)** - Docker and environment configuration
 
@@ -340,6 +341,35 @@ In the `client/` directory:
 - `npm run build` - Build production bundle (`tsc -b && vite build`)
 - `npm run preview` - Preview production build locally
 - `npm run lint` - Run ESLint for code quality (must pass before commit)
+- `npm test` - Run unit tests with Vitest
+- `npm run test:e2e` - Run E2E tests with Playwright (requires backend API)
+
+### Testing
+
+The project includes comprehensive testing:
+
+- **Unit Tests**: Component and logic tests using Vitest
+- **E2E Tests**: Full workflow tests using Playwright
+  - See **[E2E Testing Guide](client/e2e/README.md)** for setup and usage
+  - Tests cover: project creation, proposals, applying changes, navigation, error handling
+  - Tests are strongly independent and can run in parallel
+  - Requires backend API to be running
+
+```bash
+# Run unit tests
+npm test
+
+# Run E2E tests (requires backend)
+cd client
+./e2e/setup-backend.sh  # Start backend if not running
+npm run test:e2e
+
+# Run E2E tests in headed mode (visual)
+npx playwright test --headed
+
+# View E2E test report
+npx playwright show-report
+```
 
 ### API Integration
 
@@ -405,6 +435,8 @@ docker run -p 3000:80 ai-agent-client
 - **TanStack Query**: Powerful data synchronization and caching
 - **Axios**: Promise-based HTTP client
 - **ESLint 9**: Code quality with flat config
+- **Vitest**: Unit testing framework
+- **Playwright**: E2E testing framework for comprehensive workflow testing
 - **Docker**: Containerized deployment with Nginx
 
 ## Troubleshooting

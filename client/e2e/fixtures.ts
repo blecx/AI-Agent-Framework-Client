@@ -16,6 +16,7 @@ type TestFixtures = {
  */
 export const test = base.extend<TestFixtures>({
   // API helper fixture - provides direct API access
+  // eslint-disable-next-line no-empty-pattern
   apiHelper: async ({}, use) => {
     const apiBaseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
     const helper = new E2EApiHelper(apiBaseUrl);
@@ -33,6 +34,7 @@ export const test = base.extend<TestFixtures>({
   },
 
   // Unique project key fixture - ensures each test has a unique project
+  // eslint-disable-next-line no-empty-pattern
   uniqueProjectKey: async ({}, use) => {
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 8);

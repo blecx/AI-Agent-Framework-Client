@@ -4,7 +4,6 @@
  */
 
 import { test, expect } from '../fixtures';
-import { generateProjectData } from '../helpers/test-data';
 import { createProjectViaUI, waitForSuccessToast } from '../helpers/ui-helpers';
 
 test.describe('Project Creation', () => {

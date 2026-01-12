@@ -16,7 +16,7 @@ test.describe('Apply Proposal', () => {
     };
     await apiHelper.createProject(projectData.key, projectData.name);
 
-    const proposalData = generateProposalData(projectData.key);
+    const proposalData = generateProposalData();
     const proposal = await apiHelper.createProposal(projectData.key, proposalData);
 
     // Navigate to project
@@ -67,7 +67,7 @@ test.describe('Apply Proposal', () => {
   test('should reject a proposal', async ({ page, apiHelper, uniqueProjectKey }) => {
     // Setup: Create project and proposal via API
     await apiHelper.createProject(uniqueProjectKey, `Test Project ${Date.now()}`);
-    const proposalData = generateProposalData(uniqueProjectKey);
+    const proposalData = generateProposalData();
     const proposal = await apiHelper.createProposal(uniqueProjectKey, proposalData);
 
     // Navigate to Apply tab

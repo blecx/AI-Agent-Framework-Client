@@ -28,7 +28,7 @@ test.describe('Proposal Creation', () => {
     await page.waitForSelector('.propose-panel', { state: 'visible' });
 
     // Generate proposal data
-    const proposalData = generateProposalData(projectData.key);
+    const proposalData = generateProposalData();
 
     // Fill in proposal details
     await page.fill('input[placeholder*="title" i], input#title, input[name="title"]', proposalData.title);
