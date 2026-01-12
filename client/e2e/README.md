@@ -94,6 +94,36 @@ npm ci
 # 3. Install Playwright browsers (first time only)
 npx playwright install --with-deps
 
+# 4. Run E2E tests (automated setup)
+./run-e2e-tests.sh
+
+# This script will:
+# - Check dependencies
+# - Install Playwright browsers if needed
+# - Start backend API automatically
+# - Run all E2E tests
+# - Show results and report location
+
+# Optional: Pass Playwright arguments
+./run-e2e-tests.sh --headed  # Run in headed mode
+./run-e2e-tests.sh --debug   # Run in debug mode
+./run-e2e-tests.sh e2e/tests/01-project-creation.spec.ts  # Run specific test
+```
+
+### Manual Setup
+
+If you prefer manual control:
+
+```bash
+# 1. Navigate to client directory
+cd client
+
+# 2. Install dependencies (if not already done)
+npm ci
+
+# 3. Install Playwright browsers (first time only)
+npx playwright install --with-deps
+
 # 4. Start backend API (if not already running)
 ./e2e/setup-backend.sh
 # OR start manually (see Prerequisites)
@@ -288,34 +318,31 @@ test.describe('Feature Name', () => {
 
 ### GitHub Actions
 
-The E2E tests run in the `client-e2e` job after the main CI passes:
+The E2E tests run in the `client-e2e` job after the main CI passes. See [CI Setup Notes](CI-SETUP.md) for detailed configuration.
+
+**Important**: The CI workflow expects a backend Docker image at `ghcr.io/blecx/ai-agent-framework:latest`. 
+- If this image doesn't exist yet, see [CI-SETUP.md](CI-SETUP.md) for alternatives
+- The backend image must be built and published from the AI-Agent-Framework repository
+
+### CI Workflow Overview
 
 ```yaml
 client-e2e:
   runs-on: ubuntu-latest
   needs: client-ci
   
-  steps:
-    - uses: actions/checkout@v4
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright browsers
-      run: npx playwright install --with-deps
-    - name: Setup backend
-      run: ./e2e/setup-backend.sh
-    - name: Run E2E tests
-      run: npx playwright test
-    - name: Upload artifacts
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: playwright-report
-        path: playwright-report/
+  services:
+    - backend:
+        image: ghcr.io/blecx/ai-agent-framework:latest
 ```
+
+The workflow:
+1. Starts backend API as a Docker service
+2. Installs Node.js and dependencies
+3. Installs Playwright browsers
+4. Waits for backend health check
+5. Runs E2E tests
+6. Uploads artifacts on failure
 
 ### Artifacts on Failure
 
