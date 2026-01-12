@@ -33,6 +33,14 @@ test.describe('Apply Proposal', () => {
     const proposalItem = page.locator('.proposal-item, [data-proposal-id]').first();
     await expect(proposalItem).toBeVisible({ timeout: 10000 });
 
+    // Setup response promise BEFORE clicking to avoid race condition
+    const responsePromise = page.waitForResponse(
+      (response) =>
+        response.url().includes(`/proposals/${proposal.id}/apply`) &&
+        response.request().method() === 'POST',
+      { timeout: 30000 }
+    );
+
     // Click apply button
     const applyButton = proposalItem.locator('button:has-text("Apply")');
     await applyButton.click();
@@ -42,16 +50,20 @@ test.describe('Apply Proposal', () => {
     const isDialogVisible = await confirmDialog.isVisible({ timeout: 2000 }).catch(() => false);
     
     if (isDialogVisible) {
-      await page.click('button:has-text("Confirm"), button:has-text("Yes"), button:has-text("Apply")');
+      // Find and click the confirm button specifically within the dialog
+      const confirmButton = confirmDialog.locator('button:has-text("Confirm")');
+      const yesButton = confirmDialog.locator('button:has-text("Yes")');
+      const applyConfirmButton = confirmDialog.locator('button:has-text("Apply")');
+      
+      // Try each button type in order of specificity
+      if (await confirmButton.isVisible().catch(() => false)) {
+        await confirmButton.click();
+      } else if (await yesButton.isVisible().catch(() => false)) {
+        await yesButton.click();
+      } else if (await applyConfirmButton.isVisible().catch(() => false)) {
+        await applyConfirmButton.click();
+      }
     }
-
-    // Listen for API call
-    const responsePromise = page.waitForResponse(
-      (response) =>
-        response.url().includes(`/proposals/${proposal.id}/apply`) &&
-        response.request().method() === 'POST',
-      { timeout: 30000 }
-    );
 
     await responsePromise;
 
@@ -88,7 +100,19 @@ test.describe('Apply Proposal', () => {
     const isDialogVisible = await confirmDialog.isVisible({ timeout: 2000 }).catch(() => false);
     
     if (isDialogVisible) {
-      await page.click('button:has-text("Confirm"), button:has-text("Yes"), button:has-text("Reject")');
+      // Find and click the confirm button specifically within the dialog
+      const confirmButton = confirmDialog.locator('button:has-text("Confirm")');
+      const yesButton = confirmDialog.locator('button:has-text("Yes")');
+      const rejectConfirmButton = confirmDialog.locator('button:has-text("Reject")');
+      
+      // Try each button type in order of specificity
+      if (await confirmButton.isVisible().catch(() => false)) {
+        await confirmButton.click();
+      } else if (await yesButton.isVisible().catch(() => false)) {
+        await yesButton.click();
+      } else if (await rejectConfirmButton.isVisible().catch(() => false)) {
+        await rejectConfirmButton.click();
+      }
     }
 
     // Wait for success
