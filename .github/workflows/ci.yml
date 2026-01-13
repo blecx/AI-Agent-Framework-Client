@@ -71,6 +71,23 @@ jobs:
       run: |
         pip install -r requirements.txt
     
+    - name: Verify backend structure
+      working-directory: backend
+      run: |
+        echo "Backend directory contents:"
+        ls -la
+        echo ""
+        echo "Checking for main.py or main.app:"
+        if [ -f "main.py" ]; then
+          echo "✓ main.py found"
+        else
+          echo "✗ main.py not found"
+          exit 1
+        fi
+        echo ""
+        echo "Python packages installed:"
+        pip list | grep -E "(fastapi|uvicorn)" || echo "Warning: FastAPI or Uvicorn not found"
+    
     - name: Start backend API
       working-directory: backend
       env:
@@ -79,10 +96,23 @@ jobs:
         HOST: 0.0.0.0
       run: |
         mkdir -p /tmp/test-docs
+        # Create minimal config if needed
+        mkdir -p config
+        echo '{}' > config/llm.json || true
         # Start backend in background
-        nohup uvicorn main:app --host 0.0.0.0 --port 8000 > /tmp/backend.log 2>&1 &
+        nohup uvicorn main:app --host 0.0.0.0 --port 8000 --log-level debug > /tmp/backend.log 2>&1 &
         echo $! > /tmp/backend.pid
         echo "Backend started with PID $(cat /tmp/backend.pid)"
+        # Give it a moment to start
+        sleep 3
+        # Check if process is still running
+        if ps -p $(cat /tmp/backend.pid) > /dev/null; then
+          echo "Backend process is running"
+        else
+          echo "Backend process died. Log contents:"
+          cat /tmp/backend.log
+          exit 1
+        fi
     
     - name: Wait for backend to be ready
       run: |
@@ -97,6 +127,9 @@ jobs:
         done
         echo "Backend failed to start. Logs:"
         cat /tmp/backend.log || echo "No log file found"
+        echo ""
+        echo "Checking if backend process is still running:"
+        ps aux | grep uvicorn || echo "No uvicorn process found"
         exit 1
     
     # Install client dependencies and run tests
