@@ -320,29 +320,35 @@ test.describe('Feature Name', () => {
 
 The E2E tests run in the `client-e2e` job after the main CI passes. See [CI Setup Notes](CI-SETUP.md) for detailed configuration.
 
-**Important**: The CI workflow expects a backend Docker image at `ghcr.io/blecx/ai-agent-framework:latest`. 
-- If this image doesn't exist yet, see [CI-SETUP.md](CI-SETUP.md) for alternatives
-- The backend image must be built and published from the AI-Agent-Framework repository
+**Current Setup**: The CI workflow uses a **Python-based backend** that checks out and runs the AI-Agent-Framework repository directly.
 
 ### CI Workflow Overview
 
-```yaml
-client-e2e:
-  runs-on: ubuntu-latest
-  needs: client-ci
-  
-  services:
-    - backend:
-        image: ghcr.io/blecx/ai-agent-framework:latest
-```
-
 The workflow:
-1. Starts backend API as a Docker service
-2. Installs Node.js and dependencies
-3. Installs Playwright browsers
-4. Waits for backend health check
-5. Runs E2E tests
-6. Uploads artifacts on failure
+1. Checks out client repository
+2. Checks out backend repository (`blecx/AI-Agent-Framework`)
+3. Sets up Python 3.11 and installs backend dependencies
+4. Starts backend via `uvicorn` in background
+5. Waits for backend health check (up to 60 seconds)
+6. Installs Node.js and Playwright
+7. Runs E2E tests
+8. Uploads artifacts on failure (screenshots, videos, backend logs)
+
+### Benefits
+
+✅ No Docker image required - works immediately  
+✅ Uses latest backend code - always in sync  
+✅ Fast pip caching - quick CI runs  
+✅ Backend logs available for debugging  
+
+### Monitoring CI
+
+**Artifacts on Failure:**
+- `playwright-report/` - HTML test report
+- `test-screenshots/` - Screenshots from failed tests  
+- `backend-logs` - Backend API logs for debugging
+
+**Access**: GitHub Actions → Workflow Run → Artifacts section
 
 ### Artifacts on Failure
 

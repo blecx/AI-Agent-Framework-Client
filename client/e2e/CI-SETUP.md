@@ -2,83 +2,101 @@
 
 ## Current CI Configuration
 
-The E2E tests in CI use a Docker service container for the backend API. The workflow is configured to use:
+The E2E tests in CI use a **Python-based backend setup** that checks out and runs the backend repository directly.
+
+### How It Works
+
+The workflow:
+1. Checks out the client repository
+2. Checks out the backend repository (`blecx/AI-Agent-Framework`)
+3. Sets up Python 3.11 with pip caching
+4. Installs backend dependencies from `requirements.txt`
+5. Starts backend via `uvicorn` in background
+6. Waits for backend health check to pass
+7. Runs Playwright E2E tests
+8. Uploads artifacts on failure (reports, screenshots, backend logs)
 
 ```yaml
-services:
-  backend:
-    image: ghcr.io/blecx/ai-agent-framework:latest
+- name: Checkout backend
+  uses: actions/checkout@v4
+  with:
+    repository: blecx/AI-Agent-Framework
+    path: backend
+
+- name: Setup Python
+  uses: actions/setup-python@v5
+  with:
+    python-version: '3.11'
+    cache: 'pip'
+
+- name: Start backend API
+  run: |
+    cd backend
+    pip install -r requirements.txt
+    nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
 ```
+
+## Benefits of Python-Based Approach
+
+✅ **No Docker image required** - Works immediately without publishing images  
+✅ **Uses latest backend code** - Always tests against current backend  
+✅ **Fast pip caching** - Dependencies cached between runs  
+✅ **Easy debugging** - Backend logs uploaded on failure  
+✅ **Flexible configuration** - Environment variables easily adjusted  
 
 ## Important Notes
 
-### Backend Docker Image
+### Backend Repository Access
 
-**REQUIRED**: The CI workflow expects a Docker image to be published at `ghcr.io/blecx/ai-agent-framework:latest`.
-
-#### Publishing the Backend Image
-
-If the backend image doesn't exist yet, you'll need to:
-
-1. **Build and push from the backend repo**:
-   ```bash
-   cd AI-Agent-Framework
-   docker build -t ghcr.io/blecx/ai-agent-framework:latest .
-   docker login ghcr.io
-   docker push ghcr.io/blecx/ai-agent-framework:latest
+The CI workflow checks out the public `blecx/AI-Agent-Framework` repository. If the backend is private:
+1. Generate a Personal Access Token (PAT) with `repo` scope
+2. Add it as a repository secret (e.g., `BACKEND_ACCESS_TOKEN`)
+3. Update checkout step:
+   ```yaml
+   - name: Checkout backend
+     uses: actions/checkout@v4
+     with:
+       repository: blecx/AI-Agent-Framework
+       path: backend
+       token: ${{ secrets.BACKEND_ACCESS_TOKEN }}
    ```
 
-2. **Or set up automated builds** in the backend repo's GitHub Actions
+### Backend Requirements
 
-### Alternative: Skip E2E in CI Initially
+The backend must:
+- Have a `requirements.txt` file at the root
+- Start via `uvicorn main:app`
+- Expose a `/health` endpoint
+- Run on port 8000 (configurable via PORT env var)
 
-If you want to merge this PR before the backend image is available, you can temporarily disable E2E tests in CI:
+### Environment Variables
 
-**Option 1**: Comment out the `client-e2e` job in `.github/workflows/ci.yml`
+Backend configuration:
+- `PROJECT_DOCS_PATH=/tmp/test-docs` - Isolated test data directory
+- `PORT=8000` - API port
+- `HOST=0.0.0.0` - Listen on all interfaces
 
-**Option 2**: Add a condition to only run when backend image is available:
+## Alternative: Docker Service Container
+
+If you later publish a Docker image, you can switch back to the service container approach:
+
 ```yaml
 client-e2e:
-  runs-on: ubuntu-latest
-  needs: client-ci
-  if: false  # Temporarily disable until backend image is available
+  services:
+    backend:
+      image: ghcr.io/blecx/ai-agent-framework:latest
+      ports:
+        - 8000:8000
+      env:
+        PROJECT_DOCS_PATH: /tmp/test-docs
 ```
 
-**Option 3**: Use a mock backend or test double (requires additional setup)
-
-### Alternative: Use Python Setup in CI
-
-Instead of Docker service, you could check out and run the backend directly:
-
-```yaml
-client-e2e:
-  runs-on: ubuntu-latest
-  needs: client-ci
-  
-  steps:
-    - uses: actions/checkout@v4
-      with:
-        repository: blecx/AI-Agent-Framework
-        path: backend
-    
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    
-    - name: Install backend dependencies
-      working-directory: backend
-      run: |
-        pip install -r requirements.txt
-    
-    - name: Start backend
-      working-directory: backend
-      run: |
-        uvicorn main:app --host 0.0.0.0 --port 8000 &
-        sleep 10
-        curl -f http://localhost:8000/health
-    
-    # ... rest of E2E test steps
+**To publish the backend image:**
+```bash
+cd AI-Agent-Framework
+docker build -t ghcr.io/blecx/ai-agent-framework:latest .
+echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+docker push ghcr.io/blecx/ai-agent-framework:latest
 ```
 
 ## Testing CI Changes
