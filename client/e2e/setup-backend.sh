@@ -1,6 +1,6 @@
 #!/bin/bash
-# E2E Backend Setup Script
-# Starts the backend API for E2E testing
+# E2E Backend Setup Script with Smart Dependency Resolution
+# Starts the backend API for E2E testing with automatic fallback strategies
 
 set -e
 
@@ -12,95 +12,241 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 API_PORT="${API_PORT:-8000}"
 API_HOST="${API_HOST:-localhost}"
 API_BASE_URL="http://${API_HOST}:${API_PORT}"
+BACKEND_REPO="${BACKEND_REPO:-https://github.com/blecx/AI-Agent-Framework.git}"
+LOG_FILE="${LOG_FILE:-/tmp/backend-setup.log}"
 
 # Check if backend repo is cloned alongside this repo
 BACKEND_DIR="${BACKEND_DIR:-${REPO_ROOT}/../AI-Agent-Framework}"
 
-echo "=== E2E Backend Setup ==="
-echo "Backend directory: $BACKEND_DIR"
-echo "API URL: $API_BASE_URL"
-echo ""
+# Initialize log file
+echo "=== E2E Backend Setup - $(date) ===" > "$LOG_FILE"
 
-# Check if backend directory exists
+# Logging functions
+log() {
+  echo "$1" | tee -a "$LOG_FILE"
+}
+
+log_error() {
+  echo "✗ $1" | tee -a "$LOG_FILE"
+}
+
+log_success() {
+  echo "✓ $1" | tee -a "$LOG_FILE"
+}
+
+log_attempt() {
+  echo "→ $1" | tee -a "$LOG_FILE"
+}
+
+# Health check function
+check_backend_health() {
+  curl -s "$API_BASE_URL/health" > /dev/null 2>&1
+}
+
+# Wait for backend to be ready
+wait_for_backend() {
+  local max_attempts="${1:-30}"
+  local attempt_num=0
+  
+  log_attempt "Waiting for API to be ready (max $max_attempts attempts)..."
+  for i in $(seq 1 $max_attempts); do
+    if check_backend_health; then
+      return 0
+    fi
+    echo -n "." | tee -a "$LOG_FILE"
+    sleep 2
+  done
+  
+  return 1
+}
+
+# Start backend with uvicorn
+start_backend_uvicorn() {
+  local log_file="${1:-/tmp/backend-e2e.log}"
+  
+  # Find main.py location
+  if [ -f "main.py" ]; then
+    local main_module="main:app"
+  elif [ -f "apps/main.py" ]; then
+    local main_module="apps.main:app"
+  else
+    log_error "Cannot find main.py or apps/main.py"
+    return 1
+  fi
+  
+  # Start uvicorn in background
+  uvicorn "$main_module" --host "$API_HOST" --port "$API_PORT" --log-level info > "$log_file" 2>&1 &
+  BACKEND_PID=$!
+  echo $BACKEND_PID > /tmp/backend-e2e.pid
+  log_success "Backend started with PID: $BACKEND_PID"
+  
+  return 0
+}
+
+# Validate repository URL
+validate_repo_url() {
+  local url="$1"
+  
+  # Only allow GitHub URLs for security
+  if [[ ! "$url" =~ ^https://github\.com/[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+\.git$ ]]; then
+    log_error "Invalid repository URL: $url"
+    log "For security, only GitHub URLs are allowed: https://github.com/owner/repo.git"
+    return 1
+  fi
+  
+  return 0
+}
+
+log ""
+log "=== E2E Backend Setup ==="
+log "Backend directory: $BACKEND_DIR"
+log "API URL: $API_BASE_URL"
+log "Log file: $LOG_FILE"
+log ""
+
+# Smart dependency resolution: Try to clone backend if not found
 if [ ! -d "$BACKEND_DIR" ]; then
-  echo "❌ Backend not found at: $BACKEND_DIR"
-  echo ""
-  echo "Please clone the backend repository:"
-  echo "  cd $(dirname "$BACKEND_DIR")"
-  echo "  git clone https://github.com/blecx/AI-Agent-Framework.git"
-  echo ""
-  echo "Or set BACKEND_DIR environment variable to point to your backend location."
-  exit 1
+  log_error "Backend not found at: $BACKEND_DIR"
+  log ""
+  log_attempt "Attempting to clone backend repository..."
+  
+  # Validate repository URL
+  if ! validate_repo_url "$BACKEND_REPO"; then
+    log ""
+    log "RESOLUTION REQUIRED:"
+    log "  1. Clone manually: git clone $BACKEND_REPO $BACKEND_DIR"
+    log "  2. Or set BACKEND_DIR to existing backend location"
+    log "  3. Or start backend manually on port $API_PORT"
+    log ""
+    log "See log file: $LOG_FILE"
+    exit 1
+  fi
+  
+  # Try to clone the backend repository
+  PARENT_DIR="$(dirname "$BACKEND_DIR")"
+  mkdir -p "$PARENT_DIR"
+  
+  if git clone "$BACKEND_REPO" "$BACKEND_DIR" >> "$LOG_FILE" 2>&1; then
+    log_success "Backend repository cloned successfully"
+  else
+    log_error "Failed to clone backend repository"
+    log ""
+    log "RESOLUTION REQUIRED:"
+    log "  1. Clone manually: git clone $BACKEND_REPO $BACKEND_DIR"
+    log "  2. Or set BACKEND_DIR to existing backend location"
+    log "  3. Or start backend manually on port $API_PORT"
+    log ""
+    log "See log file: $LOG_FILE"
+    exit 1
+  fi
 fi
 
-echo "✓ Backend directory found"
+log_success "Backend directory found"
 
 # Check if backend is already running
-if curl -s "$API_BASE_URL/health" > /dev/null 2>&1; then
-  echo "✓ Backend API is already running at $API_BASE_URL"
-  echo "✓ Health check passed"
+log_attempt "Checking if backend is already running..."
+if check_backend_health; then
+  log_success "Backend API is already running at $API_BASE_URL"
+  log_success "Health check passed"
   exit 0
 fi
 
-echo "Starting backend API..."
+log "Backend not running, attempting to start..."
+log ""
 
-# Check if Docker is available and docker-compose.yml exists
+# Strategy 1: Try Docker Compose
 if command -v docker &> /dev/null && [ -f "$BACKEND_DIR/docker-compose.yml" ]; then
-  echo "Starting backend via Docker Compose..."
+  log_attempt "Method 1: Starting backend via Docker Compose..."
   cd "$BACKEND_DIR"
-  docker compose up -d
   
-  # Wait for API to be ready
-  echo "Waiting for API to be ready..."
-  for i in {1..30}; do
-    if curl -s "$API_BASE_URL/health" > /dev/null 2>&1; then
-      echo "✓ Backend API is ready at $API_BASE_URL"
+  if docker compose up -d >> "$LOG_FILE" 2>&1; then
+    log_success "Docker Compose started successfully"
+    
+    if wait_for_backend 30; then
+      log_success "Backend API is ready at $API_BASE_URL"
       exit 0
+    else
+      log ""
+      log_error "Backend API did not start in time after Docker Compose"
+      log "Check logs: cd $BACKEND_DIR && docker compose logs"
+      docker compose logs >> "$LOG_FILE" 2>&1 || true
+      # Don't exit yet, try next method
     fi
-    echo -n "."
-    sleep 2
-  done
-  
-  echo ""
-  echo "❌ Backend API did not start in time"
-  echo "Check logs: cd $BACKEND_DIR && docker compose logs"
-  exit 1
+  else
+    log_error "Docker Compose failed to start"
+  fi
+fi
 
-# Check if Python virtual environment exists
-elif [ -f "$BACKEND_DIR/venv/bin/activate" ]; then
-  echo "Starting backend via Python virtual environment..."
+# Strategy 2: Try Python venv
+if [ -f "$BACKEND_DIR/venv/bin/activate" ]; then
+  log_attempt "Method 2: Starting backend via Python virtual environment..."
   cd "$BACKEND_DIR"
   source venv/bin/activate
   
-  # Start uvicorn in background
-  uvicorn main:app --host "$API_HOST" --port "$API_PORT" --log-level info > /tmp/backend-e2e.log 2>&1 &
-  BACKEND_PID=$!
-  echo $BACKEND_PID > /tmp/backend-e2e.pid
-  
-  # Wait for API to be ready
-  echo "Waiting for API to be ready..."
-  for i in {1..30}; do
-    if curl -s "$API_BASE_URL/health" > /dev/null 2>&1; then
-      echo "✓ Backend API is ready at $API_BASE_URL (PID: $BACKEND_PID)"
-      echo "Log file: /tmp/backend-e2e.log"
+  if start_backend_uvicorn /tmp/backend-e2e.log; then
+    if wait_for_backend 30; then
+      log_success "Backend API is ready at $API_BASE_URL (PID: $BACKEND_PID)"
+      log "Log file: /tmp/backend-e2e.log"
       exit 0
+    else
+      log ""
+      log_error "Backend API did not start in time via Python venv"
+      log "Backend logs:"
+      cat /tmp/backend-e2e.log | tee -a "$LOG_FILE"
+      kill $BACKEND_PID 2>/dev/null || true
+      # Don't exit yet, try next method
     fi
-    echo -n "."
-    sleep 2
-  done
-  
-  echo ""
-  echo "❌ Backend API did not start in time"
-  echo "Check logs: tail /tmp/backend-e2e.log"
-  kill $BACKEND_PID 2>/dev/null || true
-  exit 1
-
-else
-  echo "❌ Could not determine how to start the backend"
-  echo ""
-  echo "Please either:"
-  echo "  1. Start backend manually (Docker or uvicorn)"
-  echo "  2. Ensure Docker is installed and backend has docker-compose.yml"
-  echo "  3. Create Python venv in backend: python -m venv venv && source venv/bin/activate && pip install -r requirements.txt"
-  exit 1
+  fi
 fi
+
+# Strategy 3: Try to create Python venv and install dependencies
+if [ -f "$BACKEND_DIR/requirements.txt" ] && command -v python3 &> /dev/null; then
+  log_attempt "Method 3: Creating Python venv and installing dependencies..."
+  cd "$BACKEND_DIR"
+  
+  if python3 -m venv venv >> "$LOG_FILE" 2>&1; then
+    log_success "Python venv created"
+    source venv/bin/activate
+    
+    log_attempt "Installing backend dependencies..."
+    if pip install -r requirements.txt >> "$LOG_FILE" 2>&1; then
+      log_success "Dependencies installed"
+      
+      log_attempt "Starting backend with uvicorn..."
+      if start_backend_uvicorn /tmp/backend-e2e.log; then
+        if wait_for_backend 30; then
+          log_success "Backend API is ready at $API_BASE_URL (PID: $BACKEND_PID)"
+          log "Log file: /tmp/backend-e2e.log"
+          exit 0
+        else
+          log ""
+          log_error "Backend API did not start in time after fresh install"
+          log "Backend logs:"
+          cat /tmp/backend-e2e.log | tee -a "$LOG_FILE"
+          kill $BACKEND_PID 2>/dev/null || true
+        fi
+      fi
+    else
+      log_error "Failed to install dependencies"
+    fi
+  else
+    log_error "Failed to create Python venv"
+  fi
+fi
+
+# All strategies failed
+log ""
+log_error "All backend startup strategies failed"
+log ""
+log "ATTEMPTED METHODS:"
+log "  1. Docker Compose - FAILED or unavailable"
+log "  2. Existing Python venv - FAILED or unavailable"
+log "  3. Create new Python venv - FAILED or unavailable"
+log ""
+log "RESOLUTION REQUIRED:"
+log "  1. Start backend manually: cd $BACKEND_DIR && docker compose up -d"
+log "  2. Or create Python venv: cd $BACKEND_DIR && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && uvicorn main:app --reload"
+log "  3. Or verify backend has docker-compose.yml or requirements.txt"
+log ""
+log "See detailed log: $LOG_FILE"
+exit 1
