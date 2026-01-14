@@ -2,15 +2,15 @@
 
 ## Overview
 
-The client E2E tests require a running backend API to test against. This document explains the backend requirements and how the CI system automatically detects and starts the backend.
+The client E2E tests require a running backend API to test against. This document explains the backend requirements and how to automatically detect and start the backend when running E2E tests **locally** or in an optional, manually configured CI job.
 
 ## Philosophy
 
-**E2E tests run by default in CI.** The system attempts to resolve all dependencies automatically. Tests only skip if resolution is truly impossible, with detailed logging explaining why.
+**E2E tests do NOT run by default in CI.** They are intended primarily for local development and debugging. Backend E2E testing is handled by the backend repository's CLI client. When E2E tests are executed locally, the system attempts to resolve all dependencies automatically and only fails if resolution is truly impossible, with detailed logging explaining why.
 
 ## Backend Startup Methods (Priority Order)
 
-The CI automatically detects and uses the best available method:
+The local E2E test runner automatically detects and uses the best available method:
 
 ### 1. E2E Test Harness (Recommended) ✅
 
@@ -102,7 +102,7 @@ def health():
     return {"status": "healthy"}
 ```
 
-**CI starts with**:
+**Local runner starts with**:
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000
 # or
@@ -122,9 +122,9 @@ uvicorn apps.main:app --host 0.0.0.0 --port 8000
 
 **HTTP Status**: 200 OK
 
-The CI polls this endpoint up to 60 times (2 minutes) before failing.
+The local runner polls this endpoint up to 60 times (2 minutes) before failing.
 
-## CI Workflow Behavior
+## Local E2E Test Runner Behavior
 
 ### Automatic Detection
 
@@ -181,7 +181,7 @@ cd client
 
 The script automatically:
 - Detects backend location
-- Uses same priority order as CI
+- Uses same priority order (E2E harness > docker-compose > uvicorn)
 - Starts backend if not running
 - Runs E2E tests
 - Cleans up after completion
@@ -228,10 +228,10 @@ npm run test:e2e
 **Cause**: Application crashes on startup.
 
 **Solution**:
-1. Check backend logs in CI artifacts
+1. Check backend logs in the terminal output
 2. Verify `requirements.txt` has all dependencies
 3. Ensure required config files exist
-4. Test backend locally first
+4. Test backend startup manually first
 
 ### Error: "Backend failed to become healthy"
 
@@ -289,7 +289,7 @@ env:
 - **Expose `/health` endpoint** that returns quickly
 - **Isolate test data** from production/development data
 - **Log startup progress** for debugging
-- **Test locally first** before pushing to CI
+- **Test locally** to ensure everything works
 
 ### ❌ DON'T
 
@@ -297,7 +297,7 @@ env:
 - **Don't use production credentials** in E2E tests
 - **Don't rely on arbitrary sleeps** - use health checks
 - **Don't start long-running migrations** in E2E setup
-- **Don't bind to `127.0.0.1`** - use `0.0.0.0` for CI
+- **Don't bind to `127.0.0.1`** - use `0.0.0.0` for accessibility
 
 ## Migration Guide
 
@@ -317,18 +317,17 @@ env:
 **Migration steps**:
 1. Ensure backend has one of the required files
 2. Test locally: `cd client && ./run-e2e-tests.sh`
-3. Verify CI passes: push to PR
-4. Remove any `run-e2e` labels (no longer needed)
+3. E2E tests are for local development only (not run in CI)
 
 ## Support
 
 ### Getting Help
 
-If E2E tests fail in CI:
+If E2E tests fail locally:
 
-1. **Check CI logs** for "RESOLUTION REQUIRED" messages
-2. **Download artifacts**: `backend-logs`, `playwright-report`
-3. **Run locally**: `cd client && ./run-e2e-tests.sh`
+1. **Check terminal output** for "RESOLUTION REQUIRED" messages
+2. **Review logs**: Backend logs shown in terminal
+3. **Run with debug**: Set `DEBUG=1` before running script
 4. **Verify backend** has required files per this document
 
 ### Contributing
@@ -344,5 +343,5 @@ To improve E2E setup:
 
 - [Backend E2E Testing](https://github.com/blecx/AI-Agent-Framework/blob/main/E2E_TESTING.md)
 - [Client E2E Setup](../client/e2e/README.md)
-- [CI Configuration](../.github/workflows/ci.yml)
+- [E2E Testing Approach](./E2E-TESTING-APPROACH.md) - Explains why E2E tests are local-only
 - [Playwright Documentation](https://playwright.dev)
