@@ -73,6 +73,11 @@ jobs:
       
       - name: Attempt backend dependency resolution
         id: backend_setup
+        # Note: continue-on-error is INTENTIONAL for two-run strategy
+        # First run: Attempt resolution and set output variable
+        # Second run: Check output variable and skip if failed
+        # This allows us to capture logs and display clear skip messages
+        continue-on-error: true
         run: |
           echo "=== Smart Backend Dependency Resolution ==="
           echo "Starting dependency resolution process..."
