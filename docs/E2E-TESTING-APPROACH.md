@@ -92,49 +92,158 @@ This automatically:
 
 See [client/e2e/README.md](../client/e2e/README.md) for detailed setup instructions.
 
-## Future: Optional E2E in CI
+## E2E Tests in CI with Smart Dependency Resolution
 
-For special cases (e.g., testing experimental integrations or releases), E2E tests can be enabled in CI by adding the `run-e2e` label to a PR.
+E2E tests can run in CI with **automatic dependency resolution**. The system intelligently attempts to resolve all backend dependencies and only skips tests when resolution is truly impossible.
 
-### How to Enable (Future Implementation)
+### When E2E Tests Run in CI
 
-1. **Add the `run-e2e` label** to your PR
-2. CI will:
-   - Checkout backend repository
-   - Start backend (using E2E harness if available)
-   - Run Playwright tests
-   - Upload artifacts on failure
+E2E tests run automatically when:
+- Pushing to `main` branch
+- Pull requests with the `run-e2e` label
 
-3. **When to use**:
-   - Testing breaking changes to client-backend contract
-   - Pre-release validation
-   - Investigating CI-specific issues
+### Smart Dependency Resolution
 
-### Implementation
+The CI implements a **two-run strategy** with comprehensive logging:
 
-To implement this, update `.github/workflows/ci.yml` to add:
+**First Run: Attempt Full Resolution**
+1. Check if backend repository is available
+2. If not found, attempt to clone from GitHub
+3. Try multiple startup methods:
+   - Docker Compose (if available)
+   - Existing Python venv (if available)
+   - Create new Python venv and install dependencies
+4. Wait for backend health check
+5. Log all attempts and results
+
+**Second Run: Fallback with Clear Reasoning**
+- Only skip tests if **ALL** resolution methods fail
+- Display detailed explanation of what was tried
+- Provide actionable steps to fix the issue
+- Upload all logs as artifacts for debugging
+
+### Auto-Enable Behavior
+
+⚠️ **This feature is AUTO-ENABLED** when:
+- The `run-e2e` label is added to a PR
+- Pushing to the `main` branch
+
+No additional configuration is needed - the system automatically:
+- Clones the backend repository if needed
+- Installs all dependencies
+- Starts the backend
+- Runs E2E tests
+- Uploads artifacts on failure
+
+### Example: Successful Resolution
+
+```
+=== Smart Backend Dependency Resolution ===
+✗ Backend not found at expected location
+→ Attempting to clone backend repository...
+✓ Backend repository cloned successfully
+→ Creating Python venv and installing dependencies...
+✓ Python venv created
+✓ Dependencies installed
+✓ Backend started with PID: 1234
+✓ Backend API is ready at http://localhost:8000
+Running E2E tests...
+```
+
+### Example: Failed Resolution with Clear Messaging
+
+```
+═══════════════════════════════════════════════════════════
+E2E TESTS SKIPPED - DEPENDENCY RESOLUTION FAILED
+═══════════════════════════════════════════════════════════
+
+The E2E tests were skipped because backend dependencies
+could not be resolved automatically.
+
+ATTEMPTED RESOLUTION METHODS:
+  1. Clone backend repository from GitHub - FAILED
+  2. Start backend via Docker Compose - UNAVAILABLE
+  3. Create Python venv and install dependencies - FAILED
+
+All methods failed. See backend-setup.log artifact for details.
+
+TO FIX:
+  - Ensure backend repository is accessible
+  - Verify backend has requirements.txt or docker-compose.yml
+  - Check backend health endpoint works
+
+For more information:
+  - docs/E2E-CI-DEPENDENCY-RESOLUTION.md
+  - docs/E2E-CI-SETUP.md
+═══════════════════════════════════════════════════════════
+```
+
+### How to Enable for Your PR
+
+1. **Add the `run-e2e` label** to your pull request
+2. CI automatically attempts dependency resolution
+3. E2E tests run if backend is available
+4. Clear skip message if dependencies cannot be resolved
+
+### When to Use
+
+Enable E2E tests in CI when:
+- Testing breaking changes to client-backend contract
+- Validating new features that require backend
+- Pre-release testing
+- Investigating CI-specific issues
+- Debugging client-backend integration problems
+
+### Diagnostics and Artifacts
+
+The CI uploads these artifacts for debugging:
+
+1. **backend-setup-log** - Complete log of all resolution attempts
+2. **playwright-report** - HTML test report (when tests run)
+3. **test-screenshots** - Screenshots from failed tests (when tests fail)
+4. **backend-logs** - Backend runtime logs (when backend starts)
+
+### Configuration
+
+The E2E CI workflow is already implemented in `.github/workflows/ci.yml`:
 
 ```yaml
 client-e2e:
-  if: contains(github.event.pull_request.labels.*.name, 'run-e2e')
+  if: github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'run-e2e')
   runs-on: ubuntu-latest
   needs: client-ci
   
   steps:
-    # Checkout repos
-    - uses: actions/checkout@v4
-    - uses: actions/checkout@v4
-      with:
-        repository: blecx/AI-Agent-Framework
-        path: backend
+    - name: Attempt backend dependency resolution
+      # Smart resolution with multiple fallback methods
     
-    # Setup and start backend
-    # ... (see docs/E2E-BACKEND-REQUIREMENTS.md)
+    - name: Run E2E tests
+      if: backend_available
     
-    # Run E2E tests
-    - working-directory: client
-      run: npx playwright test
+    - name: Skip with clear reasoning
+      if: not backend_available
+    
+    - name: Upload all artifacts
+      # Logs, reports, screenshots, backend logs
 ```
+
+### Comparison: Before vs After
+
+**Before (No CI Support):**
+- ❌ E2E tests never run in CI
+- ❌ No visibility into backend integration issues
+- ❌ Manual testing required for every change
+
+**After (Smart Resolution):**
+- ✅ E2E tests run automatically when enabled
+- ✅ Dependencies resolved automatically when possible
+- ✅ Clear skip messages when resolution fails
+- ✅ Complete diagnostic artifacts
+- ✅ Detailed logs of all resolution attempts
+
+For complete details on the dependency resolution system, see:
+- **[E2E CI Dependency Resolution](E2E-CI-DEPENDENCY-RESOLUTION.md)** - Resolution strategy details
+- **[E2E CI Setup Guide](E2E-CI-SETUP.md)** - Configuration and troubleshooting
 
 ## Benefits of This Approach
 

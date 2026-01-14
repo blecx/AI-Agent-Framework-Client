@@ -326,58 +326,239 @@ test.describe('Feature Name', () => {
 
 ## CI/CD Integration
 
-### GitHub Actions
+### Smart Dependency Resolution in CI
 
-The E2E tests are **optional in CI** and only run when:
+E2E tests in CI now include **intelligent dependency resolution** that automatically:
+- Clones the backend repository if needed
+- Installs all backend dependencies
+- Starts the backend using the best available method
+- Only skips tests if dependencies are truly unresolvable
+
+### When E2E Tests Run
+
+E2E tests run automatically when:
 - Pushing to the `main` branch, OR
 - A PR is labeled with `run-e2e`
 
-This ensures E2E tests don't block development when the backend isn't available.
-
 ### CI Workflow Overview
 
-The workflow:
-1. Checks out client repository
-2. **Optionally** checks out backend (continues if unavailable)
-3. If backend available, uses `backend_e2e_runner.py` or `docker-compose.yml`
-4. Runs E2E tests (continues even if backend unavailable)
-5. Uploads artifacts on failure
+The workflow implements a **two-run strategy**:
+
+**First Run: Attempt Full Resolution**
+1. Checkout client repository
+2. Setup Node.js and Python
+3. Attempt backend dependency resolution:
+   - Try to clone backend repository from GitHub
+   - Try to start via Docker Compose (if available)
+   - Try to start via Python venv (if available)
+   - Try to create new venv and install dependencies
+4. Verify backend health check
+5. Run E2E tests if backend is available
+6. Upload all diagnostic artifacts
+
+**Second Run: Fallback with Clear Messaging**
+- If all resolution attempts fail:
+  - Display detailed skip message
+  - List all attempted methods
+  - Provide actionable fix steps
+  - Upload resolution logs
+
+### Example: Successful Resolution
+
+```
+=== Smart Backend Dependency Resolution ===
+✗ Backend not found at expected location
+→ Attempting to clone backend repository...
+✓ Backend repository cloned successfully
+→ Creating Python venv and installing dependencies...
+✓ Python venv created
+✓ Dependencies installed
+✓ Backend started with PID: 1234
+✓ Backend API is ready at http://localhost:8000
+
+Running E2E tests...
+✓ 14 tests passed
+```
+
+### Example: Failed Resolution
+
+```
+═══════════════════════════════════════════════════════════
+E2E TESTS SKIPPED - DEPENDENCY RESOLUTION FAILED
+═══════════════════════════════════════════════════════════
+
+ATTEMPTED RESOLUTION METHODS:
+  1. Clone backend repository from GitHub - FAILED
+  2. Start backend via Docker Compose - UNAVAILABLE
+  3. Create Python venv and install dependencies - FAILED
+
+See backend-setup-log artifact for detailed logs.
+
+TO FIX:
+  - Ensure backend repository is accessible
+  - Verify backend has requirements.txt
+  - Check backend health endpoint works
+
+For more information:
+  - docs/E2E-CI-DEPENDENCY-RESOLUTION.md
+  - docs/E2E-CI-SETUP.md
+═══════════════════════════════════════════════════════════
+```
 
 ### Running E2E in CI
 
 **For Pull Requests:**
-Add the `run-e2e` label to trigger E2E tests.
+1. Add the `run-e2e` label to your PR
+2. CI automatically attempts dependency resolution
+3. Tests run if backend is available
+4. Clear skip message if dependencies cannot be resolved
 
 **For Main Branch:**
 E2E tests run automatically on every push.
 
-### Benefits
+### Benefits of Smart Resolution
 
-✅ **Non-blocking** - PRs not blocked by E2E test failures  
-✅ **Optional backend** - Works even without backend access  
-✅ **Label-triggered** - Enable per-PR with `run-e2e` label  
-✅ **Uses E2E harness** - Leverages backend's `backend_e2e_runner.py`  
+✅ **Automatic resolution** - Attempts to fix dependency issues  
+✅ **Multiple fallback strategies** - Tries Docker, Python venv, and more  
+✅ **Clear logging** - Detailed logs of all resolution attempts  
+✅ **Diagnostic artifacts** - Logs uploaded for debugging  
+✅ **Actionable messages** - Clear instructions when tests skip  
+✅ **Non-blocking** - PRs not blocked by unresolvable dependencies  
 
 ### Monitoring CI
 
-**Artifacts on Failure:**
-- `playwright-report/` - HTML test report
-- `test-screenshots/` - Screenshots from failed tests  
-- `backend-logs` - Backend API logs (if backend was used)
+**Artifacts Available:**
 
-**Access**: GitHub Actions → Workflow Run → Artifacts section
+Always uploaded:
+- `backend-setup-log` - Complete resolution attempt logs
 
-### Artifacts on Failure
+When tests run:
+- `playwright-report` - HTML test report with full details
+- `backend-logs` - Backend runtime logs
 
-When tests fail in CI:
-- **Screenshots** of failed tests
-- **Videos** of failed tests
-- **Traces** for debugging
-- **HTML report** with full details
+When tests fail:
+- `test-screenshots` - Screenshots from failed tests
+- Trace files for debugging
 
-Access artifacts via GitHub Actions → Workflow → Artifacts.
+**Access**: GitHub Actions → Workflow Run → Artifacts section (bottom of page)
+
+### Documentation
+
+For complete details, see:
+- **[E2E CI Dependency Resolution](../../docs/E2E-CI-DEPENDENCY-RESOLUTION.md)** - Resolution strategy and logging
+- **[E2E CI Setup Guide](../../docs/E2E-CI-SETUP.md)** - Configuration and troubleshooting
+- **[E2E Testing Approach](../../docs/E2E-TESTING-APPROACH.md)** - Overall E2E strategy
 
 ## Troubleshooting
+
+### CI Troubleshooting
+
+#### E2E Tests Skipped in CI
+
+**Problem**: CI shows "E2E TESTS SKIPPED - DEPENDENCY RESOLUTION FAILED"
+
+**Solution**:
+
+1. **Download the `backend-setup-log` artifact** from the CI run
+   - Go to Actions tab → Select the workflow run
+   - Scroll to bottom → Artifacts section
+   - Download `backend-setup-log`
+
+2. **Review the log** to see which resolution methods failed:
+   ```
+   ✗ Failed to clone backend repository
+   ✗ Docker Compose failed to start
+   ✗ Failed to install dependencies
+   ```
+
+3. **Fix the blocking issue**:
+   - **Clone failed**: Verify backend repo is accessible (may need `BACKEND_ACCESS_TOKEN` secret for private repos)
+   - **Docker failed**: Backend may not have `docker-compose.yml` (this is OK, other methods will try)
+   - **Dependencies failed**: Backend may be missing `requirements.txt` or have invalid dependencies
+
+4. **Common fixes**:
+   - Ensure backend repository exists at `https://github.com/blecx/AI-Agent-Framework`
+   - For private repos: Add `BACKEND_ACCESS_TOKEN` secret in repository settings
+   - Verify backend has `requirements.txt` with valid dependencies
+   - Check backend has `/health` endpoint that returns 200 OK
+
+5. **See detailed documentation**:
+   - [E2E CI Dependency Resolution](../../docs/E2E-CI-DEPENDENCY-RESOLUTION.md)
+   - [E2E CI Setup Guide](../../docs/E2E-CI-SETUP.md)
+
+#### E2E Tests Run But Fail in CI
+
+**Problem**: Backend starts successfully but tests fail
+
+**Solution**:
+
+1. **Download artifacts**:
+   - `playwright-report` - HTML test report
+   - `test-screenshots` - Screenshots from failed tests
+   - `backend-logs` - Backend runtime logs
+
+2. **Review test failures** in `playwright-report/index.html`
+   - Open in browser to see detailed failure information
+   - Check screenshots to see UI state at failure
+
+3. **Check backend logs** for API errors
+   - Look for 500 errors or exceptions
+   - Verify backend is handling requests correctly
+
+4. **Common issues**:
+   - **Timing differences**: CI is slower, increase timeouts in `playwright.config.ts`
+   - **Environment variables**: Set required env vars in workflow
+   - **Test dependencies**: Ensure `npx playwright install --with-deps chromium` ran
+   - **Hard-coded URLs**: Use environment variables instead of localhost
+
+#### Backend Health Check Timeout
+
+**Problem**: Backend starts but health check never passes
+
+**Solution**:
+
+1. **Check backend logs artifact** for startup errors
+
+2. **Common causes**:
+   - Backend binds to `127.0.0.1` instead of `0.0.0.0` (CI needs 0.0.0.0)
+   - Health endpoint doesn't exist (backend needs `/health` route)
+   - Backend crashes on startup (check logs for exceptions)
+   - Missing environment variables (add to workflow)
+
+3. **Fix in backend**:
+   ```python
+   # Ensure backend binds to all interfaces
+   uvicorn.run(app, host="0.0.0.0", port=8000)
+   
+   # Ensure health endpoint exists
+   @app.get("/health")
+   async def health():
+       return {"status": "healthy"}
+   ```
+
+#### How to Test CI Changes
+
+Before pushing workflow changes:
+
+1. **Test setup script locally**:
+   ```bash
+   export LOG_FILE=/tmp/test-setup.log
+   bash client/e2e/setup-backend.sh
+   cat /tmp/test-setup.log
+   ```
+
+2. **Create a test branch**:
+   ```bash
+   git checkout -b test/ci-e2e
+   git push origin test/ci-e2e
+   ```
+
+3. **Create draft PR with `run-e2e` label**
+   - Review CI logs in Actions tab
+   - Iterate until working
+   - Close PR when done testing
+
+### Local Troubleshooting
 
 ### Backend Not Running
 
