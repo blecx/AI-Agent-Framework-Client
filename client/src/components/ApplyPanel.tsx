@@ -114,16 +114,16 @@ export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
   const selected = proposals.find((p: Proposal) => p.id === selectedProposal);
 
   return (
-    <div className="apply-panel">
+    <div className="apply-panel" data-testid="apply-panel">
       <h2>Apply Proposals</h2>
       <p className="description">
         Review and apply pending proposals. You can preview changes before applying them.
       </p>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="error-message" data-testid="error-message">{error}</div>}
 
       {proposals.length === 0 ? (
-        <div className="empty-state">
+        <div className="empty-state" data-testid="empty-state">
           <p>No proposals yet. Create a proposal in the "Propose Changes" tab.</p>
         </div>
       ) : (
@@ -137,6 +137,8 @@ export default function ApplyPanel({ projectKey }: ApplyPanelProps) {
                 <div
                   key={proposal.id}
                   className={`proposal-item ${selectedProposal === proposal.id ? 'selected' : ''}`}
+                  data-testid={`proposal-item-${proposal.id}`}
+                  data-proposal-id={proposal.id}
                   onClick={() => setSelectedProposal(proposal.id)}
                 >
                   <div className="proposal-header">

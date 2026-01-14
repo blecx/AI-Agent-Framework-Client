@@ -90,6 +90,7 @@ export default function ProjectList() {
         <h1>Projects</h1>
         <button
           className="btn-primary"
+          data-testid="create-project-button"
           onClick={() => setShowCreateForm(!showCreateForm)}
         >
           {showCreateForm ? 'Cancel' : '+ Create Project'}
@@ -99,7 +100,7 @@ export default function ProjectList() {
       {error && <div className="error-message">{error}</div>}
 
       {showCreateForm && (
-        <div className="create-project-form">
+        <div className="create-project-form" data-testid="create-project-form">
           <h2>Create New Project</h2>
           <form onSubmit={handleCreateProject}>
             <div className="form-group">
@@ -168,6 +169,7 @@ export default function ProjectList() {
             <div
               key={project.key}
               className="project-card"
+              data-testid={`project-card-${project.key}`}
               onClick={() => handleViewProject(project.key)}
             >
               <h3>{project.name}</h3>

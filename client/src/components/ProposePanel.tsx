@@ -86,17 +86,17 @@ export default function ProposePanel({ projectKey: propProjectKey }: ProposePane
   };
 
   return (
-    <div className="propose-panel">
+    <div className="propose-panel" data-testid="propose-panel">
       <h2>Propose Document Changes</h2>
       <p className="description">
         Submit a proposal to modify documents in this project. Your changes will be reviewed
         before being applied.
       </p>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="error-message" data-testid="error-message">{error}</div>}
 
       {proposalId && (
-        <div className="success-message">
+        <div className="success-message" data-testid="success-message">
           ✓ Proposal created successfully! ID: <strong>{proposalId}</strong>
           <br />
           Go to the "Apply Proposals" tab to review and apply it.
@@ -140,6 +140,7 @@ export default function ProposePanel({ projectKey: propProjectKey }: ProposePane
           </div>
           <textarea
             id="changesJson"
+            data-testid="proposal-changes-json"
             value={changesJson}
             onChange={(e) => setChangesJson(e.target.value)}
             placeholder='{"files": [{"path": "file.txt", "type": "modify", "after": "new content"}]}'
