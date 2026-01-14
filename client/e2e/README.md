@@ -24,6 +24,16 @@ The E2E test suite validates the complete client-backend integration through the
 4. **Navigation** - Moving between views and accessing artifacts
 5. **Error Handling** - Graceful error handling and edge cases
 
+### Important: E2E Tests Are for Local Development Only
+
+**E2E tests with the backend are NOT run in CI.** Backend E2E testing should be done using the CLI client included in the backend repository (`blecx/AI-Agent-Framework`). This approach:
+- Avoids cross-repository dependencies in CI
+- Keeps backend testing within the backend repository
+- Allows client PRs to pass without backend access
+- Provides full E2E test infrastructure for local development and debugging
+
+For future adoption, E2E tests can be enabled in CI by adding the `run-e2e` label to a PR.
+
 ### Test Independence
 
 **CRITICAL**: All tests are designed to be **strongly independent**:

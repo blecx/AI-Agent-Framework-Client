@@ -2,82 +2,64 @@
 
 ## Overview
 
-E2E tests **run by default** in CI for every PR and push. The CI automatically detects and starts the backend, attempting to resolve all dependencies before failing.
+**E2E tests are NOT run in CI by default.** Backend E2E testing should be done using the CLI client included in the backend repository (`blecx/AI-Agent-Framework`).
 
 ## Design Philosophy
 
-**"Fix, don't skip"** - The CI attempts to resolve dependency issues rather than silently skipping tests. Tests only fail if resolution is truly impossible, with detailed logging explaining why.
+**"Client tests client, backend tests E2E"** - The client repository focuses on client-side unit and integration tests. Full end-to-end tests that require the backend are handled by the backend repository's CLI client, avoiding cross-repository dependencies.
 
-## How It Works
+## Why E2E Tests Are Not in Client CI
 
-### 1. Automatic Backend Detection
+1. **Avoids cross-repository dependencies** - Client PRs don't depend on backend availability
+2. **Clearer separation of concerns** - Backend tests backend, client tests client
+3. **Faster CI** - No waiting for backend startup or health checks
+4. **Better testing approach** - Backend's CLI client provides comprehensive E2E coverage
 
-The CI analyzes the backend repository and selects the best startup method:
+## Local E2E Testing
 
-```yaml
-- name: Analyze backend structure
-  run: |
-    # Priority order:
-    # 1. backend_e2e_runner.py (E2E harness)
-    # 2. docker-compose.yml (containerized)
-    # 3. main.py or apps/main.py (direct FastAPI)
-```
-
-### 2. Dependency Resolution
-
-The CI attempts to fix common issues automatically:
-
-- **Missing configs**: Creates `config/llm.json`
-- **Test directories**: Creates `/tmp/test-docs`
-- **Dependencies**: Installs from `requirements.txt`
-- **Process monitoring**: Verifies backend stays running
-
-### 3. Health Check Validation
-
-The CI polls `http://localhost:8000/health` for up to 2 minutes:
+The E2E test infrastructure is **fully available for local development**:
 
 ```bash
-for i in {1..60}; do
-  curl -f http://localhost:8000/health && break
-  sleep 2
-done
+cd client
+./run-e2e-tests.sh  # Automatically starts backend if needed
 ```
 
-### 4. Detailed Error Reporting
+This is useful for:
+- Debugging client-backend integration issues locally
+- Testing UI workflows during development
+- Validating changes before submitting to backend E2E tests
 
-If backend fails to start, CI:
-1. Logs the specific failure reason
-2. Lists required files that are missing
-3. Uploads diagnostic artifacts
-4. **Fails the build** (does not skip)
+## Future: Enabling E2E in CI
+
+For special cases (e.g., testing experimental integrations), E2E tests can be enabled by adding the `run-e2e` label to a PR.
+
+**To enable E2E tests in CI:**
+1. Add the `run-e2e` label to your PR
+2. Ensure backend repository is accessible
+3. CI will run the full E2E suite
+
+**Implementation note**: To fully implement this, add a conditional job to `.github/workflows/ci.yml`:
+
+```yaml
+client-e2e:
+  if: contains(github.event.pull_request.labels.*.name, 'run-e2e')
+  runs-on: ubuntu-latest
+  # ... steps to checkout backend, start it, run tests
+```
 
 ## Backend Requirements
 
-See **[E2E Backend Requirements](E2E-BACKEND-REQUIREMENTS.md)** for complete details.
+See **[E2E Backend Requirements](../../docs/E2E-BACKEND-REQUIREMENTS.md)** for complete details.
 
 **Quick summary** - Backend must have ONE of:
-1. `backend_e2e_runner.py` (recommended)
-2. `docker-compose.yml`
+1. `backend_e2e_runner.py` (recommended E2E harness)
+2. `docker-compose.yml` (containerized setup)
 3. `main.py` or `apps/main.py` with FastAPI
 
 Plus:
 - `requirements.txt` with dependencies
 - `/health` endpoint returning 200 OK
 - Listens on `0.0.0.0:8000`
-
-## CI Workflow Structure
-
-```yaml
-client-e2e:
-  runs-on: ubuntu-latest
-  needs: client-ci  # Runs after lint/build/test
-  
-  steps:
-    # 1. Checkout repos
-    - Checkout client repository
-    - Checkout backend repository (REQUIRED)
-    
-    # 2. Setup environments
     - Setup Python 3.11 (for backend)
     - Setup Node.js 20 (for client)
     

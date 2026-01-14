@@ -342,25 +342,29 @@ In the `client/` directory:
 - `npm run preview` - Preview production build locally
 - `npm run lint` - Run ESLint for code quality (must pass before commit)
 - `npm test` - Run unit tests with Vitest
-- `npm run test:e2e` - Run E2E tests with Playwright (requires backend API)
+- `npm run test:e2e` - Run E2E tests with Playwright (requires backend API, local development only)
 
 ### Testing
 
 The project includes comprehensive testing:
 
 - **Unit Tests**: Component and logic tests using Vitest
-- **E2E Tests**: Full workflow tests using Playwright
+- **E2E Tests**: Full workflow tests using Playwright (local development only)
   - See **[E2E Testing Guide](client/e2e/README.md)** for setup and usage
   - Tests cover: project creation, proposals, applying changes, navigation, error handling
   - Tests are strongly independent and can run in parallel
   - Requires backend API to be running
+  - **Note**: E2E tests are NOT run in CI. Backend E2E testing is done using the CLI client in the backend repository.
 
 ```bash
 # Run unit tests
 npm test
 
-# Run E2E tests (requires backend)
+# Run E2E tests (local development, requires backend)
 cd client
+./run-e2e-tests.sh  # Convenience script that handles backend setup
+
+# Or manually:
 ./e2e/setup-backend.sh  # Start backend if not running
 npm run test:e2e
 
