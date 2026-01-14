@@ -1,115 +1,324 @@
-# CI/CD Setup Notes for E2E Tests
+# CI/CD Setup for E2E Tests
 
-## Current CI Configuration
+## Overview
 
-The E2E tests in CI are **optional** and only run when:
-1. Pushing to the `main` branch, OR
-2. A PR is labeled with `run-e2e`
+E2E tests **run by default** in CI for every PR and push. The CI automatically detects and starts the backend, attempting to resolve all dependencies before failing.
 
-This approach ensures that E2E tests don't block development when the backend isn't available.
+## Design Philosophy
 
-### How It Works
+**"Fix, don't skip"** - The CI attempts to resolve dependency issues rather than silently skipping tests. Tests only fail if resolution is truly impossible, with detailed logging explaining why.
 
-The workflow:
-1. Checks out the client repository
-2. **Optionally** checks out the backend repository (continues if this fails)
-3. If backend is available:
-   - Looks for `backend_e2e_runner.py` (recommended)
-   - Falls back to `docker-compose.yml` if harness not found
-   - Starts backend and waits for health check
-4. Runs Playwright E2E tests (continues even if backend unavailable)
-5. Uploads artifacts on failure
+## How It Works
+
+### 1. Automatic Backend Detection
+
+The CI analyzes the backend repository and selects the best startup method:
+
+```yaml
+- name: Analyze backend structure
+  run: |
+    # Priority order:
+    # 1. backend_e2e_runner.py (E2E harness)
+    # 2. docker-compose.yml (containerized)
+    # 3. main.py or apps/main.py (direct FastAPI)
+```
+
+### 2. Dependency Resolution
+
+The CI attempts to fix common issues automatically:
+
+- **Missing configs**: Creates `config/llm.json`
+- **Test directories**: Creates `/tmp/test-docs`
+- **Dependencies**: Installs from `requirements.txt`
+- **Process monitoring**: Verifies backend stays running
+
+### 3. Health Check Validation
+
+The CI polls `http://localhost:8000/health` for up to 2 minutes:
+
+```bash
+for i in {1..60}; do
+  curl -f http://localhost:8000/health && break
+  sleep 2
+done
+```
+
+### 4. Detailed Error Reporting
+
+If backend fails to start, CI:
+1. Logs the specific failure reason
+2. Lists required files that are missing
+3. Uploads diagnostic artifacts
+4. **Fails the build** (does not skip)
+
+## Backend Requirements
+
+See **[E2E Backend Requirements](E2E-BACKEND-REQUIREMENTS.md)** for complete details.
+
+**Quick summary** - Backend must have ONE of:
+1. `backend_e2e_runner.py` (recommended)
+2. `docker-compose.yml`
+3. `main.py` or `apps/main.py` with FastAPI
+
+Plus:
+- `requirements.txt` with dependencies
+- `/health` endpoint returning 200 OK
+- Listens on `0.0.0.0:8000`
+
+## CI Workflow Structure
 
 ```yaml
 client-e2e:
-  # Only run on main or when explicitly requested
-  if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event.pull_request.labels.*.name == 'run-e2e'
+  runs-on: ubuntu-latest
+  needs: client-ci  # Runs after lint/build/test
   
   steps:
-    - name: Checkout backend
-      id: checkout-backend
-      continue-on-error: true  # Don't fail if backend unavailable
-      uses: actions/checkout@v4
-      with:
-        repository: blecx/AI-Agent-Framework
+    # 1. Checkout repos
+    - Checkout client repository
+    - Checkout backend repository (REQUIRED)
+    
+    # 2. Setup environments
+    - Setup Python 3.11 (for backend)
+    - Setup Node.js 20 (for client)
+    
+    # 3. Analyze and start backend
+    - Analyze backend structure
+    - Install backend dependencies
+    - Start backend with detected method
+    - Wait for health check (60 attempts)
+    
+    # 4. Run E2E tests
+    - Install client dependencies
+    - Install Playwright browsers
+    - Run Playwright tests
+    
+    # 5. Upload artifacts on failure
+    - Upload test reports
+    - Upload screenshots
+    - Upload backend logs
+    
+    # 6. Clean up
+    - Stop backend gracefully
 ```
 
-## Benefits of This Approach
+## When Tests Run
 
-✅ **Non-blocking** - E2E tests don't block PRs by default  
-✅ **Optional backend** - Works even if backend repo is unavailable  
-✅ **Uses backend's E2E harness** - Leverages `backend_e2e_runner.py` if available  
-✅ **Fallback support** - Uses docker-compose if harness not found  
-✅ **Label-triggered** - Can be enabled per-PR with `run-e2e` label  
+**Always** - E2E tests run on:
+- Every pull request
+- Every push to any branch
+- Every merge to main
 
-## Running E2E Tests in CI
+**No opt-in required** - Unlike the previous approach, you don't need to add labels.
 
-### Automatic (Main Branch)
-E2E tests run automatically on pushes to `main`.
+## Failure Scenarios
 
-### Manual (Pull Requests)
-Add the `run-e2e` label to your PR to trigger E2E tests:
-1. Open your PR
-2. Add label: `run-e2e`
-3. CI will run E2E tests on next push
+### Scenario 1: Backend Repository Unavailable
 
-### Backend Requirements
+**Error**:
+```
+Error: Repository not found: blecx/AI-Agent-Framework
+```
 
-If the backend is available, it should provide:
-1. **Recommended**: `backend_e2e_runner.py` - E2E test harness
-2. **Alternative**: `docker-compose.yml` - Docker-based setup
-3. **Health endpoint**: `/health` returning 200 when ready
+**Resolution**:
+1. Verify repository exists and is accessible
+2. For private repos, add `BACKEND_ACCESS_TOKEN` secret
+3. Update repository path in workflow if different
 
-## Local Development
+**Status**: **BLOCKS CI** ❌
 
-For local E2E testing, use the provided script:
+### Scenario 2: No Valid Startup Method
+
+**Error**:
+```
+✗ ERROR: Cannot determine backend startup method
+
+RESOLUTION REQUIRED:
+The backend repository must provide one of:
+  1. backend_e2e_runner.py (recommended for E2E tests)
+  2. docker-compose.yml (for Docker-based setup)
+  3. main.py or apps/main.py (for direct FastAPI startup)
+  
+See docs/E2E-BACKEND-REQUIREMENTS.md for details
+```
+
+**Resolution**:
+1. Add one of the required files to backend repository
+2. See [E2E Backend Requirements](E2E-BACKEND-REQUIREMENTS.md)
+
+**Status**: **BLOCKS CI** ❌
+
+### Scenario 3: Backend Fails Health Check
+
+**Error**:
+```
+✗ Backend failed to become healthy after 60 attempts
+
+Backend logs:
+[error logs here]
+```
+
+**Resolution**:
+1. Check backend logs in CI artifacts
+2. Verify `/health` endpoint exists
+3. Ensure backend binds to `0.0.0.0:8000`
+4. Test locally first
+
+**Status**: **BLOCKS CI** ❌
+
+### Scenario 4: E2E Tests Fail
+
+**Error**:
+```
+Tests failed: 3 failed, 11 passed
+```
+
+**Resolution**:
+1. Download `playwright-report` artifact
+2. Review screenshots in `test-screenshots`
+3. Fix failing tests
+4. Re-run CI
+
+**Status**: **BLOCKS CI** ❌
+
+## Artifacts on Failure
+
+The CI uploads diagnostic artifacts when tests fail:
+
+### 1. Playwright Report
+**Path**: `playwright-report/`  
+**Contains**: HTML test report with full details  
+**View**: Download and open `index.html` in browser
+
+### 2. Test Screenshots
+**Path**: `test-screenshots/`  
+**Contains**: Screenshots from failed tests  
+**View**: Download and browse image files
+
+### 3. Backend Logs
+**Path**: `backend.log`  
+**Contains**: Full backend startup and runtime logs  
+**View**: Download and read text file
+
+**Access**: GitHub Actions → Workflow Run → Artifacts section (bottom of page)
+
+## Local Testing
+
+Run E2E tests locally before pushing:
 
 ```bash
 cd client
 ./run-e2e-tests.sh
 ```
 
-The script will:
-- Check if backend is running
-- Attempt to start it automatically (Docker or Python)
-- Run E2E tests
-- Clean up after completion
+The script:
+1. Detects backend automatically
+2. Starts backend if not running
+3. Runs E2E tests
+4. Cleans up after completion
+
+**Same behavior as CI** - Uses same detection logic.
+
+## Comparison: Old vs New Approach
+
+### Old Approach (Commit 79e491b)
+
+```yaml
+client-e2e:
+  # Only run on main or with 'run-e2e' label
+  if: github.ref == 'refs/heads/main' || contains(labels, 'run-e2e')
+  
+  steps:
+    - name: Checkout backend
+      continue-on-error: true  # Don't fail
+    
+    - name: Run tests
+      continue-on-error: true  # Don't fail
+```
+
+**Problems**:
+- ❌ Tests silently skipped if backend unavailable
+- ❌ Requires manual label to enable
+- ❌ Hides dependency issues
+- ❌ No clear error messages
+
+### New Approach (Current)
+
+```yaml
+client-e2e:
+  # Always run
+  
+  steps:
+    - name: Checkout backend
+      # REQUIRED - fails if unavailable
+    
+    - name: Analyze backend structure
+      # Detects startup method or FAILS with clear error
+    
+    - name: Run tests
+      # Fails if tests fail (no continue-on-error)
+```
+
+**Benefits**:
+- ✅ Tests always run
+- ✅ Clear error messages when dependencies missing
+- ✅ Attempts to resolve issues first
+- ✅ Fails visibly with diagnostics
+
+## Advanced Configuration
+
+### Custom Backend Repository
+
+```yaml
+env:
+  BACKEND_REPO: organization/custom-backend
+```
+
+### Extended Timeout
+
+```yaml
+env:
+  BACKEND_STARTUP_TIMEOUT: 120  # seconds
+```
+
+### Custom Health Endpoint
+
+```yaml
+env:
+  BACKEND_HEALTH_ENDPOINT: /api/health
+```
 
 ## Troubleshooting
 
-### E2E tests skipped in CI
-**Cause**: Not running on `main` and no `run-e2e` label.  
-**Solution**: Add `run-e2e` label to PR or merge to `main`.
+### CI fails with "Repository not found"
 
-### Backend checkout fails
-**Cause**: Backend repository not accessible or doesn't exist.  
-**Solution**: This is expected and handled gracefully. E2E tests will be skipped or run with mock data.
+**Solution**: Verify backend repository path and access.
 
-### Backend fails to start
-**Cause**: Missing `backend_e2e_runner.py` or `docker-compose.yml`.  
-**Solution**: Ensure backend repository has proper E2E setup. Check backend logs in CI artifacts.
+### CI fails with "Cannot determine backend startup method"
 
-### Tests fail but backend is healthy
-**Cause**: API contract mismatch or test issues.  
-**Solution**: Check test logs and screenshots in CI artifacts. Verify API compatibility.
+**Solution**: Add required file to backend (see [Requirements](E2E-BACKEND-REQUIREMENTS.md)).
 
-## Alternative Approaches
+### CI fails with "Backend failed to become healthy"
 
-If you don't have access to the backend repository:
+**Solution**: Check backend logs artifact, test locally, verify health endpoint.
 
-### Option 1: Mock Backend
-Create a mock backend in `client/e2e/mock-backend/` for testing:
-```yaml
-- name: Start mock backend
-  working-directory: client/e2e/mock-backend
-  run: npm start &
-```
+### CI passes locally but fails in CI
 
-### Option 2: Skip E2E in CI
-Remove the `run-e2e` label and only run E2E tests locally.
+**Solution**: Check for environment differences, verify all dependencies in `requirements.txt`.
 
-### Option 3: Separate E2E Repository
-Create a dedicated E2E test repository that coordinates both client and backend.
+## Getting Help
+
+1. **Check logs**: Look for "RESOLUTION REQUIRED" messages
+2. **Download artifacts**: `backend-logs`, `playwright-report`, `test-screenshots`
+3. **Test locally**: `cd client && ./run-e2e-tests.sh`
+4. **Read docs**: [E2E Backend Requirements](E2E-BACKEND-REQUIREMENTS.md)
+5. **Check workflow**: [.github/workflows/ci.yml](../.github/workflows/ci.yml)
+
+## References
+
+- [E2E Backend Requirements](E2E-BACKEND-REQUIREMENTS.md) - Detailed backend setup guide
+- [Client E2E Testing](../client/e2e/README.md) - Client-side test documentation
+- [Playwright Documentation](https://playwright.dev) - Playwright test framework docs
+
 
 ## Testing CI Changes
 
