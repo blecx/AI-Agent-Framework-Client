@@ -318,35 +318,42 @@ test.describe('Feature Name', () => {
 
 ### GitHub Actions
 
-The E2E tests run in the `client-e2e` job after the main CI passes. See [CI Setup Notes](CI-SETUP.md) for detailed configuration.
+The E2E tests are **optional in CI** and only run when:
+- Pushing to the `main` branch, OR
+- A PR is labeled with `run-e2e`
 
-**Current Setup**: The CI workflow uses a **Python-based backend** that checks out and runs the AI-Agent-Framework repository directly.
+This ensures E2E tests don't block development when the backend isn't available.
 
 ### CI Workflow Overview
 
 The workflow:
 1. Checks out client repository
-2. Checks out backend repository (`blecx/AI-Agent-Framework`)
-3. Sets up Python 3.11 and installs backend dependencies
-4. Starts backend via `uvicorn` in background
-5. Waits for backend health check (up to 60 seconds)
-6. Installs Node.js and Playwright
-7. Runs E2E tests
-8. Uploads artifacts on failure (screenshots, videos, backend logs)
+2. **Optionally** checks out backend (continues if unavailable)
+3. If backend available, uses `backend_e2e_runner.py` or `docker-compose.yml`
+4. Runs E2E tests (continues even if backend unavailable)
+5. Uploads artifacts on failure
+
+### Running E2E in CI
+
+**For Pull Requests:**
+Add the `run-e2e` label to trigger E2E tests.
+
+**For Main Branch:**
+E2E tests run automatically on every push.
 
 ### Benefits
 
-✅ No Docker image required - works immediately  
-✅ Uses latest backend code - always in sync  
-✅ Fast pip caching - quick CI runs  
-✅ Backend logs available for debugging  
+✅ **Non-blocking** - PRs not blocked by E2E test failures  
+✅ **Optional backend** - Works even without backend access  
+✅ **Label-triggered** - Enable per-PR with `run-e2e` label  
+✅ **Uses E2E harness** - Leverages backend's `backend_e2e_runner.py`  
 
 ### Monitoring CI
 
 **Artifacts on Failure:**
 - `playwright-report/` - HTML test report
 - `test-screenshots/` - Screenshots from failed tests  
-- `backend-logs` - Backend API logs for debugging
+- `backend-logs` - Backend API logs (if backend was used)
 
 **Access**: GitHub Actions → Workflow Run → Artifacts section
 

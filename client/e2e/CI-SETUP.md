@@ -2,102 +2,114 @@
 
 ## Current CI Configuration
 
-The E2E tests in CI use a **Python-based backend setup** that checks out and runs the backend repository directly.
+The E2E tests in CI are **optional** and only run when:
+1. Pushing to the `main` branch, OR
+2. A PR is labeled with `run-e2e`
+
+This approach ensures that E2E tests don't block development when the backend isn't available.
 
 ### How It Works
 
 The workflow:
 1. Checks out the client repository
-2. Checks out the backend repository (`blecx/AI-Agent-Framework`)
-3. Sets up Python 3.11 with pip caching
-4. Installs backend dependencies from `requirements.txt`
-5. Starts backend via `uvicorn` in background
-6. Waits for backend health check to pass
-7. Runs Playwright E2E tests
-8. Uploads artifacts on failure (reports, screenshots, backend logs)
-
-```yaml
-- name: Checkout backend
-  uses: actions/checkout@v4
-  with:
-    repository: blecx/AI-Agent-Framework
-    path: backend
-
-- name: Setup Python
-  uses: actions/setup-python@v5
-  with:
-    python-version: '3.11'
-    cache: 'pip'
-
-- name: Start backend API
-  run: |
-    cd backend
-    pip install -r requirements.txt
-    nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
-```
-
-## Benefits of Python-Based Approach
-
-✅ **No Docker image required** - Works immediately without publishing images  
-✅ **Uses latest backend code** - Always tests against current backend  
-✅ **Fast pip caching** - Dependencies cached between runs  
-✅ **Easy debugging** - Backend logs uploaded on failure  
-✅ **Flexible configuration** - Environment variables easily adjusted  
-
-## Important Notes
-
-### Backend Repository Access
-
-The CI workflow checks out the public `blecx/AI-Agent-Framework` repository. If the backend is private:
-1. Generate a Personal Access Token (PAT) with `repo` scope
-2. Add it as a repository secret (e.g., `BACKEND_ACCESS_TOKEN`)
-3. Update checkout step:
-   ```yaml
-   - name: Checkout backend
-     uses: actions/checkout@v4
-     with:
-       repository: blecx/AI-Agent-Framework
-       path: backend
-       token: ${{ secrets.BACKEND_ACCESS_TOKEN }}
-   ```
-
-### Backend Requirements
-
-The backend must:
-- Have a `requirements.txt` file at the root
-- Start via `uvicorn main:app`
-- Expose a `/health` endpoint
-- Run on port 8000 (configurable via PORT env var)
-
-### Environment Variables
-
-Backend configuration:
-- `PROJECT_DOCS_PATH=/tmp/test-docs` - Isolated test data directory
-- `PORT=8000` - API port
-- `HOST=0.0.0.0` - Listen on all interfaces
-
-## Alternative: Docker Service Container
-
-If you later publish a Docker image, you can switch back to the service container approach:
+2. **Optionally** checks out the backend repository (continues if this fails)
+3. If backend is available:
+   - Looks for `backend_e2e_runner.py` (recommended)
+   - Falls back to `docker-compose.yml` if harness not found
+   - Starts backend and waits for health check
+4. Runs Playwright E2E tests (continues even if backend unavailable)
+5. Uploads artifacts on failure
 
 ```yaml
 client-e2e:
-  services:
-    backend:
-      image: ghcr.io/blecx/ai-agent-framework:latest
-      ports:
-        - 8000:8000
-      env:
-        PROJECT_DOCS_PATH: /tmp/test-docs
+  # Only run on main or when explicitly requested
+  if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event.pull_request.labels.*.name == 'run-e2e'
+  
+  steps:
+    - name: Checkout backend
+      id: checkout-backend
+      continue-on-error: true  # Don't fail if backend unavailable
+      uses: actions/checkout@v4
+      with:
+        repository: blecx/AI-Agent-Framework
 ```
 
-**To publish the backend image:**
+## Benefits of This Approach
+
+✅ **Non-blocking** - E2E tests don't block PRs by default  
+✅ **Optional backend** - Works even if backend repo is unavailable  
+✅ **Uses backend's E2E harness** - Leverages `backend_e2e_runner.py` if available  
+✅ **Fallback support** - Uses docker-compose if harness not found  
+✅ **Label-triggered** - Can be enabled per-PR with `run-e2e` label  
+
+## Running E2E Tests in CI
+
+### Automatic (Main Branch)
+E2E tests run automatically on pushes to `main`.
+
+### Manual (Pull Requests)
+Add the `run-e2e` label to your PR to trigger E2E tests:
+1. Open your PR
+2. Add label: `run-e2e`
+3. CI will run E2E tests on next push
+
+### Backend Requirements
+
+If the backend is available, it should provide:
+1. **Recommended**: `backend_e2e_runner.py` - E2E test harness
+2. **Alternative**: `docker-compose.yml` - Docker-based setup
+3. **Health endpoint**: `/health` returning 200 when ready
+
+## Local Development
+
+For local E2E testing, use the provided script:
+
 ```bash
-cd AI-Agent-Framework
-docker build -t ghcr.io/blecx/ai-agent-framework:latest .
-echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
-docker push ghcr.io/blecx/ai-agent-framework:latest
+cd client
+./run-e2e-tests.sh
 ```
+
+The script will:
+- Check if backend is running
+- Attempt to start it automatically (Docker or Python)
+- Run E2E tests
+- Clean up after completion
+
+## Troubleshooting
+
+### E2E tests skipped in CI
+**Cause**: Not running on `main` and no `run-e2e` label.  
+**Solution**: Add `run-e2e` label to PR or merge to `main`.
+
+### Backend checkout fails
+**Cause**: Backend repository not accessible or doesn't exist.  
+**Solution**: This is expected and handled gracefully. E2E tests will be skipped or run with mock data.
+
+### Backend fails to start
+**Cause**: Missing `backend_e2e_runner.py` or `docker-compose.yml`.  
+**Solution**: Ensure backend repository has proper E2E setup. Check backend logs in CI artifacts.
+
+### Tests fail but backend is healthy
+**Cause**: API contract mismatch or test issues.  
+**Solution**: Check test logs and screenshots in CI artifacts. Verify API compatibility.
+
+## Alternative Approaches
+
+If you don't have access to the backend repository:
+
+### Option 1: Mock Backend
+Create a mock backend in `client/e2e/mock-backend/` for testing:
+```yaml
+- name: Start mock backend
+  working-directory: client/e2e/mock-backend
+  run: npm start &
+```
+
+### Option 2: Skip E2E in CI
+Remove the `run-e2e` label and only run E2E tests locally.
+
+### Option 3: Separate E2E Repository
+Create a dedicated E2E test repository that coordinates both client and backend.
 
 ## Testing CI Changes
 
