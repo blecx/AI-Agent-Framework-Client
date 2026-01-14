@@ -3,7 +3,7 @@
  * Provides reusable functions for common UI interactions
  */
 
-import { Page, expect } from '@playwright/test';
+import { Page, expect, Locator } from '@playwright/test';
 
 /**
  * Wait for navigation to complete
@@ -147,6 +147,30 @@ export async function createProjectViaUI(
  * Switch to a tab in project view
  */
 export async function switchToTab(page: Page, tabName: string) {
-  await page.click(`.project-tabs button:has-text("${tabName}")`);
-  await page.waitForTimeout(500); // Small wait for tab content to render
+  const tabButton = page.locator(`.project-tabs button:has-text("${tabName}")`);
+  await tabButton.click();
+  // Wait deterministically for the tab to become active instead of using an arbitrary timeout
+  await expect(tabButton).toHaveAttribute('aria-selected', 'true');
+}
+
+/**
+ * Confirm a dialog by clicking the appropriate button
+ * Tries multiple button types in order of specificity
+ */
+export async function confirmDialog(page: Page, dialog: Locator) {
+  const confirmButton = dialog.locator('button:has-text("Confirm")');
+  const yesButton = dialog.locator('button:has-text("Yes")');
+  const applyConfirmButton = dialog.locator('button:has-text("Apply")');
+  const rejectConfirmButton = dialog.locator('button:has-text("Reject")');
+  
+  // Try each button type in order of specificity
+  if (await confirmButton.isVisible().catch(() => false)) {
+    await confirmButton.click();
+  } else if (await yesButton.isVisible().catch(() => false)) {
+    await yesButton.click();
+  } else if (await applyConfirmButton.isVisible().catch(() => false)) {
+    await applyConfirmButton.click();
+  } else if (await rejectConfirmButton.isVisible().catch(() => false)) {
+    await rejectConfirmButton.click();
+  }
 }

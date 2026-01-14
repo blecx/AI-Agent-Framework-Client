@@ -37,8 +37,8 @@ test.describe('Proposal Creation', () => {
       proposalData.description
     );
 
-    // Fill in changes JSON
-    const changesTextarea = page.locator('textarea').last();
+    // Fill in changes JSON using specific test-id for better stability
+    const changesTextarea = page.locator('[data-testid="proposal-changes-json"]');
     await changesTextarea.fill(JSON.stringify(proposalData.changes, null, 2));
 
     // Listen for API call

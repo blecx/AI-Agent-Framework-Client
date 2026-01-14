@@ -5,7 +5,7 @@
 
 import { test, expect } from '../fixtures';
 import { generateProposalData } from '../helpers/test-data';
-import { waitForSuccessToast, switchToTab } from '../helpers/ui-helpers';
+import { waitForSuccessToast, switchToTab, confirmDialog } from '../helpers/ui-helpers';
 
 test.describe('Apply Proposal', () => {
   test('should apply a proposal successfully', async ({ page, apiHelper, uniqueProjectKey }) => {
@@ -46,23 +46,11 @@ test.describe('Apply Proposal', () => {
     await applyButton.click();
 
     // Handle confirmation dialog if it appears
-    const confirmDialog = page.locator('.confirm-dialog, [role="dialog"]');
-    const isDialogVisible = await confirmDialog.isVisible({ timeout: 2000 }).catch(() => false);
+    const dialog = page.locator('.confirm-dialog, [role="dialog"]');
+    const isDialogVisible = await dialog.isVisible({ timeout: 2000 }).catch(() => false);
     
     if (isDialogVisible) {
-      // Find and click the confirm button specifically within the dialog
-      const confirmButton = confirmDialog.locator('button:has-text("Confirm")');
-      const yesButton = confirmDialog.locator('button:has-text("Yes")');
-      const applyConfirmButton = confirmDialog.locator('button:has-text("Apply")');
-      
-      // Try each button type in order of specificity
-      if (await confirmButton.isVisible().catch(() => false)) {
-        await confirmButton.click();
-      } else if (await yesButton.isVisible().catch(() => false)) {
-        await yesButton.click();
-      } else if (await applyConfirmButton.isVisible().catch(() => false)) {
-        await applyConfirmButton.click();
-      }
+      await confirmDialog(page, dialog);
     }
 
     await responsePromise;
@@ -96,23 +84,11 @@ test.describe('Apply Proposal', () => {
     await rejectButton.click();
 
     // Handle confirmation dialog
-    const confirmDialog = page.locator('.confirm-dialog, [role="dialog"]');
-    const isDialogVisible = await confirmDialog.isVisible({ timeout: 2000 }).catch(() => false);
+    const dialog = page.locator('.confirm-dialog, [role="dialog"]');
+    const isDialogVisible = await dialog.isVisible({ timeout: 2000 }).catch(() => false);
     
     if (isDialogVisible) {
-      // Find and click the confirm button specifically within the dialog
-      const confirmButton = confirmDialog.locator('button:has-text("Confirm")');
-      const yesButton = confirmDialog.locator('button:has-text("Yes")');
-      const rejectConfirmButton = confirmDialog.locator('button:has-text("Reject")');
-      
-      // Try each button type in order of specificity
-      if (await confirmButton.isVisible().catch(() => false)) {
-        await confirmButton.click();
-      } else if (await yesButton.isVisible().catch(() => false)) {
-        await yesButton.click();
-      } else if (await rejectConfirmButton.isVisible().catch(() => false)) {
-        await rejectConfirmButton.click();
-      }
+      await confirmDialog(page, dialog);
     }
 
     // Wait for success

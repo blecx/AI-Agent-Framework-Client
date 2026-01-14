@@ -139,16 +139,16 @@ The CI polls this endpoint up to 60 times (2 minutes) before failing.
 
 ### Dependency Resolution
 
-The CI **attempts to fix** common issues:
+The setup script **attempts to fix** common issues when running locally:
 
 1. **Missing config files**: Creates `config/llm.json` if needed
 2. **Test data directory**: Creates `/tmp/test-docs`
 3. **Dependencies**: Installs from `requirements.txt`
 4. **Process verification**: Checks backend stays running
 
-### Failure Handling
+### Failure Handling (Local Development)
 
-**If backend cannot start**, CI:
+**If backend cannot start** when running locally:
 
 1. **Logs detailed error**:
    ```
@@ -163,12 +163,10 @@ The CI **attempts to fix** common issues:
    See docs/E2E-BACKEND-REQUIREMENTS.md for details
    ```
 
-2. **Uploads diagnostic artifacts**:
-   - Backend logs
+2. **Shows diagnostic information**:
+   - Backend logs (if available)
    - Process status
    - Directory listing
-
-3. **Fails the build** (does NOT silently skip)
 
 This ensures issues are **visible and actionable**, not hidden.
 

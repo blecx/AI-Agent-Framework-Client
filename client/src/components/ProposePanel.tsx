@@ -140,6 +140,7 @@ export default function ProposePanel({ projectKey: propProjectKey }: ProposePane
           </div>
           <textarea
             id="changesJson"
+            data-testid="proposal-changes-json"
             value={changesJson}
             onChange={(e) => setChangesJson(e.target.value)}
             placeholder='{"files": [{"path": "file.txt", "type": "modify", "after": "new content"}]}'
