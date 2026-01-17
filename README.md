@@ -72,9 +72,32 @@ git push origin feature/your-feature-name
 # 6. Open PR with detailed description (use prompt template)
 ```
 
+### PR Process & Validation (Required)
+
+CI enforces that the PR description follows the required checklist/sections and rejects placeholder text.
+
+Minimum local validation for client changes:
+
+```bash
+cd client
+npm install
+npm run lint
+npm run build
+```
+
+API integration validation (requires a running backend API at `http://localhost:8000`):
+
+```bash
+cd client
+npm run test:api
+```
+
+If your change touches API integration, ensure you also coordinate with the backend repo and keep `.env` files untracked (use `.env.example` / `.env.production.example`).
+
 ### Cross-Repo Coordination
 
 If your changes require backend API modifications:
+
 1. Create/link an issue in [`blecx/AI-Agent-Framework`](https://github.com/blecx/AI-Agent-Framework) first
 2. Wait for backend changes to merge (or coordinate compatible changes)
 3. Use the [Cross-Repo Coordination template](.github/prompts/cross-repo-coordination.md)
@@ -157,12 +180,14 @@ The AI-Agent-Framework consists of two main components that work together:
 ### Option 1: Docker Deployment (Recommended)
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/blecx/AI-Agent-Framework-Client.git
 cd AI-Agent-Framework-Client
 ```
 
 2. Build and run with Docker Compose:
+
 ```bash
 docker compose up -d
 ```
@@ -172,24 +197,28 @@ docker compose up -d
 ### Option 2: Local Development
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/blecx/AI-Agent-Framework-Client.git
 cd AI-Agent-Framework-Client
 ```
 
 2. Navigate to the client directory and install dependencies:
+
 ```bash
 cd client
 npm install
 ```
 
 3. Configure the API endpoint (optional):
+
 ```bash
 cp .env.example .env
 # Edit .env to set VITE_API_BASE_URL and VITE_API_KEY
 ```
 
 4. Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -199,12 +228,14 @@ The application will be available at `http://localhost:5173`
 ### Build for Production
 
 Create a production build:
+
 ```bash
 cd client
 npm run build
 ```
 
 Preview the production build:
+
 ```bash
 npm run preview
 ```
@@ -223,7 +254,8 @@ VITE_API_KEY=your-api-key-here
 ### Workflow Commands
 
 Execute workflows using the following syntax:
-```
+
+````
 
 ## Usage
 
@@ -276,7 +308,7 @@ Example JSON format:
     }
   ]
 }
-```
+````
 
 #### Reviewing and Applying Proposals
 
@@ -297,6 +329,7 @@ Example JSON format:
 ### API Testing
 
 Access the API tester at `/api-tester` to:
+
 - Test health check, API info, agents, and capabilities endpoints
 - Run custom tests with any HTTP method
 - View detailed response data and timing
@@ -380,6 +413,7 @@ npx playwright show-report
 The client expects the AI-Agent-Framework API to provide the following endpoints:
 
 #### Project Management
+
 - `GET /projects` - List all projects
 - `POST /projects` - Create a new project
 - `GET /projects/:key` - Get project details
@@ -387,6 +421,7 @@ The client expects the AI-Agent-Framework API to provide the following endpoints
 - `DELETE /projects/:key` - Delete project
 
 #### Proposals
+
 - `GET /projects/:key/proposals` - List proposals for a project
 - `POST /projects/:key/proposals` - Create a new proposal
 - `GET /projects/:key/proposals/:id` - Get proposal details
@@ -394,11 +429,13 @@ The client expects the AI-Agent-Framework API to provide the following endpoints
 - `POST /projects/:key/proposals/:id/reject` - Reject a proposal
 
 #### Commands
+
 - `POST /commands` - Execute a command
 - `GET /commands/:id` - Get command status
 - `GET /commands?projectKey=:key` - Get command history for a project
 
 #### API Testing Endpoints
+
 - `GET /health` - Health check
 - `GET /info` - API information
 - `GET /agents` - List available agents
@@ -410,6 +447,7 @@ Customize these endpoints in `src/services/apiClient.ts` to match your API speci
 ### Docker Configuration
 
 Edit `docker-compose.yml` to customize:
+
 - Port mapping (default: 3000:80)
 - Environment variables
 - Container name and network settings
@@ -417,6 +455,7 @@ Edit `docker-compose.yml` to customize:
 ### Building for Production
 
 #### Local Build
+
 ```bash
 cd client
 npm run build
@@ -425,6 +464,7 @@ npm run build
 The built files will be in `client/dist/`.
 
 #### Docker Build
+
 ```bash
 docker build -t ai-agent-client .
 docker run -p 3000:80 ai-agent-client
@@ -458,6 +498,7 @@ Access-Control-Allow-Headers: Content-Type, Authorization
 ### Connection Refused
 
 If tests fail with "Connection refused":
+
 1. Verify the API server is running
 2. Check the API base URL configuration in `.env`
 3. Ensure no firewall is blocking the connection
@@ -466,6 +507,7 @@ If tests fail with "Connection refused":
 ### Build Errors
 
 **TypeScript errors:**
+
 ```bash
 cd client
 rm -rf node_modules package-lock.json
@@ -474,15 +516,18 @@ npm run build
 ```
 
 **ESLint errors:**
+
 ```bash
 cd client
 npm run lint
 ```
+
 Fix any reported issues before committing.
 
 ### Docker Issues
 
 If Docker container fails to start:
+
 1. Check logs: `docker compose logs`
 2. Ensure port 3000 is not in use: `lsof -i :3000`
 3. Verify Docker and Docker Compose are installed: `docker compose version`
@@ -491,6 +536,7 @@ If Docker container fails to start:
 ### Environment Variables Not Working
 
 Remember that Vite environment variables are injected at **build time**, not runtime:
+
 1. Update `.env` file
 2. Rebuild: `npm run build` or `docker compose up -d --build`
 3. For development: restart dev server after changing `.env`
@@ -498,6 +544,7 @@ Remember that Vite environment variables are injected at **build time**, not run
 ## 📖 Additional Resources
 
 ### Setup and Deployment
+
 - **[Quick Start Guide](QUICKSTART.md)** - Get running in 5 minutes with automated scripts
 - **[Production Setup Script (Bash)](production-setup.sh)** - Automated Linux/Mac setup
 - **[Production Setup Script (PowerShell)](production-setup.ps1)** - Automated Windows setup
@@ -505,21 +552,25 @@ Remember that Vite environment variables are injected at **build time**, not run
 - **[Validation Script](scripts/validate-setup.sh)** - Verify deployment health
 
 ### Documentation
+
 - **[Development Guide](docs/DEVELOPMENT.md)** - Complete dev environment setup, workflows, debugging
 - **[Testing Guide](docs/TESTING.md)** - Manual testing, integration testing, validation checklists
 - **[Production Guide](docs/PRODUCTION.md)** - Security, monitoring, scaling, backups
 - **[Deployment Guide](DEPLOYMENT.md)** - Docker deployment and configuration
 
 ### API Repository
+
 - **[AI-Agent-Framework API](https://github.com/blecx/AI-Agent-Framework)** - The backend API this client connects to
 
 ### Configuration
+
 - **[Client Environment Config](client/.env.example)** - Client-side environment variables
 - **[Production Environment Config](.env.production.example)** - Full stack production config
 
 ## 🚀 Deployment Options
 
 ### 1. Automated Production Setup (Recommended)
+
 ```bash
 # Linux/macOS - Full stack in one command
 ./production-setup.sh
@@ -529,6 +580,7 @@ Remember that Vite environment variables are injected at **build time**, not run
 ```
 
 ### 2. Docker Compose (Manual)
+
 ```bash
 # Full stack (Client + API)
 docker compose -f docker-compose.production.yml up -d
@@ -538,6 +590,7 @@ docker compose up -d
 ```
 
 ### 3. Local Development
+
 ```bash
 # Install and run
 cd client
@@ -558,6 +611,7 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed instructions.
 ## 🛡️ Security
 
 For production deployments:
+
 - Use HTTPS with SSL certificates (Let's Encrypt recommended)
 - Configure firewall to block direct access to ports 3000 and 8000
 - Set up API authentication with secure API keys
@@ -570,6 +624,7 @@ See [docs/PRODUCTION.md](docs/PRODUCTION.md) for comprehensive security guidelin
 ## 📊 Monitoring
 
 ### Health Checks
+
 ```bash
 # API health
 curl http://localhost:8000/health
@@ -582,6 +637,7 @@ curl http://localhost:3000
 ```
 
 ### View Logs
+
 ```bash
 # All services
 docker compose logs -f
@@ -601,4 +657,3 @@ docker compose logs -f ai-agent-api
 ## License
 
 This project is open source and available under the MIT License.
-
