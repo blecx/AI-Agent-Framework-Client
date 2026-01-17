@@ -1,16 +1,18 @@
+import { pathToFileURL } from 'node:url';
+
 const timeoutMs = Number.parseInt(process.env.API_TIMEOUT_MS || '10000', 10);
 
-function normalizeBaseUrl(input) {
+export function normalizeBaseUrl(input) {
   const base = (input || 'http://localhost:8000').trim().replace(/\/+$/, '');
   // If someone passes http://host:8000/api/v1, treat that as versioned base.
   return base;
 }
 
-function rootFromBase(baseUrl) {
+export function rootFromBase(baseUrl) {
   return baseUrl.replace(/\/api\/v1$/, '');
 }
 
-async function fetchJson(url) {
+export async function fetchJson(url) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -28,7 +30,7 @@ async function fetchJson(url) {
   }
 }
 
-function assertHealthy(payload, url) {
+export function assertHealthy(payload, url) {
   if (!payload || payload.status !== 'healthy') {
     throw new Error(
       `Expected {status:"healthy"} from ${url}, got: ${JSON.stringify(payload)}`,
@@ -36,7 +38,7 @@ function assertHealthy(payload, url) {
   }
 }
 
-function assertJsonArray(payload, url) {
+export function assertJsonArray(payload, url) {
   if (!Array.isArray(payload)) {
     throw new Error(
       `Expected JSON array from ${url}, got: ${JSON.stringify(payload)}`,
@@ -44,7 +46,7 @@ function assertJsonArray(payload, url) {
   }
 }
 
-async function main() {
+export async function runSmokeChecks() {
   const baseUrl = normalizeBaseUrl(process.env.API_BASE_URL);
   const rootUrl = rootFromBase(baseUrl);
 
@@ -68,7 +70,18 @@ async function main() {
   console.log('API smoke checks passed.');
 }
 
-main().catch((err) => {
-  console.error(err?.stack || String(err));
-  process.exit(1);
-});
+function isExecutedAsScript() {
+  try {
+    const invoked = process.argv[1] ? pathToFileURL(process.argv[1]).href : '';
+    return Boolean(invoked) && import.meta.url === invoked;
+  } catch {
+    return false;
+  }
+}
+
+if (isExecutedAsScript()) {
+  runSmokeChecks().catch((err) => {
+    console.error(err?.stack || String(err));
+    process.exit(1);
+  });
+}
