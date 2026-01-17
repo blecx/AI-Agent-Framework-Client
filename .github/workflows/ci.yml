@@ -25,201 +25,201 @@ jobs:
               - 'client/package-lock.json'
               - '.github/workflows/ci.yml'
 
-  client-ci: 
+  client-ci:
     runs-on: ubuntu-latest
-    
-    steps: 
-    - uses: actions/checkout@v4
 
-    - name: PR review gate (goal + acceptance criteria + validation)
-      if: ${{ github.event_name == 'pull_request' }}
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const pr = context.payload.pull_request;
-          if (!pr) {
-            core.info('No pull_request payload found; skipping.');
-            return;
-          }
+    steps:
+      - uses: actions/checkout@v4
 
-          const body = pr.body || '';
-          const requiredMarkers = [
-            '# Summary',
-            '## Goal / Acceptance Criteria (required)',
-            '## Issue / Tracking Link (required)',
-            '## Validation (required)',
-            '## Automated checks',
-            '## Manual test evidence (required)',
-            '## Cross-repo / Downstream impact (always include)',
-          ];
-          const missing = requiredMarkers.filter(m => !body.includes(m));
-          if (missing.length) {
-            core.setFailed(`PR description is missing required sections: ${missing.join(', ')}`);
-            return;
-          }
+      - name: PR review gate (goal + acceptance criteria + validation)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              core.info('No pull_request payload found; skipping.');
+              return;
+            }
 
-          function sectionText(md, heading) {
-            const start = md.indexOf(heading);
-            if (start === -1) return '';
-            const rest = md.slice(start + heading.length);
-            const next = rest.search(/\n#{1,2}\s+/);
-            return (next === -1 ? rest : rest.slice(0, next)).trim();
-          }
+            const body = pr.body || '';
+            const requiredMarkers = [
+              '# Summary',
+              '## Goal / Acceptance Criteria (required)',
+              '## Issue / Tracking Link (required)',
+              '## Validation (required)',
+              '## Automated checks',
+              '## Manual test evidence (required)',
+              '## Cross-repo / Downstream impact (always include)',
+            ];
+            const missing = requiredMarkers.filter(m => !body.includes(m));
+            if (missing.length) {
+              core.setFailed(`PR description is missing required sections: ${missing.join(', ')}`);
+              return;
+            }
 
-          function checkboxLines(mdSection) {
-            return mdSection
+            function sectionText(md, heading) {
+              const start = md.indexOf(heading);
+              if (start === -1) return '';
+              const rest = md.slice(start + heading.length);
+              const next = rest.search(/\n#{1,2}\s+/);
+              return (next === -1 ? rest : rest.slice(0, next)).trim();
+            }
+
+            function checkboxLines(mdSection) {
+              return mdSection
+                .split(/\r?\n/)
+                .map(l => l.trim())
+                .filter(l => /^- \[[ xX]\]/.test(l));
+            }
+
+            function requireCheckboxChecked(section, pattern, label) {
+              const lines = section.split(/\r?\n/).map(l => l.trim());
+              const line = lines.find(l => pattern.test(l));
+              if (!line) return `Missing checkbox line for: ${label}`;
+              if (!/^\- \[[xX]\]/.test(line)) return `Checkbox must be checked for: ${label}`;
+              return null;
+            }
+
+            // Acceptance criteria must exist and be checked
+            const ac = sectionText(body, '## Goal / Acceptance Criteria (required)');
+            const acBoxes = checkboxLines(ac);
+            const problems = [];
+            if (acBoxes.length === 0) problems.push('Acceptance Criteria section must include at least one checkbox item.');
+            if (acBoxes.length && acBoxes.some(l => !/^\- \[[xX]\]/.test(l))) problems.push('All Acceptance Criteria checkboxes must be checked.');
+
+            // Tracking link must not be placeholder underscores
+            const fixesLine = (body.split(/\r?\n/).find(l => l.trim().toLowerCase().startsWith('fixes:')) || '').trim();
+            const fixesValue = fixesLine.replace(/^fixes:\s*/i, '').trim();
+            const fixesOk =
+              fixesValue.length > 0 &&
+              !/_{5,}/.test(fixesValue) &&
+              !/\*{3,}/.test(fixesValue) &&
+              (['none', 'n/a', 'na'].includes(fixesValue.toLowerCase()) || /#\d+/.test(fixesValue) || /https?:\/\//.test(fixesValue));
+            if (!fixesOk) problems.push('Fixes: must reference a real issue/ticket (e.g. Fixes #123 or URL) or be explicitly "None"/"N/A".');
+
+            // Validation checkboxes
+            const auto = sectionText(body, '## Automated checks');
+            const manual = sectionText(body, '## Manual test evidence (required)');
+
+            const lintReq = requireCheckboxChecked(auto, /^- \[[ xX]\]\s+Lint passes\b/, 'Lint passes');
+            if (lintReq) problems.push(lintReq);
+            const buildReq = requireCheckboxChecked(auto, /^- \[[ xX]\]\s+Build passes\b/, 'Build passes');
+            if (buildReq) problems.push(buildReq);
+            const manualReq = requireCheckboxChecked(manual, /^- \[[ xX]\]\s+Manual test entry #1\b/, 'Manual test entry #1');
+            if (manualReq) problems.push(manualReq);
+
+            function hasNonPlaceholderValue(line) {
+              const value = (line || '').split(':').slice(1).join(':').trim();
+              if (!value) return false;
+              if (/_{5,}/.test(value)) return false;
+              if (/\*{3,}/.test(value)) return false;
+              if (/^\*+$/.test(value)) return false;
+              return true;
+            }
+
+            function findBlockDetails(lines, checkboxRegex) {
+              const idx = lines.findIndex(l => checkboxRegex.test(l));
+              if (idx === -1) return { command: '', evidence: '' };
+              const window = lines.slice(idx, idx + 12);
+              const command = window.find(l => l.startsWith('- Command(s):')) || '';
+              const evidence = window.find(l => l.toLowerCase().startsWith('- evidence')) || '';
+              return { command, evidence };
+            }
+
+            // Require at least one meaningful "How to review" step
+            const howToReview = sectionText(body, '## How to review');
+            const reviewSteps = howToReview
               .split(/\r?\n/)
               .map(l => l.trim())
-              .filter(l => /^- \[[ xX]\]/.test(l));
-          }
+              .filter(l => /^\d+\./.test(l));
+            const meaningfulSteps = reviewSteps.filter(l => !/^\d+\.\s*$/.test(l));
+            if (meaningfulSteps.length === 0) {
+              problems.push('How to review must include at least one numbered step with content.');
+            }
 
-          function requireCheckboxChecked(section, pattern, label) {
-            const lines = section.split(/\r?\n/).map(l => l.trim());
-            const line = lines.find(l => pattern.test(l));
-            if (!line) return `Missing checkbox line for: ${label}`;
-            if (!/^\- \[[xX]\]/.test(line)) return `Checkbox must be checked for: ${label}`;
-            return null;
-          }
+            // Require non-placeholder commands/evidence for lint/build
+            const autoLines = auto.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+            const lintDetails = findBlockDetails(autoLines, /^- \[[ xX]\]\s+Lint passes\b/i);
+            if (lintDetails.command && !hasNonPlaceholderValue(lintDetails.command)) problems.push('Lint passes: Command(s) must be filled (not placeholder).');
+            if (lintDetails.evidence && !hasNonPlaceholderValue(lintDetails.evidence)) problems.push('Lint passes: Evidence must be filled (not placeholder).');
 
-          // Acceptance criteria must exist and be checked
-          const ac = sectionText(body, '## Goal / Acceptance Criteria (required)');
-          const acBoxes = checkboxLines(ac);
-          const problems = [];
-          if (acBoxes.length === 0) problems.push('Acceptance Criteria section must include at least one checkbox item.');
-          if (acBoxes.length && acBoxes.some(l => !/^\- \[[xX]\]/.test(l))) problems.push('All Acceptance Criteria checkboxes must be checked.');
+            const buildDetails = findBlockDetails(autoLines, /^- \[[ xX]\]\s+Build passes\b/i);
+            if (buildDetails.command && !hasNonPlaceholderValue(buildDetails.command)) problems.push('Build passes: Command(s) must be filled (not placeholder).');
+            if (buildDetails.evidence && !hasNonPlaceholderValue(buildDetails.evidence)) problems.push('Build passes: Evidence must be filled (not placeholder).');
 
-          // Tracking link must not be placeholder underscores
-          const fixesLine = (body.split(/\r?\n/).find(l => l.trim().toLowerCase().startsWith('fixes:')) || '').trim();
-          const fixesValue = fixesLine.replace(/^fixes:\s*/i, '').trim();
-          const fixesOk =
-            fixesValue.length > 0 &&
-            !/_{5,}/.test(fixesValue) &&
-            !/\*{3,}/.test(fixesValue) &&
-            (['none', 'n/a', 'na'].includes(fixesValue.toLowerCase()) || /#\d+/.test(fixesValue) || /https?:\/\//.test(fixesValue));
-          if (!fixesOk) problems.push('Fixes: must reference a real issue/ticket (e.g. Fixes #123 or URL) or be explicitly "None"/"N/A".');
+            // Manual test entry details must not be placeholders
+            const manualLines = manual.split(/\r?\n/).map(l => l.trim());
+            const scenarioLine = manualLines.find(l => l.startsWith('- Scenario:'));
+            const expectedLine = manualLines.find(l => l.startsWith('- Expected result:'));
+            const actualLine = manualLines.find(l => l.startsWith('- Actual result / Evidence'));
+            if (scenarioLine && !hasNonPlaceholderValue(scenarioLine)) problems.push('Manual test entry #1: Scenario must be filled (not placeholder).');
+            if (expectedLine && !hasNonPlaceholderValue(expectedLine)) problems.push('Manual test entry #1: Expected result must be filled (not placeholder).');
+            if (actualLine && !hasNonPlaceholderValue(actualLine)) problems.push('Manual test entry #1: Actual result / Evidence must be filled (not placeholder).');
 
-          // Validation checkboxes
-          const auto = sectionText(body, '## Automated checks');
-          const manual = sectionText(body, '## Manual test evidence (required)');
+            // Cross-repo impact must be explicitly filled (can be "None")
+            const crossRepoLine = (body.split(/\r?\n/).find(l => l.trim().startsWith('- Related repos/services impacted:')) || '').trim();
+            if (!crossRepoLine || /_{5,}/.test(crossRepoLine)) {
+              problems.push('Cross-repo impact must be filled (use "None" if not applicable).');
+            }
 
-          const lintReq = requireCheckboxChecked(auto, /^- \[[ xX]\]\s+Lint passes\b/, 'Lint passes');
-          if (lintReq) problems.push(lintReq);
-          const buildReq = requireCheckboxChecked(auto, /^- \[[ xX]\]\s+Build passes\b/, 'Build passes');
-          if (buildReq) problems.push(buildReq);
-          const manualReq = requireCheckboxChecked(manual, /^- \[[ xX]\]\s+Manual test entry #1\b/, 'Manual test entry #1');
-          if (manualReq) problems.push(manualReq);
+            // Lightweight implementation guard: require test changes when UI code changes.
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100,
+            });
+            const changed = files.map(f => f.filename);
+            const uiTouched = changed.some(p => p.startsWith('client/src/'));
+            const scriptsTouched = changed.some(p => p.startsWith('client/scripts/'));
+            const testsTouched = changed.some(p => /client\/(src\/.*\.(test|spec)\.[jt]sx?$|e2e\/|__tests__\/|playwright\.config\.|vitest\.config\.)/.test(p));
+            if (uiTouched && !testsTouched) {
+              problems.push('UI code changed under client/src/ but no client tests were updated/added (unit or e2e).');
+            }
+            if (scriptsTouched && !testsTouched) {
+              problems.push('Client scripts changed under client/scripts/ but no tests were updated/added (unit or e2e).');
+            }
 
-          function hasNonPlaceholderValue(line) {
-            const value = (line || '').split(':').slice(1).join(':').trim();
-            if (!value) return false;
-            if (/_{5,}/.test(value)) return false;
-            if (/\*{3,}/.test(value)) return false;
-            if (/^\*+$/.test(value)) return false;
-            return true;
-          }
+            if (problems.length) {
+              core.setFailed(`PR review gate failed:\n- ${problems.join('\n- ')}`);
+              return;
+            }
+            core.info('PR review gate passed.');
 
-          function findBlockDetails(lines, checkboxRegex) {
-            const idx = lines.findIndex(l => checkboxRegex.test(l));
-            if (idx === -1) return { command: '', evidence: '' };
-            const window = lines.slice(idx, idx + 12);
-            const command = window.find(l => l.startsWith('- Command(s):')) || '';
-            const evidence = window.find(l => l.toLowerCase().startsWith('- evidence')) || '';
-            return { command, evidence };
-          }
+      - name: Repo hygiene guard (forbidden env files)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Forbid committing real env files; examples are allowed.
+          if git ls-files | grep -E '(^|/)\.env$|(^|/)\.env\.local$|(^|/)\.env\.production$|(^|/)\.env\.e2e$' -n; then
+            echo "Forbidden env files detected in git index (.env/.env.local/.env.production/.env.e2e)."
+            echo "Use .env.example files instead."
+            exit 1
+          fi
 
-          // Require at least one meaningful "How to review" step
-          const howToReview = sectionText(body, '## How to review');
-          const reviewSteps = howToReview
-            .split(/\r?\n/)
-            .map(l => l.trim())
-            .filter(l => /^\d+\./.test(l));
-          const meaningfulSteps = reviewSteps.filter(l => !/^\d+\.\s*$/.test(l));
-          if (meaningfulSteps.length === 0) {
-            problems.push('How to review must include at least one numbered step with content.');
-          }
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'client/package-lock.json'
 
-          // Require non-placeholder commands/evidence for lint/build
-          const autoLines = auto.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-          const lintDetails = findBlockDetails(autoLines, /^- \[[ xX]\]\s+Lint passes\b/i);
-          if (lintDetails.command && !hasNonPlaceholderValue(lintDetails.command)) problems.push('Lint passes: Command(s) must be filled (not placeholder).');
-          if (lintDetails.evidence && !hasNonPlaceholderValue(lintDetails.evidence)) problems.push('Lint passes: Evidence must be filled (not placeholder).');
+      - name: Install dependencies
+        working-directory: client
+        run: npm ci
 
-          const buildDetails = findBlockDetails(autoLines, /^- \[[ xX]\]\s+Build passes\b/i);
-          if (buildDetails.command && !hasNonPlaceholderValue(buildDetails.command)) problems.push('Build passes: Command(s) must be filled (not placeholder).');
-          if (buildDetails.evidence && !hasNonPlaceholderValue(buildDetails.evidence)) problems.push('Build passes: Evidence must be filled (not placeholder).');
+      - name: Run lint
+        working-directory: client
+        run: npm run lint
 
-          // Manual test entry details must not be placeholders
-          const manualLines = manual.split(/\r?\n/).map(l => l.trim());
-          const scenarioLine = manualLines.find(l => l.startsWith('- Scenario:'));
-          const expectedLine = manualLines.find(l => l.startsWith('- Expected result:'));
-          const actualLine = manualLines.find(l => l.startsWith('- Actual result / Evidence'));
-          if (scenarioLine && !hasNonPlaceholderValue(scenarioLine)) problems.push('Manual test entry #1: Scenario must be filled (not placeholder).');
-          if (expectedLine && !hasNonPlaceholderValue(expectedLine)) problems.push('Manual test entry #1: Expected result must be filled (not placeholder).');
-          if (actualLine && !hasNonPlaceholderValue(actualLine)) problems.push('Manual test entry #1: Actual result / Evidence must be filled (not placeholder).');
+      - name: Build
+        working-directory: client
+        run: npm run build
 
-          // Cross-repo impact must be explicitly filled (can be "None")
-          const crossRepoLine = (body.split(/\r?\n/).find(l => l.trim().startsWith('- Related repos/services impacted:')) || '').trim();
-          if (!crossRepoLine || /_{5,}/.test(crossRepoLine)) {
-            problems.push('Cross-repo impact must be filled (use "None" if not applicable).');
-          }
-
-          // Lightweight implementation guard: require test changes when UI code changes.
-          const files = await github.paginate(github.rest.pulls.listFiles, {
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            pull_number: pr.number,
-            per_page: 100,
-          });
-          const changed = files.map(f => f.filename);
-          const uiTouched = changed.some(p => p.startsWith('client/src/'));
-          const scriptsTouched = changed.some(p => p.startsWith('client/scripts/'));
-          const testsTouched = changed.some(p => /client\/(src\/.*\.(test|spec)\.[jt]sx?$|e2e\/|__tests__\/|playwright\.config\.|vitest\.config\.)/.test(p));
-          if (uiTouched && !testsTouched) {
-            problems.push('UI code changed under client/src/ but no client tests were updated/added (unit or e2e).');
-          }
-          if (scriptsTouched && !testsTouched) {
-            problems.push('Client scripts changed under client/scripts/ but no tests were updated/added (unit or e2e).');
-          }
-
-          if (problems.length) {
-            core.setFailed(`PR review gate failed:\n- ${problems.join('\n- ')}`);
-            return;
-          }
-          core.info('PR review gate passed.');
-
-    - name: Repo hygiene guard (forbidden env files)
-      shell: bash
-      run: |
-        set -euo pipefail
-        # Forbid committing real env files; examples are allowed.
-        if git ls-files | grep -E '(^|/)\.env$|(^|/)\.env\.local$|(^|/)\.env\.production$|(^|/)\.env\.e2e$' -n; then
-          echo "Forbidden env files detected in git index (.env/.env.local/.env.production/.env.e2e)."
-          echo "Use .env.example files instead."
-          exit 1
-        fi
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        cache-dependency-path: 'client/package-lock.json'
-    
-    - name: Install dependencies
-      working-directory: client
-      run: npm ci
-    
-    - name: Run lint
-      working-directory: client
-      run: npm run lint
-    
-    - name: Build
-      working-directory: client
-      run: npm run build
-    
-    - name: Run tests
-      working-directory: client
-      run: npm test
+      - name: Run tests
+        working-directory: client
+        run: npm test
 
   api-integration:
     needs: [changes, client-ci]
@@ -245,31 +245,31 @@ jobs:
     needs: client-ci
     # Run on main branch or when 'run-e2e' label is present
     if: github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'run-e2e')
-    
+
     steps:
       - name: Checkout client repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: 'client/package-lock.json'
-      
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      
+          python-version: '3.12'
+
       - name: Install client dependencies
         working-directory: client
         run: npm ci
-      
+
       - name: Install Playwright browsers
         working-directory: client
         run: npx playwright install --with-deps chromium
-      
+
       - name: Attempt backend dependency resolution
         id: backend_setup
         # Note: continue-on-error is INTENTIONAL for two-run strategy
@@ -281,11 +281,11 @@ jobs:
           echo "=== Smart Backend Dependency Resolution ==="
           echo "Starting dependency resolution process..."
           echo ""
-          
+
           # Set backend directory in CI environment
           export BACKEND_DIR="${GITHUB_WORKSPACE}/../AI-Agent-Framework"
           export LOG_FILE="${GITHUB_WORKSPACE}/backend-setup.log"
-          
+
           # Run the smart setup script
           if bash client/e2e/setup-backend.sh; then
             echo "backend_available=true" >> $GITHUB_OUTPUT
@@ -297,8 +297,7 @@ jobs:
             echo "✗ Backend setup failed"
             echo "See backend-setup.log for details"
           fi
-        continue-on-error: true
-      
+
       - name: Display backend setup log
         if: always()
         run: |
@@ -306,7 +305,7 @@ jobs:
             echo "=== Backend Setup Log ==="
             cat backend-setup.log
           fi
-      
+
       - name: Run E2E tests
         if: steps.backend_setup.outputs.backend_available == 'true'
         working-directory: client
@@ -314,7 +313,7 @@ jobs:
         env:
           E2E_BASE_URL: http://localhost:5173
           API_BASE_URL: http://localhost:8000
-      
+
       - name: Skip E2E tests with reason
         if: steps.backend_setup.outputs.backend_available != 'true'
         run: |
@@ -345,7 +344,7 @@ jobs:
           echo ""
           echo "E2E tests will run successfully once dependencies are resolved."
           echo "═══════════════════════════════════════════════════════════"
-      
+
       - name: Upload backend setup log
         if: always()
         uses: actions/upload-artifact@v4
@@ -353,7 +352,7 @@ jobs:
           name: backend-setup-log
           path: backend-setup.log
           if-no-files-found: ignore
-      
+
       - name: Upload Playwright report
         if: always() && steps.backend_setup.outputs.backend_available == 'true'
         uses: actions/upload-artifact@v4
@@ -361,7 +360,7 @@ jobs:
           name: playwright-report
           path: client/playwright-report/
           retention-days: 30
-      
+
       - name: Upload test screenshots
         if: failure() && steps.backend_setup.outputs.backend_available == 'true'
         uses: actions/upload-artifact@v4
@@ -369,7 +368,7 @@ jobs:
           name: test-screenshots
           path: client/test-results/
           retention-days: 30
-      
+
       - name: Upload backend logs
         if: always() && steps.backend_setup.outputs.backend_available == 'true'
         uses: actions/upload-artifact@v4
