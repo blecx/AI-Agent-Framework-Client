@@ -36,12 +36,21 @@ function assertHealthy(payload, url) {
   }
 }
 
+function assertJsonArray(payload, url) {
+  if (!Array.isArray(payload)) {
+    throw new Error(
+      `Expected JSON array from ${url}, got: ${JSON.stringify(payload)}`,
+    );
+  }
+}
+
 async function main() {
   const baseUrl = normalizeBaseUrl(process.env.API_BASE_URL);
   const rootUrl = rootFromBase(baseUrl);
 
   const healthUrl = `${rootUrl}/health`;
   const v1HealthUrl = `${rootUrl}/api/v1/health`;
+  const v1ProjectsUrl = `${rootUrl}/api/v1/projects`;
 
   console.log(`API_BASE_URL=${baseUrl}`);
   console.log(`Checking ${healthUrl}`);
@@ -51,6 +60,10 @@ async function main() {
   console.log(`Checking ${v1HealthUrl}`);
   const v1 = await fetchJson(v1HealthUrl);
   assertHealthy(v1, v1HealthUrl);
+
+  console.log(`Checking ${v1ProjectsUrl}`);
+  const projects = await fetchJson(v1ProjectsUrl);
+  assertJsonArray(projects, v1ProjectsUrl);
 
   console.log('API smoke checks passed.');
 }

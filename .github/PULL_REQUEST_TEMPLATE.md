@@ -36,9 +36,9 @@ Keep it verifiable. If there is no prior issue with AC, add AC here.
 - [ ] Build/CI
 - [ ] Test
 - [ ] Chore
-- [ ] Other: ****\*\*****\_\_****\*\*****
+- [ ] Other: **\_\_\_\_**
 
-# Issue / Tracking Link (required)
+## Issue / Tracking Link (required)
 
 <!--
 REQUIRED: Link the issue/ticket this PR addresses.
@@ -48,9 +48,9 @@ Use one of:
 - If no issue exists, create one first.
 -->
 
-Fixes: ****\*\*\*\*****\_\_\_\_****\*\*\*\*****
+Fixes: **\_\_\_\_**
 
-# What changed?
+## What changed?
 
 <!-- Bullet list of key changes. Keep it scannable. -->
 
@@ -58,11 +58,11 @@ Fixes: ****\*\*\*\*****\_\_\_\_****\*\*\*\*****
 -
 -
 
-# Why?
+## Why?
 
 <!-- What problem does this solve? What user impact? -->
 
-# How to review
+## How to review
 
 <!-- Steps for reviewers to validate the change. Prefer deterministic, numbered steps. -->
 
@@ -70,7 +70,7 @@ Fixes: ****\*\*\*\*****\_\_\_\_****\*\*\*\*****
 2.
 3.
 
-# Validation (required)
+## Validation (required)
 
 ## Automated checks
 
@@ -80,14 +80,14 @@ If the repo uses specific commands, paste them and their results.
 -->
 
 - [ ] Lint passes (attach output or CI link):
-  - Command(s): ******\*\*******\_\_******\*\*******
-  - Evidence (CI link or pasted summary): ******\*\*******\_\_******\*\*******
+  - Command(s): **\_\_\_\_**
+  - Evidence (CI link or pasted summary): **\_\_\_\_**
 - [ ] Build passes (attach output or CI link):
-  - Command(s): ******\*\*******\_\_******\*\*******
-  - Evidence (CI link or pasted summary): ******\*\*******\_\_******\*\*******
+  - Command(s): **\_\_\_\_**
+  - Evidence (CI link or pasted summary): **\_\_\_\_**
 - [ ] Tests pass (if applicable) (attach output or CI link):
-  - Command(s): ******\*\*******\_\_******\*\*******
-  - Evidence (CI link or pasted summary): ******\*\*******\_\_******\*\*******
+  - Command(s): **\_\_\_\_**
+  - Evidence (CI link or pasted summary): **\_\_\_\_**
 
 ## Manual test evidence (required)
 
@@ -97,15 +97,15 @@ If manual testing is truly not applicable, explain why and what alternative vali
 -->
 
 - [ ] Manual test entry #1
-  - Scenario: ******\*\*******\_\_******\*\*******
+  - Scenario: **\_\_\_\_**
   - Steps:
     1. ***
     2. ***
     3. ***
-  - Expected result: ******\*\*******\_\_******\*\*******
-  - Actual result / Evidence (screenshots, logs, GIF, terminal output, etc.): ******\*\*******\_\_******\*\*******
+  - Expected result: **\_\_\_\_**
+  - Actual result / Evidence (screenshots, logs, GIF, terminal output, etc.): **\_\_\_\_**
 
-# Backward compatibility / Migration
+## Backward compatibility / Migration
 
 - [ ] No breaking changes
 - [ ] Breaking change (describe impact + migration steps):
@@ -114,7 +114,7 @@ Migration notes:
 
 -
 
-# Risks & Rollback
+## Risks & Rollback
 
 <!-- Call out risk areas and how to revert/mitigate. -->
 
@@ -126,18 +126,18 @@ Rollback plan:
 
 -
 
-# Cross-repo / Downstream impact (always include)
+## Cross-repo / Downstream impact (always include)
 
 <!--
 Always present: This repo interacts with other repos/services.
 If none, explicitly state "None".
 -->
 
-- Related repos/services impacted: ******\*\*******\_\_******\*\*******
-- Required coordinated releases/PRs: ******\*\*******\_\_******\*\*******
-- Follow-up issues/PRs needed: ******\*\*******\_\_******\*\*******
+- Related repos/services impacted: **\_\_\_\_**
+- Required coordinated releases/PRs: **\_\_\_\_**
+- Follow-up issues/PRs needed: **\_\_\_\_**
 
-# PR Title (recommendation)
+## PR Title (recommendation)
 
 <!--
 Recommended (not required): Use a Conventional Commit-style prefix in the PR title.
@@ -151,7 +151,7 @@ Examples:
 
 - [ ] I used a Conventional Commit-style prefix in the PR title (recommended).
 
-# Checklist
+## Checklist
 
 - [ ] Linked the required issue/ticket above.
 - [ ] Updated/added tests where appropriate.

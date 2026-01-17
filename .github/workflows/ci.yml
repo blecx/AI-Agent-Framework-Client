@@ -6,6 +6,25 @@ on:
   pull_request:
 
 jobs:
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      api_integration: ${{ steps.filter.outputs.api_integration }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Path filter
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            api_integration:
+              - 'client/src/**'
+              - 'client/scripts/**'
+              - 'client/package.json'
+              - 'client/package-lock.json'
+              - '.github/workflows/ci.yml'
+
   client-ci: 
     runs-on: ubuntu-latest
     
@@ -27,11 +46,11 @@ jobs:
           const requiredMarkers = [
             '# Summary',
             '## Goal / Acceptance Criteria (required)',
-            '# Issue / Tracking Link (required)',
-            '# Validation (required)',
+            '## Issue / Tracking Link (required)',
+            '## Validation (required)',
             '## Automated checks',
             '## Manual test evidence (required)',
-            '# Cross-repo / Downstream impact (always include)',
+            '## Cross-repo / Downstream impact (always include)',
           ];
           const missing = requiredMarkers.filter(m => !body.includes(m));
           if (missing.length) {
@@ -80,7 +99,6 @@ jobs:
           if (!fixesOk) problems.push('Fixes: must reference a real issue/ticket (e.g. Fixes #123 or URL) or be explicitly "None"/"N/A".');
 
           // Validation checkboxes
-          const validation = sectionText(body, '# Validation (required)');
           const auto = sectionText(body, '## Automated checks');
           const manual = sectionText(body, '## Manual test evidence (required)');
 
@@ -90,6 +108,54 @@ jobs:
           if (buildReq) problems.push(buildReq);
           const manualReq = requireCheckboxChecked(manual, /^- \[[ xX]\]\s+Manual test entry #1\b/, 'Manual test entry #1');
           if (manualReq) problems.push(manualReq);
+
+          function hasNonPlaceholderValue(line) {
+            const value = (line || '').split(':').slice(1).join(':').trim();
+            if (!value) return false;
+            if (/_{5,}/.test(value)) return false;
+            if (/\*{3,}/.test(value)) return false;
+            if (/^\*+$/.test(value)) return false;
+            return true;
+          }
+
+          function findBlockDetails(lines, checkboxRegex) {
+            const idx = lines.findIndex(l => checkboxRegex.test(l));
+            if (idx === -1) return { command: '', evidence: '' };
+            const window = lines.slice(idx, idx + 12);
+            const command = window.find(l => l.startsWith('- Command(s):')) || '';
+            const evidence = window.find(l => l.toLowerCase().startsWith('- evidence')) || '';
+            return { command, evidence };
+          }
+
+          // Require at least one meaningful "How to review" step
+          const howToReview = sectionText(body, '## How to review');
+          const reviewSteps = howToReview
+            .split(/\r?\n/)
+            .map(l => l.trim())
+            .filter(l => /^\d+\./.test(l));
+          const meaningfulSteps = reviewSteps.filter(l => !/^\d+\.\s*$/.test(l));
+          if (meaningfulSteps.length === 0) {
+            problems.push('How to review must include at least one numbered step with content.');
+          }
+
+          // Require non-placeholder commands/evidence for lint/build
+          const autoLines = auto.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+          const lintDetails = findBlockDetails(autoLines, /^- \[[ xX]\]\s+Lint passes\b/i);
+          if (lintDetails.command && !hasNonPlaceholderValue(lintDetails.command)) problems.push('Lint passes: Command(s) must be filled (not placeholder).');
+          if (lintDetails.evidence && !hasNonPlaceholderValue(lintDetails.evidence)) problems.push('Lint passes: Evidence must be filled (not placeholder).');
+
+          const buildDetails = findBlockDetails(autoLines, /^- \[[ xX]\]\s+Build passes\b/i);
+          if (buildDetails.command && !hasNonPlaceholderValue(buildDetails.command)) problems.push('Build passes: Command(s) must be filled (not placeholder).');
+          if (buildDetails.evidence && !hasNonPlaceholderValue(buildDetails.evidence)) problems.push('Build passes: Evidence must be filled (not placeholder).');
+
+          // Manual test entry details must not be placeholders
+          const manualLines = manual.split(/\r?\n/).map(l => l.trim());
+          const scenarioLine = manualLines.find(l => l.startsWith('- Scenario:'));
+          const expectedLine = manualLines.find(l => l.startsWith('- Expected result:'));
+          const actualLine = manualLines.find(l => l.startsWith('- Actual result / Evidence'));
+          if (scenarioLine && !hasNonPlaceholderValue(scenarioLine)) problems.push('Manual test entry #1: Scenario must be filled (not placeholder).');
+          if (expectedLine && !hasNonPlaceholderValue(expectedLine)) problems.push('Manual test entry #1: Expected result must be filled (not placeholder).');
+          if (actualLine && !hasNonPlaceholderValue(actualLine)) problems.push('Manual test entry #1: Actual result / Evidence must be filled (not placeholder).');
 
           // Cross-repo impact must be explicitly filled (can be "None")
           const crossRepoLine = (body.split(/\r?\n/).find(l => l.trim().startsWith('- Related repos/services impacted:')) || '').trim();
@@ -106,9 +172,13 @@ jobs:
           });
           const changed = files.map(f => f.filename);
           const uiTouched = changed.some(p => p.startsWith('client/src/'));
-          const testsTouched = changed.some(p => /client\/(src\/.*\.(test|spec)\.[jt]sx?$|e2e\/|__tests__\/)/.test(p));
+          const scriptsTouched = changed.some(p => p.startsWith('client/scripts/'));
+          const testsTouched = changed.some(p => /client\/(src\/.*\.(test|spec)\.[jt]sx?$|e2e\/|__tests__\/|playwright\.config\.|vitest\.config\.)/.test(p));
           if (uiTouched && !testsTouched) {
             problems.push('UI code changed under client/src/ but no client tests were updated/added (unit or e2e).');
+          }
+          if (scriptsTouched && !testsTouched) {
+            problems.push('Client scripts changed under client/scripts/ but no tests were updated/added (unit or e2e).');
           }
 
           if (problems.length) {
@@ -152,7 +222,8 @@ jobs:
       run: npm test
 
   api-integration:
-    needs: client-ci
+    needs: [changes, client-ci]
+    if: ${{ github.ref == 'refs/heads/main' || needs.changes.outputs.api_integration == 'true' }}
     uses: blecx/AI-Agent-Framework/.github/workflows/reusable-client-api-integration.yml@main
     with:
       client_runtime: node
