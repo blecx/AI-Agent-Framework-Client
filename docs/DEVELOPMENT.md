@@ -31,7 +31,7 @@ This guide provides comprehensive instructions for setting up and developing wit
 
 ### Optional but Recommended
 
-- **Python 3.9+** (for running API locally without Docker)
+- **Python 3.12** (required if running the backend API locally without Docker)
 - **VS Code** with extensions: ESLint, Prettier, TypeScript
 - **curl** or **Postman** for API testing
 
@@ -182,8 +182,8 @@ cd AI-Agent-Framework
 **Step 2: Create virtual environment**
 
 ```bash
-# Python 3.9+
-python3 -m venv venv
+# Python 3.12 (backend requires 3.12)
+python3.12 -m venv venv
 
 # Activate (Linux/Mac)
 source venv/bin/activate
@@ -205,8 +205,8 @@ pip install -r requirements.txt
 cp .env.example .env
 
 # Edit .env to set paths
-export PROJECT_DOCS_PATH=./projectDocs
-export LLM_CONFIG_PATH=./config/llm.json
+export PROJECT_DOCS_PATH="$(pwd)/projectDocs"
+export LLM_CONFIG_PATH="$(pwd)/config/llm.json"
 ```
 
 **Step 5: Create required directories**
@@ -219,6 +219,7 @@ mkdir -p projectDocs config
 
 ```bash
 # Development mode with hot reload
+cd apps/api
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 # Or production mode
@@ -297,20 +298,27 @@ The client will start at **http://localhost:5173** with hot module replacement (
 4. Verify you see: `{"status":"healthy"}`
 
 If you see connection errors, verify:
+
 - API is running on port 8000
 - `VITE_API_BASE_URL` is correct in `.env`
 - No firewall blocking localhost connections
 
 ## Development Workflow
 
+### CI & PR Review Gate
+
+This repository uses a CI “PR review gate” that enforces a structured PR description (required sections, checked acceptance criteria, filled validation commands/evidence, at least one manual test entry, and explicit cross-repo impact).
+
+Branch policy note: `main` is typically protected in GitHub. Push changes to a feature branch and open a PR (CI will block direct pushes to `main`).
+
 ### Typical Development Session
 
 ```bash
 # Terminal 1: API
 cd ~/projects/AI-Agent-Framework
-source venv/bin/activate  # if using Python
+source .venv/bin/activate  # if using Python
 # docker compose up -d    # if using Docker
-uvicorn main:app --reload
+cd apps/api && PROJECT_DOCS_PATH=../../projectDocs uvicorn main:app --reload
 
 # Terminal 2: Client
 cd ~/projects/AI-Agent-Framework-Client/client
@@ -330,6 +338,7 @@ Both services support hot reload:
 - **Client**: Vite provides HMR automatically
 
 Changes to files are immediately reflected:
+
 - **Client**: `.tsx`, `.ts`, `.css` files auto-reload
 - **API**: `.py` files trigger server restart
 
@@ -430,6 +439,7 @@ npm run lint -- --fix
 ```
 
 **Before committing**:
+
 1. ✅ `npm run lint` must pass with 0 errors
 2. ✅ `npm run build` must succeed
 3. ✅ Manual testing confirms changes work
@@ -439,6 +449,7 @@ npm run lint -- --fix
 **Important**: Vite environment variables are injected at **build time**, not runtime.
 
 After changing `.env`:
+
 ```bash
 # Development: restart dev server
 npm run dev
@@ -448,6 +459,7 @@ npm run build
 ```
 
 Variables must be prefixed with `VITE_`:
+
 ```env
 VITE_API_BASE_URL=http://localhost:8000/api  ✅
 API_BASE_URL=http://localhost:8000/api       ❌ (won't work)
@@ -474,6 +486,7 @@ export async function testHealth() {
 #### Use React DevTools
 
 Install the React Developer Tools browser extension to:
+
 - Inspect component props and state
 - View component hierarchy
 - Profile performance
@@ -485,12 +498,12 @@ Install the React Developer Tools browser extension to:
 // Add axios interceptor for debugging
 import axios from 'axios';
 
-axios.interceptors.request.use(request => {
+axios.interceptors.request.use((request) => {
   console.log('Starting Request', request);
   return request;
 });
 
-axios.interceptors.response.use(response => {
+axios.interceptors.response.use((response) => {
   console.log('Response:', response);
   return response;
 });
@@ -587,6 +600,7 @@ VITE_API_BASE_URL=http://localhost:8000  # missing /api
 **Cause**: API not running or unreachable
 
 **Fix**:
+
 ```bash
 # Verify API is running
 curl http://localhost:8000/health
@@ -603,6 +617,7 @@ uvicorn main:app --reload
 **Cause**: Type mismatches or missing types
 
 **Fix**:
+
 ```bash
 cd client
 
@@ -622,6 +637,7 @@ npm run build
 ### Issue: npm install fails
 
 **Symptoms**:
+
 - Package installation errors
 - Network timeouts
 - Permission errors
@@ -646,6 +662,7 @@ sudo chown -R $USER:$USER ./node_modules
 ### Issue: API connection refused
 
 **Symptoms**:
+
 - Client shows "Failed to fetch"
 - Network errors in console
 - CORS errors
@@ -674,6 +691,7 @@ npm run dev  # Ctrl+C and restart
 ### Issue: Port already in use
 
 **Symptoms**:
+
 - "EADDRINUSE: address already in use"
 - "Port 5173 is already in use"
 
@@ -693,6 +711,7 @@ npm run dev -- --port 5174
 ### Issue: Build fails with TypeScript errors
 
 **Symptoms**:
+
 - `tsc` compilation errors
 - Type errors during `npm run build`
 
@@ -718,6 +737,7 @@ npm run build
 ### Issue: ESLint errors
 
 **Symptoms**:
+
 - `npm run lint` fails
 - Linting errors in editor
 
@@ -742,6 +762,7 @@ npm list eslint
 ### Issue: Changes not reflecting
 
 **Symptoms**:
+
 - Code changes don't appear in browser
 - Environment variables not updating
 
@@ -765,6 +786,7 @@ rm -rf node_modules/.vite
 ### Issue: Docker build fails
 
 **Symptoms**:
+
 - Docker compose errors
 - Container exits immediately
 
@@ -787,6 +809,7 @@ docker compose version
 ### Issue: Module not found errors
 
 **Symptoms**:
+
 - Import errors
 - "Cannot find module"
 

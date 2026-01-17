@@ -23,7 +23,7 @@ The AI-Agent-Framework Client is a frontend application that requires integratio
 4. **UI Testing**: Manual testing of user interface
 5. **End-to-End Testing**: Complete workflow validation
 
-**Note**: Currently, no automated test framework is configured. All testing is manual.
+**Note**: The repository includes automated checks in CI (lint/build/unit tests) and a deterministic API smoke test (`npm run test:api`).
 
 ## Testing Prerequisites
 
@@ -106,7 +106,14 @@ npm run lint
 npm run build
 # Expected: Build succeeds, dist/ folder created
 
-# 3. Preview production build
+# 3. API smoke test (when integration/APIs are touched)
+# Requires a running backend API at http://localhost:8000
+npm run test:api
+
+# Optional: Override API endpoint
+# API_BASE_URL=http://localhost:8000 npm run test:api
+
+# 4. Preview production build
 npm run preview
 # Expected: Server starts on port 4173
 
@@ -199,16 +206,19 @@ curl -X POST http://localhost:8000/api/execute \
 #### Example Requests
 
 **Health Check**
+
 - Method: `GET`
 - URL: `{{base_url}}/health`
 - Expected Status: `200 OK`
 
 **List Agents**
+
 - Method: `GET`
 - URL: `{{base_url}}/api/agents`
 - Expected Status: `200 OK`
 
 **Execute Task**
+
 - Method: `POST`
 - URL: `{{base_url}}/api/execute`
 - Headers: `Content-Type: application/json`
@@ -318,6 +328,7 @@ Time: 15ms
 ### React DevTools Testing
 
 Install React Developer Tools extension:
+
 - Chrome: https://chrome.google.com/webstore (search "React Developer Tools")
 - Firefox: https://addons.mozilla.org/firefox (search "React Developer Tools")
 
@@ -338,11 +349,13 @@ Tests the complete flow from client to API and back.
 #### Test Scenario: Health Check Flow
 
 **Steps**:
+
 1. Open client in browser
 2. Navigate to API Tester
 3. Click "Test Health" button
 
 **Expected Flow**:
+
 1. Client sends GET request to `/api/health`
 2. Request goes to http://localhost:8000/api/health
 3. API responds with `{"status":"healthy"}`
@@ -351,6 +364,7 @@ Tests the complete flow from client to API and back.
 6. Response data shown in UI
 
 **Verification**:
+
 - Browser console: No errors
 - Network tab: Status 200
 - UI: Success message visible
@@ -359,6 +373,7 @@ Tests the complete flow from client to API and back.
 #### Test Scenario: Agent Execution Flow
 
 **Steps**:
+
 1. Navigate to API Tester
 2. Enter agent ID: "coding-agent"
 3. Enter task: "Test task"
@@ -366,6 +381,7 @@ Tests the complete flow from client to API and back.
 5. Click "Test Execute" button
 
 **Expected Flow**:
+
 1. Client validates input
 2. Client sends POST request to `/api/execute`
 3. Request includes JSON body with agent_id, task, parameters
@@ -375,6 +391,7 @@ Tests the complete flow from client to API and back.
 7. Client displays result in UI
 
 **Verification**:
+
 - Request payload matches expected format
 - Response status is 200
 - Result data is displayed
@@ -388,14 +405,17 @@ Test CORS (Cross-Origin Resource Sharing) configuration:
 **Scenario**: Client on different port than API
 
 **Setup**:
+
 - API: http://localhost:8000
 - Client: http://localhost:5173
 
 **Expected**:
+
 - API allows requests from http://localhost:5173
 - No CORS errors in browser console
 
 **If CORS errors occur**:
+
 1. Check API CORS configuration
 2. Verify allowed origins include client URL
 3. Check preflight (OPTIONS) requests succeed
@@ -405,11 +425,13 @@ Test CORS (Cross-Origin Resource Sharing) configuration:
 #### Test API Unavailable
 
 **Steps**:
+
 1. Stop the API: `docker compose down` or stop uvicorn
 2. Try to use client features
 3. Observe error handling
 
 **Expected**:
+
 - Client shows "Connection failed" or similar error
 - Error messages are user-friendly
 - No unhandled exceptions in console
@@ -418,10 +440,12 @@ Test CORS (Cross-Origin Resource Sharing) configuration:
 #### Test Invalid Input
 
 **Steps**:
+
 1. Enter invalid agent ID
 2. Try to execute task
 
 **Expected**:
+
 - Client validates input
 - Error message displayed
 - API returns appropriate error (404 or 400)
@@ -430,9 +454,11 @@ Test CORS (Cross-Origin Resource Sharing) configuration:
 #### Test Network Timeout
 
 **Simulate**:
+
 - Slow network or large response
 
 **Expected**:
+
 - Loading indicator shown
 - Timeout handled gracefully
 - Error message if timeout occurs
@@ -448,6 +474,7 @@ These tests cover the most important user workflows.
 **Objective**: Verify new user can access and use the application
 
 **Steps**:
+
 1. Navigate to http://localhost:5173
 2. Observe homepage loads
 3. Navigate to different sections
@@ -455,6 +482,7 @@ These tests cover the most important user workflows.
 5. Run health check test
 
 **Expected Results**:
+
 - [ ] Homepage loads without errors
 - [ ] Navigation works smoothly
 - [ ] API Tester interface is accessible
@@ -466,11 +494,13 @@ These tests cover the most important user workflows.
 **Objective**: User can discover available agents
 
 **Steps**:
+
 1. Open API Tester
 2. Click "Test Agents"
 3. Review agent list
 
 **Expected Results**:
+
 - [ ] Request completes successfully
 - [ ] Agent list is displayed
 - [ ] Each agent has ID, name, description
@@ -481,6 +511,7 @@ These tests cover the most important user workflows.
 **Objective**: User can execute a task with an agent
 
 **Steps**:
+
 1. Open API Tester
 2. Enter valid agent ID
 3. Enter task description
@@ -489,6 +520,7 @@ These tests cover the most important user workflows.
 6. Observe results
 
 **Expected Results**:
+
 - [ ] Request is sent correctly
 - [ ] Loading state is shown
 - [ ] Response is received
@@ -577,6 +609,7 @@ Verify UI works correctly:
 ### Sample Agent IDs
 
 Use these for testing:
+
 - `coding-agent`
 - `research-agent`
 - `testing-agent`
@@ -584,6 +617,7 @@ Use these for testing:
 ### Sample Tasks
 
 Use these for testing execute endpoint:
+
 ```json
 {
   "agent_id": "coding-agent",
@@ -607,11 +641,13 @@ Use these for testing execute endpoint:
 ### Sample API Responses
 
 **Health Check**:
+
 ```json
-{"status":"healthy"}
+{ "status": "healthy" }
 ```
 
 **API Info**:
+
 ```json
 {
   "name": "AI Agent Framework API",
@@ -621,6 +657,7 @@ Use these for testing execute endpoint:
 ```
 
 **Agents List**:
+
 ```json
 {
   "agents": [
@@ -638,12 +675,14 @@ Use these for testing execute endpoint:
 ### Issue: Health check fails
 
 **Possible Causes**:
+
 1. API not running
 2. Wrong API URL in `.env`
 3. Port conflict
 4. Firewall blocking connection
 
 **Solutions**:
+
 ```bash
 # Check if API is running
 curl http://localhost:8000/health
@@ -661,10 +700,12 @@ lsof -i :8000
 ### Issue: CORS errors in browser
 
 **Possible Causes**:
+
 1. API CORS not configured for client origin
 2. Wrong origin in CORS config
 
 **Solutions**:
+
 1. Check API CORS configuration
 2. Ensure allowed origins include `http://localhost:5173`
 3. Restart API after changing CORS config
@@ -672,11 +713,13 @@ lsof -i :8000
 ### Issue: Tests pass locally but fail in production
 
 **Possible Causes**:
+
 1. Environment variables differ
 2. Different API endpoint
 3. Network configuration differs
 
 **Solutions**:
+
 1. Verify environment variables in production
 2. Check API URL is correct for production
 3. Test production build locally with `npm run preview`
