@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:api": "node scripts/api-smoke.mjs",
     "test:watch": "vitest",
     "test:e2e": "playwright test"
   },

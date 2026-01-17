@@ -2,8 +2,8 @@ name: Client CI
 
 on:
   push:
-    branches: [ main ]
-  pull_request: 
+    branches: [main]
+  pull_request:
 
 jobs:
   client-ci: 
@@ -11,6 +11,118 @@ jobs:
     
     steps: 
     - uses: actions/checkout@v4
+
+    - name: PR review gate (goal + acceptance criteria + validation)
+      if: ${{ github.event_name == 'pull_request' }}
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const pr = context.payload.pull_request;
+          if (!pr) {
+            core.info('No pull_request payload found; skipping.');
+            return;
+          }
+
+          const body = pr.body || '';
+          const requiredMarkers = [
+            '# Summary',
+            '## Goal / Acceptance Criteria (required)',
+            '# Issue / Tracking Link (required)',
+            '# Validation (required)',
+            '## Automated checks',
+            '## Manual test evidence (required)',
+            '# Cross-repo / Downstream impact (always include)',
+          ];
+          const missing = requiredMarkers.filter(m => !body.includes(m));
+          if (missing.length) {
+            core.setFailed(`PR description is missing required sections: ${missing.join(', ')}`);
+            return;
+          }
+
+          function sectionText(md, heading) {
+            const start = md.indexOf(heading);
+            if (start === -1) return '';
+            const rest = md.slice(start + heading.length);
+            const next = rest.search(/\n#{1,2}\s+/);
+            return (next === -1 ? rest : rest.slice(0, next)).trim();
+          }
+
+          function checkboxLines(mdSection) {
+            return mdSection
+              .split(/\r?\n/)
+              .map(l => l.trim())
+              .filter(l => /^- \[[ xX]\]/.test(l));
+          }
+
+          function requireChecked(section, needlePrefix) {
+            const lines = section.split(/\r?\n/).map(l => l.trim());
+            const line = lines.find(l => l.startsWith(needlePrefix));
+            if (!line) return `Missing checkbox line: ${needlePrefix}`;
+            if (!line.startsWith('- [x]') && !line.startsWith('- [X]')) return `Checkbox must be checked: ${needlePrefix}`;
+            return null;
+          }
+
+          // Acceptance criteria must exist and be checked
+          const ac = sectionText(body, '## Goal / Acceptance Criteria (required)');
+          const acBoxes = checkboxLines(ac);
+          const problems = [];
+          if (acBoxes.length === 0) problems.push('Acceptance Criteria section must include at least one checkbox item.');
+          if (acBoxes.length && acBoxes.some(l => !/^\- \[[xX]\]/.test(l))) problems.push('All Acceptance Criteria checkboxes must be checked.');
+
+          // Tracking link must not be placeholder underscores
+          const fixesLine = (body.split(/\r?\n/).find(l => l.trim().toLowerCase().startsWith('fixes:')) || '').trim();
+          if (!fixesLine || /_{5,}/.test(fixesLine)) {
+            problems.push('Fixes: must reference a real issue/ticket (not placeholders).');
+          }
+
+          // Validation checkboxes
+          const validation = sectionText(body, '# Validation (required)');
+          const auto = sectionText(body, '## Automated checks');
+          const manual = sectionText(body, '## Manual test evidence (required)');
+
+          const lintReq = requireChecked(auto, '- [ ] Lint passes');
+          if (lintReq) problems.push(lintReq.replace('- [ ]', '- [x]'));
+          const buildReq = requireChecked(auto, '- [ ] Build passes');
+          if (buildReq) problems.push(buildReq.replace('- [ ]', '- [x]'));
+          const manualReq = requireChecked(manual, '- [ ] Manual test entry #1');
+          if (manualReq) problems.push(manualReq.replace('- [ ]', '- [x]'));
+
+          // Cross-repo impact must be explicitly filled (can be "None")
+          const crossRepoLine = (body.split(/\r?\n/).find(l => l.trim().startsWith('- Related repos/services impacted:')) || '').trim();
+          if (!crossRepoLine || /_{5,}/.test(crossRepoLine)) {
+            problems.push('Cross-repo impact must be filled (use "None" if not applicable).');
+          }
+
+          // Lightweight implementation guard: require test changes when UI code changes.
+          const files = await github.paginate(github.rest.pulls.listFiles, {
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: pr.number,
+            per_page: 100,
+          });
+          const changed = files.map(f => f.filename);
+          const uiTouched = changed.some(p => p.startsWith('client/src/'));
+          const testsTouched = changed.some(p => /client\/(src\/.*\.(test|spec)\.[jt]sx?$|e2e\/|__tests__\/)/.test(p));
+          if (uiTouched && !testsTouched) {
+            problems.push('UI code changed under client/src/ but no client tests were updated/added (unit or e2e).');
+          }
+
+          if (problems.length) {
+            core.setFailed(`PR review gate failed:\n- ${problems.join('\n- ')}`);
+            return;
+          }
+          core.info('PR review gate passed.');
+
+    - name: Repo hygiene guard (forbidden env files)
+      shell: bash
+      run: |
+        set -euo pipefail
+        # Forbid committing real env files; examples are allowed.
+        if git ls-files | grep -E '(^|/)\.env$|(^|/)\.env\.local$|(^|/)\.env\.production$|(^|/)\.env\.e2e$' -n; then
+          echo "Forbidden env files detected in git index (.env/.env.local/.env.production/.env.e2e)."
+          echo "Use .env.example files instead."
+          exit 1
+        fi
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -34,6 +146,18 @@ jobs:
     - name: Run tests
       working-directory: client
       run: npm test
+
+  api-integration:
+    needs: client-ci
+    uses: blecx/AI-Agent-Framework/.github/workflows/reusable-client-api-integration.yml@main
+    with:
+      client_runtime: node
+      node_version: '20'
+      client_workdir: client
+      client_install_command: npm ci
+      client_lint_command: ''
+      client_build_command: ''
+      client_test_command: npm run test:api
 
   # E2E tests with smart dependency resolution
   # This job implements intelligent backend dependency resolution:
