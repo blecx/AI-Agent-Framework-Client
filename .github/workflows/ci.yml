@@ -54,11 +54,11 @@ jobs:
               .filter(l => /^- \[[ xX]\]/.test(l));
           }
 
-          function requireChecked(section, needlePrefix) {
+          function requireCheckboxChecked(section, pattern, label) {
             const lines = section.split(/\r?\n/).map(l => l.trim());
-            const line = lines.find(l => l.startsWith(needlePrefix));
-            if (!line) return `Missing checkbox line: ${needlePrefix}`;
-            if (!line.startsWith('- [x]') && !line.startsWith('- [X]')) return `Checkbox must be checked: ${needlePrefix}`;
+            const line = lines.find(l => pattern.test(l));
+            if (!line) return `Missing checkbox line for: ${label}`;
+            if (!/^\- \[[xX]\]/.test(line)) return `Checkbox must be checked for: ${label}`;
             return null;
           }
 
@@ -71,21 +71,25 @@ jobs:
 
           // Tracking link must not be placeholder underscores
           const fixesLine = (body.split(/\r?\n/).find(l => l.trim().toLowerCase().startsWith('fixes:')) || '').trim();
-          if (!fixesLine || /_{5,}/.test(fixesLine)) {
-            problems.push('Fixes: must reference a real issue/ticket (not placeholders).');
-          }
+          const fixesValue = fixesLine.replace(/^fixes:\s*/i, '').trim();
+          const fixesOk =
+            fixesValue.length > 0 &&
+            !/_{5,}/.test(fixesValue) &&
+            !/\*{3,}/.test(fixesValue) &&
+            (['none', 'n/a', 'na'].includes(fixesValue.toLowerCase()) || /#\d+/.test(fixesValue) || /https?:\/\//.test(fixesValue));
+          if (!fixesOk) problems.push('Fixes: must reference a real issue/ticket (e.g. Fixes #123 or URL) or be explicitly "None"/"N/A".');
 
           // Validation checkboxes
           const validation = sectionText(body, '# Validation (required)');
           const auto = sectionText(body, '## Automated checks');
           const manual = sectionText(body, '## Manual test evidence (required)');
 
-          const lintReq = requireChecked(auto, '- [ ] Lint passes');
-          if (lintReq) problems.push(lintReq.replace('- [ ]', '- [x]'));
-          const buildReq = requireChecked(auto, '- [ ] Build passes');
-          if (buildReq) problems.push(buildReq.replace('- [ ]', '- [x]'));
-          const manualReq = requireChecked(manual, '- [ ] Manual test entry #1');
-          if (manualReq) problems.push(manualReq.replace('- [ ]', '- [x]'));
+          const lintReq = requireCheckboxChecked(auto, /^- \[[ xX]\]\s+Lint passes\b/, 'Lint passes');
+          if (lintReq) problems.push(lintReq);
+          const buildReq = requireCheckboxChecked(auto, /^- \[[ xX]\]\s+Build passes\b/, 'Build passes');
+          if (buildReq) problems.push(buildReq);
+          const manualReq = requireCheckboxChecked(manual, /^- \[[ xX]\]\s+Manual test entry #1\b/, 'Manual test entry #1');
+          if (manualReq) problems.push(manualReq);
 
           // Cross-repo impact must be explicitly filled (can be "None")
           const crossRepoLine = (body.split(/\r?\n/).find(l => l.trim().startsWith('- Related repos/services impacted:')) || '').trim();
