@@ -44,4 +44,21 @@ describe('Routing Components', () => {
     expect(screen.getByText('404 - Page Not Found')).toBeInTheDocument();
     expect(screen.getByText('Go Home')).toBeInTheDocument();
   });
+
+  it('home page has correct navigation links', () => {
+    render(
+      <BrowserRouter>
+        <ProjectProvider>
+          <Home />
+        </ProjectProvider>
+      </BrowserRouter>,
+    );
+
+    // Verify both navigation links exist with correct hrefs
+    const projectsLink = screen.getByText('View Projects');
+    expect(projectsLink).toHaveAttribute('href', '/projects');
+
+    const chatLink = screen.getByText('Open Chat');
+    expect(chatLink).toHaveAttribute('href', '/chat');
+  });
 });
