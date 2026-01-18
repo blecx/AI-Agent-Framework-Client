@@ -203,18 +203,19 @@ describe('ApiClient', () => {
       expect(apiClient).toBeDefined();
     });
 
-    it.skip('should use custom timeout', async () => {
-      // Note: MockAdapter doesn't respect axios timeout configuration
-      // This test verifies that timeout can be set, but actual timeout behavior
-      // requires real network requests which are tested in integration/e2e tests
+    it('should use custom timeout', async () => {
       const quickClient = new ApiClient({
         baseURL: 'http://localhost:8000',
         timeout: 100,
       });
 
-      // Verify the client was created with custom timeout
+      // Verify timeout configuration is set correctly
       // @ts-ignore - accessing private property for testing
       expect(quickClient['client'].defaults.timeout).toBe(100);
+
+      // Note: MockAdapter fundamentally cannot simulate axios timeout behavior
+      // because it intercepts requests before axios applies timeout logic.
+      // Timeout behavior is validated in integration tests with real requests.
     });
   });
 });
