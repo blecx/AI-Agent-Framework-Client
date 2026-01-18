@@ -3,9 +3,8 @@
  * Tests RAID-related API calls
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import MockAdapter from 'axios-mock-adapter';
-import axios from 'axios';
 import { ApiClient } from '../../../services/api/client';
 import { RAIDService } from '../../../services/api/raid';
 import {
@@ -25,7 +24,13 @@ describe('RAIDService', () => {
       baseURL: 'http://localhost:8000',
     });
     raidService = new RAIDService(apiClient);
-    mockAxios = new MockAdapter(axios);
+    // @ts-ignore - accessing private property for testing
+    mockAxios = new MockAdapter(apiClient['client']);
+  });
+
+  afterEach(() => {
+    mockAxios.reset();
+    mockAxios.restore();
   });
 
   describe('listRAIDItems', () => {

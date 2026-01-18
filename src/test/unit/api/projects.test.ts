@@ -3,9 +3,8 @@
  * Tests project-related API calls
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import MockAdapter from 'axios-mock-adapter';
-import axios from 'axios';
 import { ApiClient } from '../../../services/api/client';
 import { ProjectsService } from '../../../services/api/projects';
 import { ProjectInfo, ProjectCreate } from '../../../types/api';
@@ -20,7 +19,13 @@ describe('ProjectsService', () => {
       baseURL: 'http://localhost:8000',
     });
     projectsService = new ProjectsService(apiClient);
-    mockAxios = new MockAdapter(axios);
+    // @ts-ignore - accessing private property for testing
+    mockAxios = new MockAdapter(apiClient['client']);
+  });
+
+  afterEach(() => {
+    mockAxios.reset();
+    mockAxios.restore();
   });
 
   describe('listProjects', () => {
