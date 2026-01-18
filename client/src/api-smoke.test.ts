@@ -44,8 +44,8 @@ describe('API Smoke Script Helpers', () => {
 
   it('should validate array responses', () => {
     // The smoke script assertJsonArray function behavior
-    const validArray = [];
-    const invalidArray = {};
+    const validArray: unknown[] = [];
+    const invalidArray: unknown = {};
 
     expect(Array.isArray(validArray)).toBe(true);
     expect(Array.isArray(invalidArray)).toBe(false);
