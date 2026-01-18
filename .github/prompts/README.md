@@ -5,6 +5,7 @@ This directory contains reusable prompt templates to help maintain consistent de
 ## Available Templates
 
 ### 1. [Feature Planning](feature-planning.md)
+
 **When to use**: Before starting any new feature development.
 
 **Purpose**: Create a comprehensive plan with goal, scope, acceptance criteria, and issue breakdown.
@@ -16,6 +17,7 @@ This directory contains reusable prompt templates to help maintain consistent de
 ---
 
 ### 2. [Implementation Issue](implementation-issue.md)
+
 **When to use**: When breaking down feature plan into individual GitHub issues.
 
 **Purpose**: Create detailed, actionable issues with clear acceptance criteria and testing steps.
@@ -27,6 +29,7 @@ This directory contains reusable prompt templates to help maintain consistent de
 ---
 
 ### 3. [PR Description](pr-description.md)
+
 **When to use**: When opening a pull request for completed work.
 
 **Purpose**: Document changes, validation performed, and testing results comprehensively.
@@ -38,6 +41,7 @@ This directory contains reusable prompt templates to help maintain consistent de
 ---
 
 ### 4. [Cross-Repo Coordination](cross-repo-coordination.md)
+
 **When to use**: When changes require coordination with the backend API (`blecx/AI-Agent-Framework`).
 
 **Purpose**: Plan API contract changes and coordinate timeline between repos.
@@ -45,6 +49,16 @@ This directory contains reusable prompt templates to help maintain consistent de
 **Output**: Coordination plan with compatibility matrix and testing strategy.
 
 **Time**: 15-20 minutes
+
+---
+
+### 5. [PR Review Rubric](pr-review-rubric.md)
+
+**When to use**: When reviewing a PR manually or running a review agent.
+
+**Purpose**: Ensure the stated goal/acceptance criteria are actually implemented, validated, and safe to merge.
+
+**Output**: Pass/fail against acceptance criteria with evidence, plus an approve vs request-changes recommendation.
 
 ---
 
@@ -133,6 +147,7 @@ When changes affect both client and backend API:
 ## Quick Start
 
 ### For New Features
+
 ```bash
 # 1. Use feature planning template
 cat .github/prompts/feature-planning.md
@@ -147,6 +162,7 @@ git checkout -b feature/issue-123-description
 ```
 
 ### For Cross-Repo Changes
+
 ```bash
 # 1. Plan coordination
 cat .github/prompts/cross-repo-coordination.md
@@ -171,6 +187,7 @@ cat .github/prompts/cross-repo-coordination.md
 ## Validation Commands
 
 **ALWAYS run these before committing:**
+
 ```bash
 cd client
 npm run lint         # Must pass with 0 errors
@@ -178,6 +195,7 @@ npm run build        # Must succeed
 ```
 
 **For UI changes, also test in browser:**
+
 ```bash
 cd client
 npm run dev          # Open http://localhost:5173
@@ -194,6 +212,7 @@ npm run dev          # Open http://localhost:5173
 ## Contributing to Templates
 
 If you find these templates helpful and want to suggest improvements:
+
 1. Create an issue describing the improvement
 2. Follow the workflow above (yes, meta!)
 3. Submit PR with updated template(s)

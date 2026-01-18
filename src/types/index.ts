@@ -1,3 +1,4 @@
+// Legacy chat types (to be deprecated)
 export interface PromptMessage {
   id: string;
   role: 'user' | 'assistant' | 'system';
@@ -33,3 +34,6 @@ export interface ApiConfig {
   baseUrl: string;
   apiKey?: string;
 }
+
+// Export all API types
+export * from './api';
