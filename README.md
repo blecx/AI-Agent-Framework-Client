@@ -24,6 +24,7 @@ docker compose -f docker-compose.production.yml up -d
 - **[E2E Testing Guide](client/e2e/README.md)** - Playwright E2E test setup and usage
 - **[Production Deployment](docs/PRODUCTION.md)** - Production setup, security, and scaling
 - **[Deployment Guide](DEPLOYMENT.md)** - Docker and environment configuration
+- **[UI Component Library](docs/UI-COMPONENTS.md)** - Shared typed UI primitives and demo route
 
 ## 🤝 Contributing
 
