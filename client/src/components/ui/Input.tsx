@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useId } from 'react';
 import './ui.css';
 
 export interface InputProps extends Omit<
@@ -12,9 +12,9 @@ export interface InputProps extends Omit<
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, hint, error, id, className, ...rest }, ref) => {
-    const inputId = id || rest.name || undefined;
-    const describedById =
-      hint || error ? `${inputId || 'ui-input'}-desc` : undefined;
+    const autoId = useId();
+    const inputId = id || rest.name || autoId;
+    const describedById = hint || error ? `${inputId}-desc` : undefined;
 
     return (
       <div className="ui-field">

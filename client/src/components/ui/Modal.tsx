@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import './ui.css';
 
 export type ModalSize = 'sm' | 'md' | 'lg';
@@ -26,6 +26,8 @@ export function Modal({
   closeOnOverlayClick = true,
   ariaLabelledById,
 }: ModalProps) {
+  const autoTitleId = useId();
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -45,7 +47,7 @@ export function Modal({
 
   if (!isOpen) return null;
 
-  const titleId = ariaLabelledById;
+  const titleId = ariaLabelledById || (title ? autoTitleId : undefined);
 
   const modalClasses = ['ui-modal', `ui-modal--${size}`].join(' ');
 
@@ -64,7 +66,9 @@ export function Modal({
       >
         {title ? (
           <div className="ui-modal__header">
-            <h2 className="ui-modal__title">{title}</h2>
+            <h2 id={titleId} className="ui-modal__title">
+              {title}
+            </h2>
             <button
               type="button"
               className="ui-modal__close"

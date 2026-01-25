@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useId } from 'react';
 import './ui.css';
 
 export interface SelectOption {
@@ -19,9 +19,9 @@ export interface SelectProps extends Omit<
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, hint, error, id, className, options, ...rest }, ref) => {
-    const selectId = id || rest.name || undefined;
-    const describedById =
-      hint || error ? `${selectId || 'ui-select'}-desc` : undefined;
+    const autoId = useId();
+    const selectId = id || rest.name || autoId;
+    const describedById = hint || error ? `${selectId}-desc` : undefined;
 
     return (
       <div className="ui-field">

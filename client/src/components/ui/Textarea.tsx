@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useId } from 'react';
 import './ui.css';
 
 export interface TextareaProps extends Omit<
@@ -12,9 +12,9 @@ export interface TextareaProps extends Omit<
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, hint, error, id, className, ...rest }, ref) => {
-    const textareaId = id || rest.name || undefined;
-    const describedById =
-      hint || error ? `${textareaId || 'ui-textarea'}-desc` : undefined;
+    const autoId = useId();
+    const textareaId = id || rest.name || autoId;
+    const describedById = hint || error ? `${textareaId}-desc` : undefined;
 
     return (
       <div className="ui-field">
