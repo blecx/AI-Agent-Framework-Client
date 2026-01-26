@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { projectsReducer, ProjectsState } from '../../../state/projectsState';
+import {
+  projectsReducer,
+  type ProjectsState,
+} from '../../../state/projectsSlice';
 import { createAsyncSlice } from '../../../state/types';
 
 describe('projectsState', () => {
@@ -20,8 +23,8 @@ describe('projectsState', () => {
         {
           key: 'P1',
           name: 'Project 1',
-          created_at: 'now',
-          updated_at: 'now',
+          createdAt: 'now',
+          updatedAt: 'now',
         },
       ],
     });

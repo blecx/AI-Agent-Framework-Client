@@ -29,19 +29,19 @@ Provide a consistent state management layer for Projects, RAID, and Workflow tha
 ## Acceptance criteria mapping
 
 - **State accessible throughout app via hooks**: export `useProjectsState`, `useRaidState`, `useWorkflowState`, `useUiPreferences`.
-- **Loading/error states managed consistently**: standardized `AsyncSlice<T>` shape (`data`, `isLoading`, `error`).
+- **Loading/error states managed consistently**: standardized `AsyncSlice<T>` shape (`status`, `data`, `error`), where `status` is one of `'idle' | 'loading' | 'success' | 'error'`.
 - **State updates trigger re-renders correctly**: reducer-based immutable updates.
 - **Unit tests pass**: vitest tests for reducer/actions and `localStorage` persistence.
 
 ## Target files
 
-- `src/state/*` (new): state types, reducers, providers, hooks
-- `src/App.tsx`: wrap routes with provider
-- `src/test/unit/state/*` (new): unit tests
+- `client/src/state/*` (new): state types, reducers, providers, hooks
+- `client/src/App.tsx`: wrap app with providers
+- `client/src/test/unit/state/*` (new): unit tests
 
 ## Validation
 
 From repo root:
 
-- `npm test`
-- `npm run build`
+- `cd client && npm run test`
+- `cd client && npm run build`

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   loadUiPreferences,
   saveUiPreferences,
-} from '../../../state/uiPreferences';
+} from '../../../state/uiPreferencesStorage';
 
 describe('uiPreferences', () => {
   beforeEach(() => {

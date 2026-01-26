@@ -1,19 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { raidReducer, type RaidState } from '../../../state/raidState';
 import {
-  RAIDImpactLevel,
-  RAIDLikelihood,
-  RAIDPriority,
-  RAIDStatus,
-  RAIDType,
-  type RAIDItem,
-  type RAIDItemList,
-} from '../../../types/api';
+  raidReducer,
+  type RaidItem,
+  type RaidItemList,
+  type RaidState,
+} from '../../../state/raidSlice';
 import { createAsyncSlice } from '../../../state/types';
 
 describe('raidState', () => {
   const initialState: RaidState = {
-    raidItems: createAsyncSlice<RAIDItemList>({ items: [], total: 0 }),
+    raidItems: createAsyncSlice<RaidItemList>({ items: [], total: 0 }),
   };
 
   it('sets loading status', () => {
@@ -33,18 +29,13 @@ describe('raidState', () => {
   });
 
   it('sets items data and success status', () => {
-    const item: RAIDItem = {
+    const item: RaidItem = {
       id: '1',
-      project_key: 'P1',
-      type: RAIDType.RISK,
+      projectKey: 'P1',
+      type: 'risk',
       title: 'Risk 1',
-      description: 'Risk description',
-      status: RAIDStatus.OPEN,
-      priority: RAIDPriority.HIGH,
-      impact: RAIDImpactLevel.HIGH,
-      likelihood: RAIDLikelihood.POSSIBLE,
-      created_at: 'now',
-      updated_at: 'now',
+      createdAt: 'now',
+      updatedAt: 'now',
     };
 
     const next = raidReducer(initialState, {
@@ -59,16 +50,13 @@ describe('raidState', () => {
   });
 
   it('respects explicit total when setting items', () => {
-    const item: RAIDItem = {
+    const item: RaidItem = {
       id: '1',
-      project_key: 'P1',
-      type: RAIDType.ISSUE,
+      projectKey: 'P1',
+      type: 'issue',
       title: 'Issue 1',
-      description: 'Issue description',
-      status: RAIDStatus.OPEN,
-      priority: RAIDPriority.MEDIUM,
-      created_at: 'now',
-      updated_at: 'now',
+      createdAt: 'now',
+      updatedAt: 'now',
     };
 
     const next = raidReducer(initialState, {

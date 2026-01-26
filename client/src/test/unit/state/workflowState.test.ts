@@ -1,13 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import {
+  WORKFLOW_STATES,
   workflowReducer,
-  type WorkflowSliceState,
-} from '../../../state/workflowState';
-import {
-  WorkflowStateEnum,
   type AllowedTransitions,
+  type WorkflowSliceState,
   type WorkflowState,
-} from '../../../types/api';
+} from '../../../state/workflowSlice';
 import { createAsyncSlice } from '../../../state/types';
 
 describe('workflowState', () => {
@@ -62,10 +60,10 @@ describe('workflowState', () => {
 
   it('sets workflow data and success status', () => {
     const workflow: WorkflowState = {
-      project_key: 'P1',
-      current_state: WorkflowStateEnum.PLANNING,
-      allowed_transitions: [WorkflowStateEnum.EXECUTING],
-      updated_at: 'now',
+      projectKey: 'P1',
+      currentState: WORKFLOW_STATES.PLANNING,
+      allowedTransitions: [WORKFLOW_STATES.EXECUTING],
+      updatedAt: 'now',
     };
 
     const next = workflowReducer(initialState, {
@@ -74,15 +72,15 @@ describe('workflowState', () => {
     });
 
     expect(next.workflow.status).toBe('success');
-    expect(next.workflow.data?.current_state).toBe(WorkflowStateEnum.PLANNING);
+    expect(next.workflow.data?.currentState).toBe(WORKFLOW_STATES.PLANNING);
     expect(next.workflow.error).toBe(null);
   });
 
   it('sets allowed transitions data and success status', () => {
     const allowed: AllowedTransitions = {
-      project_key: 'P1',
-      current_state: WorkflowStateEnum.PLANNING,
-      allowed_transitions: [WorkflowStateEnum.EXECUTING],
+      projectKey: 'P1',
+      currentState: WORKFLOW_STATES.PLANNING,
+      allowedTransitions: [WORKFLOW_STATES.EXECUTING],
     };
 
     const next = workflowReducer(initialState, {
@@ -91,8 +89,8 @@ describe('workflowState', () => {
     });
 
     expect(next.allowedTransitions.status).toBe('success');
-    expect(next.allowedTransitions.data?.allowed_transitions).toEqual([
-      WorkflowStateEnum.EXECUTING,
+    expect(next.allowedTransitions.data?.allowedTransitions).toEqual([
+      WORKFLOW_STATES.EXECUTING,
     ]);
     expect(next.allowedTransitions.error).toBe(null);
   });
@@ -102,19 +100,19 @@ describe('workflowState', () => {
       workflow: {
         status: 'success',
         data: {
-          project_key: 'P1',
-          current_state: WorkflowStateEnum.CLOSED,
-          allowed_transitions: [],
-          updated_at: 'now',
+          projectKey: 'P1',
+          currentState: WORKFLOW_STATES.CLOSED,
+          allowedTransitions: [],
+          updatedAt: 'now',
         },
         error: null,
       },
       allowedTransitions: {
         status: 'success',
         data: {
-          project_key: 'P1',
-          current_state: WorkflowStateEnum.CLOSED,
-          allowed_transitions: [],
+          projectKey: 'P1',
+          currentState: WORKFLOW_STATES.CLOSED,
+          allowedTransitions: [],
         },
         error: null,
       },

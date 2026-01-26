@@ -18,6 +18,10 @@ import UiLibraryDemo from './components/UiLibraryDemo';
 import { ToastProvider } from './components/ToastContext';
 import ToastContainer from './components/ToastContainer';
 import apiClient from './services/apiClient';
+import { ProjectsStateProvider } from './state/projectsState';
+import { RaidStateProvider } from './state/raidState';
+import { UiPreferencesProvider } from './state/uiPreferences';
+import { WorkflowStateProvider } from './state/workflowState';
 import './App.css';
 
 // Create a QueryClient instance
@@ -123,33 +127,44 @@ function Navigation() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ToastProvider>
-        <Router>
-          <div className="App">
-            <Navigation />
-            <main className="app-main">
-              <Routes>
-                <Route path="/" element={<ProjectList />} />
-                <Route path="/projects" element={<ProjectList />} />
-                <Route path="/projects/:projectKey" element={<ProjectView />} />
-                <Route
-                  path="/projects/:projectKey/propose"
-                  element={<ProposePanel />}
-                />
-                <Route
-                  path="/projects/:projectKey/apply"
-                  element={<ApplyPanelWrapper />}
-                />
-                <Route path="/project/:key" element={<ProjectView />} />
-                <Route path="/commands" element={<CommandPanel />} />
-                <Route path="/api-tester" element={<ApiTester />} />
-                <Route path="/ui" element={<UiLibraryDemo />} />
-              </Routes>
-            </main>
-            <ToastContainer />
-          </div>
-        </Router>
-      </ToastProvider>
+      <UiPreferencesProvider>
+        <ProjectsStateProvider>
+          <RaidStateProvider>
+            <WorkflowStateProvider>
+              <ToastProvider>
+                <Router>
+                  <div className="App">
+                    <Navigation />
+                    <main className="app-main">
+                      <Routes>
+                        <Route path="/" element={<ProjectList />} />
+                        <Route path="/projects" element={<ProjectList />} />
+                        <Route
+                          path="/projects/:projectKey"
+                          element={<ProjectView />}
+                        />
+                        <Route
+                          path="/projects/:projectKey/propose"
+                          element={<ProposePanel />}
+                        />
+                        <Route
+                          path="/projects/:projectKey/apply"
+                          element={<ApplyPanelWrapper />}
+                        />
+                        <Route path="/project/:key" element={<ProjectView />} />
+                        <Route path="/commands" element={<CommandPanel />} />
+                        <Route path="/api-tester" element={<ApiTester />} />
+                        <Route path="/ui" element={<UiLibraryDemo />} />
+                      </Routes>
+                    </main>
+                    <ToastContainer />
+                  </div>
+                </Router>
+              </ToastProvider>
+            </WorkflowStateProvider>
+          </RaidStateProvider>
+        </ProjectsStateProvider>
+      </UiPreferencesProvider>
     </QueryClientProvider>
   );
 }
