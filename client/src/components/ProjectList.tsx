@@ -4,6 +4,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../services/apiClient';
 import type { Project } from '../types';
 import { useToast } from '../hooks/useToast';
+import { SkeletonProjectCard } from './ui/Skeleton';
+import EmptyState from './ui/EmptyState';
+import { Button } from './ui/Button';
 import './ProjectList.css';
 
 export default function ProjectList() {
@@ -11,11 +14,19 @@ export default function ProjectList() {
   const queryClient = useQueryClient();
   const toast = useToast();
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newProject, setNewProject] = useState({ key: '', name: '', description: '' });
+  const [newProject, setNewProject] = useState({
+    key: '',
+    name: '',
+    description: '',
+  });
   const [error, setError] = useState<string | null>(null);
 
   // Fetch projects
-  const { data: projectsResponse, isLoading, error: queryError } = useQuery({
+  const {
+    data: projectsResponse,
+    isLoading,
+    error: queryError,
+  } = useQuery({
     queryKey: ['projects'],
     queryFn: async () => {
       const response = await apiClient.listProjects();
@@ -28,11 +39,15 @@ export default function ProjectList() {
 
   // Create project mutation
   const createProjectMutation = useMutation({
-    mutationFn: async (project: { key: string; name: string; description?: string }) => {
+    mutationFn: async (project: {
+      key: string;
+      name: string;
+      description?: string;
+    }) => {
       const response = await apiClient.createProject(
         project.key,
         project.name,
-        project.description
+        project.description,
       );
       if (!response.success) {
         throw new Error(response.error || 'Failed to create project');
@@ -69,7 +84,14 @@ export default function ProjectList() {
   if (isLoading) {
     return (
       <div className="project-list-container">
-        <div className="loading">Loading projects...</div>
+        <header className="project-list-header">
+          <h1>Projects</h1>
+        </header>
+        <div className="projects-grid">
+          <SkeletonProjectCard />
+          <SkeletonProjectCard />
+          <SkeletonProjectCard />
+        </div>
       </div>
     );
   }
@@ -77,7 +99,9 @@ export default function ProjectList() {
   if (queryError) {
     return (
       <div className="project-list-container">
-        <div className="error">Error loading projects: {(queryError as Error).message}</div>
+        <div className="error">
+          Error loading projects: {(queryError as Error).message}
+        </div>
       </div>
     );
   }
@@ -109,7 +133,9 @@ export default function ProjectList() {
                 id="projectKey"
                 type="text"
                 value={newProject.key}
-                onChange={(e) => setNewProject({ ...newProject, key: e.target.value })}
+                onChange={(e) =>
+                  setNewProject({ ...newProject, key: e.target.value })
+                }
                 placeholder="e.g., my-project"
                 required
               />
@@ -121,7 +147,9 @@ export default function ProjectList() {
                 id="projectName"
                 type="text"
                 value={newProject.name}
-                onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
+                onChange={(e) =>
+                  setNewProject({ ...newProject, name: e.target.value })
+                }
                 placeholder="e.g., My Awesome Project"
                 required
               />
@@ -131,38 +159,47 @@ export default function ProjectList() {
               <textarea
                 id="projectDescription"
                 value={newProject.description}
-                onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+                onChange={(e) =>
+                  setNewProject({ ...newProject, description: e.target.value })
+                }
                 placeholder="Optional project description"
                 rows={3}
               />
             </div>
             <div className="form-actions">
-              <button
+              <Button
                 type="submit"
-                className="btn-primary"
+                variant="primary"
+                isLoading={createProjectMutation.isPending}
                 disabled={createProjectMutation.isPending}
               >
-                {createProjectMutation.isPending ? 'Creating...' : 'Create Project'}
-              </button>
-              <button
+                Create Project
+              </Button>
+              <Button
                 type="button"
-                className="btn-secondary"
+                variant="secondary"
                 onClick={() => {
                   setShowCreateForm(false);
                   setError(null);
                 }}
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </form>
         </div>
       )}
 
       {projects.length === 0 ? (
-        <div className="empty-state">
-          <p>No projects yet. Create your first project to get started!</p>
-        </div>
+        <EmptyState
+          icon="📁"
+          title="No projects yet"
+          description="Create your first project to start managing your work with AI-powered assistance."
+          action={{
+            label: '+ Create Project',
+            onClick: () => setShowCreateForm(true),
+          }}
+        />
       ) : (
         <div className="projects-grid">
           {projects.map((project: Project) => (
@@ -178,7 +215,9 @@ export default function ProjectList() {
                 <p className="project-description">{project.description}</p>
               )}
               <div className="project-meta">
-                <span>Created: {new Date(project.createdAt).toLocaleDateString()}</span>
+                <span>
+                  Created: {new Date(project.createdAt).toLocaleDateString()}
+                </span>
                 {project.gitRepo && (
                   <span className="git-status">
                     📁 {project.gitRepo.branch}
