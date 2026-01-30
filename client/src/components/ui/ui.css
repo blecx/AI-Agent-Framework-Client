@@ -2,7 +2,7 @@
   --ui-color-bg: #ffffff;
   --ui-color-surface: #ffffff;
   --ui-color-text: #213547;
-  --ui-color-muted: #666666;
+  --ui-color-muted: #4a4a4a;
   --ui-color-border: #e1e1e1;
 
   --ui-color-primary: #646cff;
@@ -82,7 +82,7 @@
 
 .ui-button--secondary {
   background: var(--ui-color-neutral);
-  color: #333;
+  color: #1a1a1a;
 }
 
 .ui-button--secondary:hover:not(:disabled) {
@@ -110,6 +110,12 @@
 
 .ui-button--fullWidth {
   width: 100%;
+}
+
+/* Focus indicators for all buttons */
+.ui-button:focus-visible {
+  outline: 2px solid #646cff;
+  outline-offset: 2px;
 }
 
 .ui-spinner {
