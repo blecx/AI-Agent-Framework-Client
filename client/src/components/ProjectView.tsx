@@ -5,6 +5,7 @@ import apiClient from '../services/apiClient';
 import ProposePanel from './ProposePanel';
 import ApplyPanel from './ApplyPanel';
 import CommandPanel from './ProjectCommandPanel';
+import Skeleton from './ui/Skeleton';
 import './ProjectView.css';
 
 type TabType = 'overview' | 'propose' | 'apply' | 'commands';
@@ -15,7 +16,11 @@ export default function ProjectView() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
 
   // Fetch project data
-  const { data: projectResponse, isLoading, error } = useQuery({
+  const {
+    data: projectResponse,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['project', key],
     queryFn: async () => {
       if (!key) throw new Error('Project key is required');
@@ -31,7 +36,31 @@ export default function ProjectView() {
   if (isLoading) {
     return (
       <div className="project-view-container">
-        <div className="loading">Loading project...</div>
+        <header className="project-header">
+          <div className="header-left">
+            <button className="btn-back" onClick={() => navigate('/')}>
+              ← Back to Projects
+            </button>
+            <div>
+              <Skeleton width="200px" height="32px" />
+              <Skeleton width="150px" height="16px" />
+            </div>
+          </div>
+        </header>
+        <nav className="project-tabs">
+          <Skeleton variant="rectangular" width="100px" height="40px" />
+          <Skeleton variant="rectangular" width="150px" height="40px" />
+          <Skeleton variant="rectangular" width="140px" height="40px" />
+          <Skeleton variant="rectangular" width="120px" height="40px" />
+        </nav>
+        <div className="project-content">
+          <div className="project-section">
+            <Skeleton width="180px" height="24px" />
+            <Skeleton width="100%" height="20px" />
+            <Skeleton width="90%" height="20px" />
+            <Skeleton width="80%" height="20px" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -122,13 +151,17 @@ export default function ProjectView() {
                 {project.gitRepo.lastCommit && (
                   <div className="detail-row">
                     <span className="label">Last Commit:</span>
-                    <span className="monospace">{project.gitRepo.lastCommit}</span>
+                    <span className="monospace">
+                      {project.gitRepo.lastCommit}
+                    </span>
                   </div>
                 )}
                 {project.gitRepo.status && (
                   <div className="detail-row">
                     <span className="label">Status:</span>
-                    <span className={`status-badge status-${project.gitRepo.status}`}>
+                    <span
+                      className={`status-badge status-${project.gitRepo.status}`}
+                    >
                       {project.gitRepo.status}
                     </span>
                   </div>
@@ -145,7 +178,8 @@ export default function ProjectView() {
                       <div className="document-name">{doc.name}</div>
                       <div className="document-path">{doc.path}</div>
                       <div className="document-meta">
-                        Last modified: {new Date(doc.lastModified).toLocaleString()}
+                        Last modified:{' '}
+                        {new Date(doc.lastModified).toLocaleString()}
                       </div>
                     </div>
                   ))}
