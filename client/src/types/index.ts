@@ -2,6 +2,8 @@
  * Type definitions for AI Agent Framework Client
  */
 
+export * from './raid';
+
 // Project types
 export interface Project {
   key: string;
