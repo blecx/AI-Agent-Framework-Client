@@ -2,8 +2,9 @@
  * Toast Context - Global toast notification management
  */
 
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { subscribe } from '../notifications/notificationBus';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
@@ -38,9 +39,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
+  const createToastId = () => {
+    const randomUUID = globalThis.crypto?.randomUUID?.bind(globalThis.crypto);
+    if (randomUUID) {
+      return randomUUID();
+    }
+    return `toast_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  };
+
   const showToast = useCallback(
     (type: ToastType, message: string, duration: number = 5000) => {
-      const id = crypto.randomUUID();
+      const id = createToastId();
       const newToast: Toast = { id, type, message, duration };
 
       setToasts((prev) => [...prev, newToast]);
@@ -54,6 +63,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     },
     [removeToast]
   );
+
+  useEffect(() => {
+    return subscribe((event) => {
+      showToast(event.type, event.message, event.duration);
+    });
+  }, [showToast]);
 
   return (
     <ToastContext.Provider value={{ toasts, showToast, removeToast }}>
