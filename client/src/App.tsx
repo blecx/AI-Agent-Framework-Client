@@ -136,8 +136,11 @@ function App() {
                 <ErrorBoundary>
                   <Router>
                     <div className="App">
+                      <a href="#main-content" className="skip-to-content">
+                        Skip to main content
+                      </a>
                       <Navigation />
-                      <main className="app-main">
+                      <main id="main-content" className="app-main">
                         <Routes>
                           <Route path="/" element={<ProjectList />} />
                           <Route path="/projects" element={<ProjectList />} />
