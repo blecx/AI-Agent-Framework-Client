@@ -1,11 +1,23 @@
 /**
  * API Client for AI Agent Framework
- * Provides methods for project management, proposals, and commands
+ * Provides methods for project management, proposals, commands, and RAID
  */
 
 import axios, { AxiosError } from 'axios';
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
-import type { Project, Proposal, Command, ApiResponse } from '../types';
+import type {
+  Project,
+  Proposal,
+  Command,
+  ApiResponse,
+  RAIDItem,
+  RAIDItemCreate,
+  RAIDItemUpdate,
+  RAIDItemList,
+  RAIDType,
+  RAIDStatus,
+  RAIDPriority,
+} from '../types';
 import { notify } from '../notifications/notificationBus';
 
 type ApiClientRequestConfig = AxiosRequestConfig & {
@@ -430,6 +442,135 @@ class ApiClient {
       suppressToastConfig,
     );
     return response.data;
+  }
+
+  // ============================================================================
+  // RAID Register Endpoints
+  // ============================================================================
+
+  /**
+   * List RAID items for a project with optional filters
+   * GET /projects/:projectKey/raid
+   */
+  async listRAIDItems(
+    projectKey: string,
+    filters?: {
+      type?: RAIDType;
+      status?: RAIDStatus;
+      owner?: string;
+      priority?: RAIDPriority;
+    },
+  ): Promise<ApiResponse<RAIDItemList>> {
+    try {
+      const params = new URLSearchParams();
+      if (filters?.type) params.append('type', filters.type);
+      if (filters?.status) params.append('status', filters.status);
+      if (filters?.owner) params.append('owner', filters.owner);
+      if (filters?.priority) params.append('priority', filters.priority);
+
+      const queryString = params.toString();
+      const url = `/projects/${projectKey}/raid${queryString ? `?${queryString}` : ''}`;
+
+      const response = await this.client.get<RAIDItemList>(url);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'Failed to list RAID items',
+      };
+    }
+  }
+
+  /**
+   * Get a specific RAID item
+   * GET /projects/:projectKey/raid/:raidId
+   */
+  async getRAIDItem(
+    projectKey: string,
+    raidId: string,
+  ): Promise<ApiResponse<RAIDItem>> {
+    try {
+      const response = await this.client.get<RAIDItem>(
+        `/projects/${projectKey}/raid/${raidId}`,
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'Failed to get RAID item',
+      };
+    }
+  }
+
+  /**
+   * Create a new RAID item
+   * POST /projects/:projectKey/raid
+   */
+  async createRAIDItem(
+    projectKey: string,
+    data: RAIDItemCreate,
+  ): Promise<ApiResponse<RAIDItem>> {
+    try {
+      const response = await this.client.post<RAIDItem>(
+        `/projects/${projectKey}/raid`,
+        data,
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'Failed to create RAID item',
+      };
+    }
+  }
+
+  /**
+   * Update an existing RAID item
+   * PUT /projects/:projectKey/raid/:raidId
+   */
+  async updateRAIDItem(
+    projectKey: string,
+    raidId: string,
+    data: RAIDItemUpdate,
+  ): Promise<ApiResponse<RAIDItem>> {
+    try {
+      const response = await this.client.put<RAIDItem>(
+        `/projects/${projectKey}/raid/${raidId}`,
+        data,
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'Failed to update RAID item',
+      };
+    }
+  }
+
+  /**
+   * Delete a RAID item
+   * DELETE /projects/:projectKey/raid/:raidId
+   */
+  async deleteRAIDItem(
+    projectKey: string,
+    raidId: string,
+  ): Promise<ApiResponse<{ message: string }>> {
+    try {
+      const response = await this.client.delete<{ message: string }>(
+        `/projects/${projectKey}/raid/${raidId}`,
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'Failed to delete RAID item',
+      };
+    }
   }
 }
 
