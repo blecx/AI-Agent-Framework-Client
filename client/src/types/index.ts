@@ -3,6 +3,7 @@
  */
 
 export * from './raid';
+export * from './workflow';
 
 // Project types
 export interface Project {
