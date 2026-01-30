@@ -74,6 +74,56 @@
   padding: 0;
 }
 
+/* Error boundary fallback UI */
+.error-boundary {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #fff;
+  border: 1px solid #e1e1e1;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.error-boundary h2 {
+  margin: 0 0 0.5rem;
+  color: #222;
+}
+
+.error-boundary p {
+  margin: 0 0 1rem;
+  color: #555;
+}
+
+.error-boundary-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.error-boundary-actions button {
+  border: 1px solid #d0d0d0;
+  background: #f7f7f7;
+  color: #222;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.error-boundary-actions button:hover {
+  background: #efefef;
+}
+
+.error-boundary-details {
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 0.75rem;
+  color: #b00020;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .app-nav {

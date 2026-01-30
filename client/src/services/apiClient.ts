@@ -4,13 +4,49 @@
  */
 
 import axios, { AxiosError } from 'axios';
-import type { AxiosInstance } from 'axios';
-import type { 
-  Project, 
-  Proposal, 
-  Command, 
-  ApiResponse 
-} from '../types';
+import type { AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { Project, Proposal, Command, ApiResponse } from '../types';
+import { notify } from '../notifications/notificationBus';
+
+type ApiClientRequestConfig = AxiosRequestConfig & {
+  suppressErrorToast?: boolean;
+};
+
+type NotifyFn = typeof notify;
+
+export function formatApiErrorMessage(error: AxiosError): string {
+  if (error.response) {
+    const responseData = error.response.data as
+      | { message?: string; detail?: string }
+      | undefined;
+
+    return (
+      responseData?.detail ||
+      responseData?.message ||
+      `API Error: ${error.response.status}`
+    );
+  }
+
+  if (error.request) {
+    return 'No response from server. Please check if the API is running.';
+  }
+
+  return error.message || 'Request failed';
+}
+
+export function handleApiClientAxiosError(
+  error: AxiosError,
+  notifyFn: NotifyFn = notify,
+): never {
+  const cfg = (error.config || {}) as ApiClientRequestConfig;
+  const message = formatApiErrorMessage(error);
+
+  if (!cfg.suppressErrorToast) {
+    notifyFn({ type: 'error', message, duration: 5000 });
+  }
+
+  throw new Error(message);
+}
 
 class ApiClient {
   private client: AxiosInstance;
@@ -20,12 +56,12 @@ class ApiClient {
   constructor() {
     this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
     this.apiKey = import.meta.env.VITE_API_KEY || '';
-    
+
     this.client = axios.create({
       baseURL: this.baseUrl,
       headers: {
         'Content-Type': 'application/json',
-        ...(this.apiKey && { 'Authorization': `Bearer ${this.apiKey}` }),
+        ...(this.apiKey && { Authorization: `Bearer ${this.apiKey}` }),
       },
       timeout: 30000,
     });
@@ -34,21 +70,8 @@ class ApiClient {
     this.client.interceptors.response.use(
       (response) => response,
       (error: AxiosError) => {
-        if (error.response) {
-          // Server responded with error status
-          const responseData = error.response.data as { message?: string } | undefined;
-          throw new Error(
-            responseData?.message || 
-            `API Error: ${error.response.status}`
-          );
-        } else if (error.request) {
-          // Request made but no response
-          throw new Error('No response from server. Please check if the API is running.');
-        } else {
-          // Error in request setup
-          throw new Error(error.message || 'Request failed');
-        }
-      }
+        handleApiClientAxiosError(error);
+      },
     );
   }
 
@@ -90,7 +113,8 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to list projects',
+        error:
+          error instanceof Error ? error.message : 'Failed to list projects',
       };
     }
   }
@@ -116,7 +140,11 @@ class ApiClient {
   /**
    * Create a new project
    */
-  async createProject(key: string, name: string, description?: string): Promise<ApiResponse<Project>> {
+  async createProject(
+    key: string,
+    name: string,
+    description?: string,
+  ): Promise<ApiResponse<Project>> {
     try {
       const response = await this.client.post<Project>('/projects', {
         key,
@@ -130,7 +158,8 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to create project',
+        error:
+          error instanceof Error ? error.message : 'Failed to create project',
       };
     }
   }
@@ -138,9 +167,15 @@ class ApiClient {
   /**
    * Update a project
    */
-  async updateProject(key: string, updates: Partial<Project>): Promise<ApiResponse<Project>> {
+  async updateProject(
+    key: string,
+    updates: Partial<Project>,
+  ): Promise<ApiResponse<Project>> {
     try {
-      const response = await this.client.put<Project>(`/projects/${key}`, updates);
+      const response = await this.client.put<Project>(
+        `/projects/${key}`,
+        updates,
+      );
       return {
         success: true,
         data: response.data,
@@ -148,7 +183,8 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to update project',
+        error:
+          error instanceof Error ? error.message : 'Failed to update project',
       };
     }
   }
@@ -165,7 +201,8 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to delete project',
+        error:
+          error instanceof Error ? error.message : 'Failed to delete project',
       };
     }
   }
@@ -175,11 +212,14 @@ class ApiClient {
   /**
    * Propose changes to a project
    */
-  async propose(projectKey: string, changes: object): Promise<ApiResponse<Proposal>> {
+  async propose(
+    projectKey: string,
+    changes: object,
+  ): Promise<ApiResponse<Proposal>> {
     try {
       const response = await this.client.post<Proposal>(
         `/projects/${projectKey}/proposals`,
-        changes
+        changes,
       );
       return {
         success: true,
@@ -188,7 +228,8 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to create proposal',
+        error:
+          error instanceof Error ? error.message : 'Failed to create proposal',
       };
     }
   }
@@ -199,7 +240,7 @@ class ApiClient {
   async getProposals(projectKey: string): Promise<ApiResponse<Proposal[]>> {
     try {
       const response = await this.client.get<Proposal[]>(
-        `/projects/${projectKey}/proposals`
+        `/projects/${projectKey}/proposals`,
       );
       return {
         success: true,
@@ -208,7 +249,8 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to get proposals',
+        error:
+          error instanceof Error ? error.message : 'Failed to get proposals',
       };
     }
   }
@@ -216,10 +258,13 @@ class ApiClient {
   /**
    * Get a specific proposal
    */
-  async getProposal(projectKey: string, proposalId: string): Promise<ApiResponse<Proposal>> {
+  async getProposal(
+    projectKey: string,
+    proposalId: string,
+  ): Promise<ApiResponse<Proposal>> {
     try {
       const response = await this.client.get<Proposal>(
-        `/projects/${projectKey}/proposals/${proposalId}`
+        `/projects/${projectKey}/proposals/${proposalId}`,
       );
       return {
         success: true,
@@ -228,7 +273,8 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to get proposal',
+        error:
+          error instanceof Error ? error.message : 'Failed to get proposal',
       };
     }
   }
@@ -236,10 +282,13 @@ class ApiClient {
   /**
    * Apply a proposal to the project
    */
-  async applyProposal(projectKey: string, proposalId: string): Promise<ApiResponse<Proposal>> {
+  async applyProposal(
+    projectKey: string,
+    proposalId: string,
+  ): Promise<ApiResponse<Proposal>> {
     try {
       const response = await this.client.post<Proposal>(
-        `/projects/${projectKey}/proposals/${proposalId}/apply`
+        `/projects/${projectKey}/proposals/${proposalId}/apply`,
       );
       return {
         success: true,
@@ -248,7 +297,8 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to apply proposal',
+        error:
+          error instanceof Error ? error.message : 'Failed to apply proposal',
       };
     }
   }
@@ -256,10 +306,13 @@ class ApiClient {
   /**
    * Reject a proposal
    */
-  async rejectProposal(projectKey: string, proposalId: string): Promise<ApiResponse<Proposal>> {
+  async rejectProposal(
+    projectKey: string,
+    proposalId: string,
+  ): Promise<ApiResponse<Proposal>> {
     try {
       const response = await this.client.post<Proposal>(
-        `/projects/${projectKey}/proposals/${proposalId}/reject`
+        `/projects/${projectKey}/proposals/${proposalId}/reject`,
       );
       return {
         success: true,
@@ -268,7 +321,8 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to reject proposal',
+        error:
+          error instanceof Error ? error.message : 'Failed to reject proposal',
       };
     }
   }
@@ -281,7 +335,7 @@ class ApiClient {
   async executeCommand(
     command: string,
     projectKey?: string,
-    args?: string[]
+    args?: string[],
   ): Promise<ApiResponse<Command>> {
     try {
       const response = await this.client.post<Command>('/commands', {
@@ -296,7 +350,8 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to execute command',
+        error:
+          error instanceof Error ? error.message : 'Failed to execute command',
       };
     }
   }
@@ -322,10 +377,12 @@ class ApiClient {
   /**
    * Get command history
    */
-  async getCommandHistory(projectKey?: string): Promise<ApiResponse<Command[]>> {
+  async getCommandHistory(
+    projectKey?: string,
+  ): Promise<ApiResponse<Command[]>> {
     try {
-      const url = projectKey 
-        ? `/commands?projectKey=${projectKey}` 
+      const url = projectKey
+        ? `/commands?projectKey=${projectKey}`
         : '/commands';
       const response = await this.client.get<Command[]>(url);
       return {
@@ -335,7 +392,10 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to get command history',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to get command history',
       };
     }
   }
@@ -345,7 +405,14 @@ class ApiClient {
    * GET /health
    */
   async checkHealth(): Promise<{ status: string; timestamp?: string }> {
-    const response = await this.client.get<{ status: string; timestamp?: string }>('/health');
+    const suppressToastConfig: ApiClientRequestConfig = {
+      suppressErrorToast: true,
+    };
+
+    const response = await this.client.get<{
+      status: string;
+      timestamp?: string;
+    }>('/health', suppressToastConfig);
     return response.data;
   }
 
@@ -354,7 +421,14 @@ class ApiClient {
    * GET /info
    */
   async getInfo(): Promise<{ version: string; name: string }> {
-    const response = await this.client.get<{ version: string; name: string }>('/info');
+    const suppressToastConfig: ApiClientRequestConfig = {
+      suppressErrorToast: true,
+    };
+
+    const response = await this.client.get<{ version: string; name: string }>(
+      '/info',
+      suppressToastConfig,
+    );
     return response.data;
   }
 }

@@ -17,6 +17,7 @@ import ApiTester from './components/ApiTester';
 import UiLibraryDemo from './components/UiLibraryDemo';
 import { ToastProvider } from './components/ToastContext';
 import ToastContainer from './components/ToastContainer';
+import ErrorBoundary from './components/ErrorBoundary';
 import apiClient from './services/apiClient';
 import { ProjectsStateProvider } from './state/projectsState';
 import { RaidStateProvider } from './state/raidState';
@@ -132,34 +133,39 @@ function App() {
           <RaidStateProvider>
             <WorkflowStateProvider>
               <ToastProvider>
-                <Router>
-                  <div className="App">
-                    <Navigation />
-                    <main className="app-main">
-                      <Routes>
-                        <Route path="/" element={<ProjectList />} />
-                        <Route path="/projects" element={<ProjectList />} />
-                        <Route
-                          path="/projects/:projectKey"
-                          element={<ProjectView />}
-                        />
-                        <Route
-                          path="/projects/:projectKey/propose"
-                          element={<ProposePanel />}
-                        />
-                        <Route
-                          path="/projects/:projectKey/apply"
-                          element={<ApplyPanelWrapper />}
-                        />
-                        <Route path="/project/:key" element={<ProjectView />} />
-                        <Route path="/commands" element={<CommandPanel />} />
-                        <Route path="/api-tester" element={<ApiTester />} />
-                        <Route path="/ui" element={<UiLibraryDemo />} />
-                      </Routes>
-                    </main>
-                    <ToastContainer />
-                  </div>
-                </Router>
+                <ErrorBoundary>
+                  <Router>
+                    <div className="App">
+                      <Navigation />
+                      <main className="app-main">
+                        <Routes>
+                          <Route path="/" element={<ProjectList />} />
+                          <Route path="/projects" element={<ProjectList />} />
+                          <Route
+                            path="/projects/:projectKey"
+                            element={<ProjectView />}
+                          />
+                          <Route
+                            path="/projects/:projectKey/propose"
+                            element={<ProposePanel />}
+                          />
+                          <Route
+                            path="/projects/:projectKey/apply"
+                            element={<ApplyPanelWrapper />}
+                          />
+                          <Route
+                            path="/project/:key"
+                            element={<ProjectView />}
+                          />
+                          <Route path="/commands" element={<CommandPanel />} />
+                          <Route path="/api-tester" element={<ApiTester />} />
+                          <Route path="/ui" element={<UiLibraryDemo />} />
+                        </Routes>
+                      </main>
+                      <ToastContainer />
+                    </div>
+                  </Router>
+                </ErrorBoundary>
               </ToastProvider>
             </WorkflowStateProvider>
           </RaidStateProvider>
