@@ -17,6 +17,11 @@ import type {
   RAIDType,
   RAIDStatus,
   RAIDPriority,
+  WorkflowStateInfo,
+  WorkflowStateUpdate,
+  AllowedTransitionsResponse,
+  AuditEventList,
+  AuditEventType,
 } from '../types';
 import { notify } from '../notifications/notificationBus';
 
@@ -569,6 +574,128 @@ class ApiClient {
         success: false,
         error:
           error instanceof Error ? error.message : 'Failed to delete RAID item',
+      };
+    }
+  }
+
+  // =========================================================================
+  // Workflow State Methods
+  // =========================================================================
+
+  /**
+   * Get current workflow state for a project
+   * GET /projects/:projectKey/workflow/state
+   */
+  async getWorkflowState(
+    projectKey: string,
+  ): Promise<ApiResponse<WorkflowStateInfo>> {
+    try {
+      const response = await this.client.get<WorkflowStateInfo>(
+        `/projects/${projectKey}/workflow/state`,
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to fetch workflow state',
+      };
+    }
+  }
+
+  /**
+   * Transition workflow state for a project
+   * PATCH /projects/:projectKey/workflow/state
+   */
+  async transitionWorkflowState(
+    projectKey: string,
+    stateUpdate: WorkflowStateUpdate,
+  ): Promise<ApiResponse<WorkflowStateInfo>> {
+    try {
+      const response = await this.client.patch<WorkflowStateInfo>(
+        `/projects/${projectKey}/workflow/state`,
+        stateUpdate,
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to transition workflow state',
+      };
+    }
+  }
+
+  /**
+   * Get allowed workflow state transitions from current state
+   * GET /projects/:projectKey/workflow/allowed-transitions
+   */
+  async getAllowedTransitions(
+    projectKey: string,
+  ): Promise<ApiResponse<AllowedTransitionsResponse>> {
+    try {
+      const response = await this.client.get<AllowedTransitionsResponse>(
+        `/projects/${projectKey}/workflow/allowed-transitions`,
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to fetch allowed transitions',
+      };
+    }
+  }
+
+  // =========================================================================
+  // Audit Events Methods
+  // =========================================================================
+
+  /**
+   * Retrieve audit events for a project with optional filters
+   * GET /projects/:projectKey/audit-events
+   */
+  async getAuditEvents(
+    projectKey: string,
+    filters?: {
+      event_type?: AuditEventType;
+      actor?: string;
+      since?: string;
+      until?: string;
+      limit?: number;
+      offset?: number;
+    },
+  ): Promise<ApiResponse<AuditEventList>> {
+    try {
+      const params = new URLSearchParams();
+
+      if (filters?.event_type) params.append('event_type', filters.event_type);
+      if (filters?.actor) params.append('actor', filters.actor);
+      if (filters?.since) params.append('since', filters.since);
+      if (filters?.until) params.append('until', filters.until);
+      if (filters?.limit !== undefined)
+        params.append('limit', filters.limit.toString());
+      if (filters?.offset !== undefined)
+        params.append('offset', filters.offset.toString());
+
+      const queryString = params.toString();
+      const url = `/projects/${projectKey}/audit-events${queryString ? `?${queryString}` : ''}`;
+
+      const response = await this.client.get<AuditEventList>(url);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to fetch audit events',
       };
     }
   }
