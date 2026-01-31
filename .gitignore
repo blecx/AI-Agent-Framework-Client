@@ -58,3 +58,6 @@ coverage/
 # Temporary files
 tmp/
 temp/
+
+# AI Agent temporary files (workspace-scoped for better tool access)
+.tmp/
