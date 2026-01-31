@@ -4,7 +4,7 @@
  */
 
 import { test, expect } from '../fixtures';
-import { navigateToProject, waitForNavigation } from '../helpers/ui-helpers';
+import { navigateToProject } from '../helpers/ui-helpers';
 
 test.describe('RAID List Views', () => {
   let projectKey: string;
@@ -278,7 +278,7 @@ test.describe('RAID List Views', () => {
     apiHelper,
   }) => {
     // Create a RAID item
-    const item = await apiHelper.createRAIDItem(projectKey, {
+    await apiHelper.createRAIDItem(projectKey, {
       type: 'risk',
       title: 'Navigation Test Risk',
       description: 'Testing navigation flows',
@@ -385,7 +385,8 @@ test.describe('RAID List Views', () => {
     const loadingIndicator = page.locator(
       '.loading, .spinner, [aria-busy="true"]',
     );
-    const hasLoader = (await loadingIndicator.count()) > 0;
+    // Check if loader is present (may be very brief, so we just check)
+    await loadingIndicator.count();
 
     await raidLinkClick;
     await page.waitForLoadState('networkidle');
