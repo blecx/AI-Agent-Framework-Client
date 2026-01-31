@@ -4,11 +4,11 @@ import { resolve } from 'path';
 
 /**
  * Responsive design tests for Issue #46
- * 
+ *
  * These tests validate that responsive CSS media queries exist in component stylesheets.
  * Actual visual responsive behavior is tested manually at breakpoints:
  * - Mobile: <640px
- * - Tablet: <768px  
+ * - Tablet: <768px
  * - Desktop: >1024px
  */
 describe('Responsive Design CSS', () => {
@@ -28,40 +28,40 @@ describe('Responsive Design CSS', () => {
     'client/src/components/chat/ChatMessageList.css',
   ];
 
-  cssFiles.forEach(filePath => {
+  cssFiles.forEach((filePath) => {
     it(`should have responsive breakpoints in ${filePath}`, () => {
       const fullPath = resolve(process.cwd(), filePath);
       const content = readFileSync(fullPath, 'utf-8');
-      
+
       // Check for mobile or tablet media queries
-      const hasResponsive = 
+      const hasResponsive =
         content.includes('@media (max-width: 640px)') || // mobile
         content.includes('@media (max-width: 768px)') || // tablet
         content.includes('@media (max-width: 1024px)'); // large tablet/small desktop
-      
+
       expect(hasResponsive).toBe(true);
     });
   });
 
   it('should use consistent breakpoint values', () => {
     const expectedBreakpoints = [
-      '@media (max-width: 640px)',  // mobile
-      '@media (max-width: 768px)',  // tablet
+      '@media (max-width: 640px)', // mobile
+      '@media (max-width: 768px)', // tablet
     ];
-    
-    let foundBreakpoints = new Set<string>();
-    
-    cssFiles.forEach(filePath => {
+
+    const foundBreakpoints = new Set<string>();
+
+    cssFiles.forEach((filePath) => {
       const fullPath = resolve(process.cwd(), filePath);
       const content = readFileSync(fullPath, 'utf-8');
-      
-      expectedBreakpoints.forEach(breakpoint => {
+
+      expectedBreakpoints.forEach((breakpoint) => {
         if (content.includes(breakpoint)) {
           foundBreakpoints.add(breakpoint);
         }
       });
     });
-    
+
     // Should have used both mobile and tablet breakpoints
     expect(foundBreakpoints.size).toBeGreaterThanOrEqual(2);
   });
