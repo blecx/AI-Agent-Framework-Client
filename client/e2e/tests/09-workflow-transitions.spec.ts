@@ -32,10 +32,7 @@ test.describe('Workflow State Transitions', () => {
     uniqueProjectKey,
   }) => {
     // Setup: Create project
-    await apiHelper.createProject(
-      uniqueProjectKey,
-      'Transition Test Project',
-    );
+    await apiHelper.createProject(uniqueProjectKey, 'Transition Test Project');
 
     // Transition to Planning
     const newState = await apiHelper.transitionWorkflowState(
@@ -136,10 +133,11 @@ test.describe('Workflow State Transitions', () => {
       );
       // If we get here, the test should fail
       expect(true).toBe(false); // Force failure
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Should get 400 error for invalid transition
-      expect(error.response?.status).toBe(400);
-      expect(error.response?.data?.detail).toContain('Invalid transition');
+      const axiosError = error as { response?: { status?: number; data?: { detail?: string } } };
+      expect(axiosError.response?.status).toBe(400);
+      expect(axiosError.response?.data?.detail).toContain('Invalid transition');
     }
 
     // Verify state unchanged
@@ -172,9 +170,10 @@ test.describe('Workflow State Transitions', () => {
         'Try to reopen',
       );
       expect(true).toBe(false); // Force failure if no error
-    } catch (error: any) {
-      expect(error.response?.status).toBe(400);
-      expect(error.response?.data?.detail).toContain('Invalid transition');
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number; data?: { detail?: string } } };
+      expect(axiosError.response?.status).toBe(400);
+      expect(axiosError.response?.data?.detail).toContain('Invalid transition');
     }
 
     // Verify state still closed
@@ -187,15 +186,11 @@ test.describe('Workflow State Transitions', () => {
     uniqueProjectKey,
   }) => {
     // Create project in Initiating state
-    await apiHelper.createProject(
-      uniqueProjectKey,
-      'Allowed Transitions Test',
-    );
+    await apiHelper.createProject(uniqueProjectKey, 'Allowed Transitions Test');
 
     // Check allowed transitions from Initiating
-    let allowedTransitions = await apiHelper.getAllowedTransitions(
-      uniqueProjectKey,
-    );
+    let allowedTransitions =
+      await apiHelper.getAllowedTransitions(uniqueProjectKey);
     expect(allowedTransitions.current_state).toBe('initiating');
     expect(allowedTransitions.allowed_transitions).toEqual(['planning']);
 
@@ -203,9 +198,8 @@ test.describe('Workflow State Transitions', () => {
     await apiHelper.transitionWorkflowState(uniqueProjectKey, 'planning');
 
     // Check allowed transitions from Planning
-    allowedTransitions = await apiHelper.getAllowedTransitions(
-      uniqueProjectKey,
-    );
+    allowedTransitions =
+      await apiHelper.getAllowedTransitions(uniqueProjectKey);
     expect(allowedTransitions.current_state).toBe('planning');
     expect(allowedTransitions.allowed_transitions).toHaveLength(2);
     expect(allowedTransitions.allowed_transitions).toContain('executing');
@@ -215,9 +209,8 @@ test.describe('Workflow State Transitions', () => {
     await apiHelper.transitionWorkflowState(uniqueProjectKey, 'executing');
 
     // Check allowed transitions from Executing
-    allowedTransitions = await apiHelper.getAllowedTransitions(
-      uniqueProjectKey,
-    );
+    allowedTransitions =
+      await apiHelper.getAllowedTransitions(uniqueProjectKey);
     expect(allowedTransitions.current_state).toBe('executing');
     expect(allowedTransitions.allowed_transitions).toContain('monitoring');
     expect(allowedTransitions.allowed_transitions).toContain('planning');
@@ -252,14 +245,14 @@ test.describe('Workflow State Transitions', () => {
 
     // Find workflow transition events
     const workflowEvents = auditEvents.events.filter(
-      (event: any) => event.event_type === 'workflow.state_transition',
+      (event: { event_type?: string }) => event.event_type === 'workflow.state_transition',
     );
 
     expect(workflowEvents.length).toBeGreaterThanOrEqual(2);
 
     // Verify event structure
     const firstTransition = workflowEvents.find(
-      (e: any) => e.event_data?.to_state === 'planning',
+      (e: { event_data?: { to_state?: string } }) => e.event_data?.to_state === 'planning',
     );
     expect(firstTransition).toBeDefined();
     expect(firstTransition.actor).toBe('user-1');
@@ -307,15 +300,12 @@ test.describe('Workflow State Transitions', () => {
     expect(state.current_state).toBe('closing');
 
     // Closing → Closed
-    state = await apiHelper.transitionWorkflowState(
-      uniqueProjectKey,
-      'closed',
-    );
+    state = await apiHelper.transitionWorkflowState(uniqueProjectKey, 'closed');
     expect(state.current_state).toBe('closed');
 
     // Verify complete transition history
     expect(state.transition_history).toHaveLength(5);
-    const states = state.transition_history.map((t: any) => t.to_state);
+    const states = state.transition_history.map((t: { to_state?: string }) => t.to_state);
     expect(states).toEqual([
       'planning',
       'executing',
@@ -337,16 +327,8 @@ test.describe('Workflow State Transitions', () => {
 
     // Try two transitions at same time (one should succeed, one may fail)
     const [result1, result2] = await Promise.allSettled([
-      apiHelper.transitionWorkflowState(
-        uniqueProjectKey,
-        'planning',
-        'user-1',
-      ),
-      apiHelper.transitionWorkflowState(
-        uniqueProjectKey,
-        'planning',
-        'user-2',
-      ),
+      apiHelper.transitionWorkflowState(uniqueProjectKey, 'planning', 'user-1'),
+      apiHelper.transitionWorkflowState(uniqueProjectKey, 'planning', 'user-2'),
     ]);
 
     // At least one should succeed
