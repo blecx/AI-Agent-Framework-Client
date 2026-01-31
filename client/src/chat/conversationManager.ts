@@ -1,10 +1,16 @@
 /**
  * Conversation manager for multi-turn chat dialogs
- * 
+ *
  * Manages conversation state for creating/editing RAID items and transitioning workflows.
  */
 
-import { CommandType, type ConversationState, type CreateRAIDState, type ConversationStep, type CommandIntent } from './types';
+import {
+  CommandType,
+  type ConversationState,
+  type CreateRAIDState,
+  type ConversationStep,
+  type CommandIntent,
+} from './types';
 import { RAIDType, RAIDStatus, RAIDPriority } from '../types/raid';
 
 /**
@@ -12,10 +18,10 @@ import { RAIDType, RAIDStatus, RAIDPriority } from '../types/raid';
  */
 export function initCreateRAIDConversation(
   projectKey: string,
-  raidType: RAIDType | null
+  raidType: RAIDType | null,
 ): CreateRAIDState {
   const steps = getCreateRAIDSteps(raidType);
-  
+
   return {
     intent: CommandType.CREATE_RAID,
     projectKey,
@@ -60,7 +66,8 @@ function getCreateRAIDSteps(raidType: RAIDType | null): ConversationStep[] {
       field: 'priority',
       prompt: 'What is the priority? (critical, high, medium, low)',
       required: true,
-      validate: (value) => Object.values(RAIDPriority).includes(value as RAIDPriority),
+      validate: (value) =>
+        Object.values(RAIDPriority).includes(value as RAIDPriority),
     },
     {
       field: 'owner',
@@ -72,7 +79,7 @@ function getCreateRAIDSteps(raidType: RAIDType | null): ConversationStep[] {
 
   // If type is already known, skip the type question
   if (raidType) {
-    return commonSteps.filter(step => step.field !== 'type');
+    return commonSteps.filter((step) => step.field !== 'type');
   }
 
   return commonSteps;
@@ -83,7 +90,7 @@ function getCreateRAIDSteps(raidType: RAIDType | null): ConversationStep[] {
  */
 export function processConversationResponse(
   state: ConversationState,
-  userResponse: string
+  userResponse: string,
 ): {
   state: ConversationState;
   nextPrompt: string | null;
@@ -117,7 +124,7 @@ export function processConversationResponse(
  */
 function processCreateRAIDResponse(
   state: CreateRAIDState,
-  userResponse: string
+  userResponse: string,
 ): {
   state: CreateRAIDState;
   nextPrompt: string | null;
@@ -125,7 +132,7 @@ function processCreateRAIDResponse(
   error?: string;
 } {
   const currentStepDef = state.steps[state.currentStep];
-  
+
   if (!currentStepDef) {
     return {
       state,
@@ -137,7 +144,7 @@ function processCreateRAIDResponse(
 
   // Parse and validate the response
   const parsedValue = parseFieldValue(currentStepDef.field, userResponse);
-  
+
   if (currentStepDef.validate && !currentStepDef.validate(parsedValue)) {
     return {
       state,
@@ -196,7 +203,8 @@ function parseRAIDType(input: string): RAIDType {
   if (lower.includes('risk')) return RAIDType.RISK;
   if (lower.includes('assumption')) return RAIDType.ASSUMPTION;
   if (lower.includes('issue')) return RAIDType.ISSUE;
-  if (lower.includes('dependency') || lower.includes('depend')) return RAIDType.DEPENDENCY;
+  if (lower.includes('dependency') || lower.includes('depend'))
+    return RAIDType.DEPENDENCY;
   return input as RAIDType; // Will fail validation
 }
 
@@ -205,9 +213,11 @@ function parseRAIDType(input: string): RAIDType {
  */
 function parseRAIDPriority(input: string): RAIDPriority {
   const lower = input.toLowerCase();
-  if (lower.includes('critical') || lower.includes('crit')) return RAIDPriority.CRITICAL;
+  if (lower.includes('critical') || lower.includes('crit'))
+    return RAIDPriority.CRITICAL;
   if (lower.includes('high')) return RAIDPriority.HIGH;
-  if (lower.includes('medium') || lower.includes('med')) return RAIDPriority.MEDIUM;
+  if (lower.includes('medium') || lower.includes('med'))
+    return RAIDPriority.MEDIUM;
   if (lower.includes('low')) return RAIDPriority.LOW;
   return input as RAIDPriority; // Will fail validation
 }
@@ -218,7 +228,8 @@ function parseRAIDPriority(input: string): RAIDPriority {
 function parseRAIDStatus(input: string): RAIDStatus {
   const lower = input.toLowerCase();
   if (lower.includes('open')) return RAIDStatus.OPEN;
-  if (lower.includes('progress') || lower.includes('in progress')) return RAIDStatus.IN_PROGRESS;
+  if (lower.includes('progress') || lower.includes('in progress'))
+    return RAIDStatus.IN_PROGRESS;
   if (lower.includes('mitigat')) return RAIDStatus.MITIGATED;
   if (lower.includes('clos')) return RAIDStatus.CLOSED;
   if (lower.includes('accept')) return RAIDStatus.ACCEPTED;
@@ -230,7 +241,7 @@ function parseRAIDStatus(input: string): RAIDStatus {
  */
 export function startConversation(
   intent: CommandIntent,
-  projectKey: string
+  projectKey: string,
 ): {
   state: ConversationState;
   initialPrompt: string;
@@ -239,7 +250,7 @@ export function startConversation(
     const raidType = intent.params.raidType as RAIDType | undefined;
     const state = initCreateRAIDConversation(projectKey, raidType || null);
     const initialPrompt = state.steps[0].prompt;
-    
+
     return { state, initialPrompt };
   }
 
