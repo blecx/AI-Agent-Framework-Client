@@ -1,7 +1,19 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { Breadcrumb } from '../components/Breadcrumb';
+import { ProjectProvider } from '../contexts/ProjectContext';
+
+// Mock API services used by ProjectSelector
+vi.mock('../services/api/client', () => ({
+  ApiClient: vi.fn(function (this: any) {}),
+}));
+
+vi.mock('../services/api/projects', () => ({
+  ProjectsService: vi.fn(function (this: any) {
+    this.listProjects = vi.fn().mockResolvedValue([]);
+  }),
+}));
 
 // Mock useLocation for different paths
 const renderBreadcrumbAt = (pathname: string) => {
@@ -10,12 +22,18 @@ const renderBreadcrumbAt = (pathname: string) => {
 
   render(
     <BrowserRouter>
-      <Breadcrumb />
+      <ProjectProvider>
+        <Breadcrumb />
+      </ProjectProvider>
     </BrowserRouter>,
   );
 };
 
 describe('Breadcrumb Component', () => {
+  beforeEach(() => {
+    // Clear localStorage before each test
+    localStorage.clear();
+  });
   it('renders Home link at root', () => {
     renderBreadcrumbAt('/');
     expect(screen.getByText('Home')).toBeInTheDocument();

@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { ProjectSelector } from './ProjectSelector';
 import './Breadcrumb.css';
 
 export function Breadcrumb() {
@@ -17,27 +18,32 @@ export function Breadcrumb() {
 
   return (
     <nav aria-label="Breadcrumb" className="breadcrumb">
-      <ol>
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        {pathSegments.map((segment, index) => {
-          const path = '/' + pathSegments.slice(0, index + 1).join('/');
-          const isLast = index === pathSegments.length - 1;
-          const label = getLabel(segment);
+      <div className="breadcrumb-content">
+        <ol>
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          {pathSegments.map((segment, index) => {
+            const path = '/' + pathSegments.slice(0, index + 1).join('/');
+            const isLast = index === pathSegments.length - 1;
+            const label = getLabel(segment);
 
-          return (
-            <li key={path}>
-              <span className="separator">/</span>
-              {isLast ? (
-                <span className="current">{label}</span>
-              ) : (
-                <Link to={path}>{label}</Link>
-              )}
-            </li>
-          );
-        })}
-      </ol>
+            return (
+              <li key={path}>
+                <span className="separator">/</span>
+                {isLast ? (
+                  <span className="current">{label}</span>
+                ) : (
+                  <Link to={path}>{label}</Link>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+        <div className="breadcrumb-actions">
+          <ProjectSelector />
+        </div>
+      </div>
     </nav>
   );
 }
