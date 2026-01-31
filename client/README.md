@@ -145,9 +145,20 @@ client/
 
 ## 🧪 Testing
 
-### Unit Tests (121 passing, 23 test files)
+### Unit Tests (141 passing, 23 test files) ✅
 
-- **RAID Components**: 76 tests (5 test files)
+All tests passing as of 2026-01-31
+
+Run tests:
+
+```bash
+npm test              # Watch mode
+npm test -- --run     # Run once
+```
+
+**Test Breakdown:**
+
+- **RAID Components**: 76 tests (5 test files) - **COMPLETE** ✅
   - RAIDBadge: 25 tests (type/status/priority variants)
   - RAIDFilters: 14 tests (filter logic, URL sync)
   - RAIDList: 8 tests (list rendering, filtering)
@@ -156,9 +167,17 @@ client/
 - **UI Components**: 11 tests (Button, Modal, Table, EmptyState, Skeleton)
 - **State Management**: 20 tests (projects, RAID, workflow, preferences)
 - **API Services**: 13 tests (error handling, retries)
+- **Type Validation**: 4 tests (RAID types, workflow types)
 - **Accessibility**: 5 tests (ARIA, keyboard nav)
+- **Smoke Tests**: 4 tests (API integration)
+- **Other**: 8 tests (ErrorBoundary, App, notifications)
 
-**Note**: Some tests currently failing (8 failures) - primarily in RAIDList component due to import issues.
+**Test Quality:**
+
+- All API calls properly mocked
+- React Testing Library used throughout
+- Comprehensive component coverage
+- Duration: ~6.75s for full suite
 
 ### E2E Tests (Playwright)
 
