@@ -7,6 +7,7 @@ import EmptyState from './ui/EmptyState';
 import { Button } from './ui/Button';
 import { TypeBadge, StatusBadge, PriorityBadge } from './raid/RAIDBadge';
 import { RAIDFilters, type RAIDFiltersState } from './raid/RAIDFilters';
+import { RAIDCreateModal } from './raid/RAIDCreateModal';
 import './RAIDList.css';
 
 interface RAIDListProps {
@@ -15,35 +16,41 @@ interface RAIDListProps {
 
 export default function RAIDList({ projectKey }: RAIDListProps) {
   const [searchParams, setSearchParams] = useSearchParams();
-  
-  // Initialize filters from URL params
-  const [selectedFilters, setSelectedFilters] = useState<RAIDFiltersState>(() => {
-    const type = searchParams.get('type') as RAIDType | null;
-    const status = searchParams.get('status') as RAIDStatus | null;
-    const priority = searchParams.get('priority') as RAIDPriority | null;
-    const owner = searchParams.get('owner');
-    const dueDateFrom = searchParams.get('dueDateFrom');
-    const dueDateTo = searchParams.get('dueDateTo');
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
-    return {
-      type: type || undefined,
-      status: status || undefined,
-      priority: priority || undefined,
-      owner: owner || undefined,
-      dueDateFrom: dueDateFrom || undefined,
-      dueDateTo: dueDateTo || undefined,
-    };
-  });
+  // Initialize filters from URL params
+  const [selectedFilters, setSelectedFilters] = useState<RAIDFiltersState>(
+    () => {
+      const type = searchParams.get('type') as RAIDType | null;
+      const status = searchParams.get('status') as RAIDStatus | null;
+      const priority = searchParams.get('priority') as RAIDPriority | null;
+      const owner = searchParams.get('owner');
+      const dueDateFrom = searchParams.get('dueDateFrom');
+      const dueDateTo = searchParams.get('dueDateTo');
+
+      return {
+        type: type || undefined,
+        status: status || undefined,
+        priority: priority || undefined,
+        owner: owner || undefined,
+        dueDateFrom: dueDateFrom || undefined,
+        dueDateTo: dueDateTo || undefined,
+      };
+    },
+  );
 
   // Update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams();
     if (selectedFilters.type) params.set('type', selectedFilters.type);
     if (selectedFilters.status) params.set('status', selectedFilters.status);
-    if (selectedFilters.priority) params.set('priority', selectedFilters.priority);
+    if (selectedFilters.priority)
+      params.set('priority', selectedFilters.priority);
     if (selectedFilters.owner) params.set('owner', selectedFilters.owner);
-    if (selectedFilters.dueDateFrom) params.set('dueDateFrom', selectedFilters.dueDateFrom);
-    if (selectedFilters.dueDateTo) params.set('dueDateTo', selectedFilters.dueDateTo);
+    if (selectedFilters.dueDateFrom)
+      params.set('dueDateFrom', selectedFilters.dueDateFrom);
+    if (selectedFilters.dueDateTo)
+      params.set('dueDateTo', selectedFilters.dueDateTo);
     setSearchParams(params, { replace: true });
   }, [selectedFilters, setSearchParams]);
 
@@ -95,17 +102,17 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
       items = items.filter((item: RAIDItem) => {
         if (!item.target_resolution_date) return false;
         const itemDate = new Date(item.target_resolution_date);
-        
+
         if (selectedFilters.dueDateFrom) {
           const fromDate = new Date(selectedFilters.dueDateFrom);
           if (itemDate < fromDate) return false;
         }
-        
+
         if (selectedFilters.dueDateTo) {
           const toDate = new Date(selectedFilters.dueDateTo);
           if (itemDate > toDate) return false;
         }
-        
+
         return true;
       });
     }
@@ -223,12 +230,7 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
       <div className="raid-list-container">
         <header className="raid-list-header">
           <h2>RAID Register</h2>
-          <Button
-            variant="primary"
-            onClick={() => {
-              /* TODO: Open create modal */
-            }}
-          >
+          <Button variant="primary" onClick={() => setShowCreateModal(true)}>
             + Add RAID Item
           </Button>
         </header>
@@ -238,9 +240,7 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
           description="Track Risks, Assumptions, Issues, and Dependencies for this project."
           action={{
             label: 'Add First Item',
-            onClick: () => {
-              /* TODO: Open create modal */
-            },
+            onClick: () => setShowCreateModal(true),
           }}
         />
       </div>
@@ -256,12 +256,7 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
             {items.length} {items.length === 1 ? 'item' : 'items'}
           </span>
         </div>
-        <Button
-          variant="primary"
-          onClick={() => {
-            /* TODO: Open create modal */
-          }}
-        >
+        <Button variant="primary" onClick={() => setShowCreateModal(true)}>
           + Add RAID Item
         </Button>
       </header>
@@ -317,6 +312,13 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
             </tbody>
           </table>
         </div>
+      )}
+
+      {showCreateModal && (
+        <RAIDCreateModal
+          projectKey={projectKey}
+          onClose={() => setShowCreateModal(false)}
+        />
       )}
     </div>
   );
