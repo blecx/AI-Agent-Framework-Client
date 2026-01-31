@@ -4,6 +4,13 @@
   border-bottom: 1px solid #ddd;
 }
 
+.breadcrumb-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .breadcrumb ol {
   list-style: none;
   padding: 0;
@@ -11,6 +18,8 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .breadcrumb li {
@@ -36,4 +45,11 @@
 .breadcrumb .current {
   color: #333;
   font-weight: 500;
+}
+
+.breadcrumb-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
