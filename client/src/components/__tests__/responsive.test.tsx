@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync, existsSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 /**
  * Responsive design tests for Issue #46
@@ -12,7 +13,10 @@ import { resolve } from 'path';
  * - Desktop: >1024px
  */
 describe('Responsive Design CSS', () => {
-  // Paths are relative to project root where tests run
+  // Determine project root: go up from client/src/components/__tests__ to project root
+  const projectRoot = resolve(__dirname, '../../../../');
+  
+  // Paths are relative to project root
   const cssFiles = [
     'src/App.css',
     'src/components/Breadcrumb.css',
@@ -31,8 +35,10 @@ describe('Responsive Design CSS', () => {
 
   cssFiles.forEach((filePath) => {
     it(`should have responsive breakpoints in ${filePath}`, () => {
-      // Working directory is project root, so paths are already correct
-      const fullPath = resolve(process.cwd(), filePath);
+      const fullPath = resolve(projectRoot, filePath);
+      
+      // Verify file exists before reading
+      expect(existsSync(fullPath)).toBe(true);
       const content = readFileSync(fullPath, 'utf-8');
 
       // Check for mobile or tablet media queries
@@ -54,7 +60,7 @@ describe('Responsive Design CSS', () => {
     const foundBreakpoints = new Set<string>();
 
     cssFiles.forEach((filePath) => {
-      const fullPath = resolve(process.cwd(), filePath);
+      const fullPath = resolve(projectRoot, filePath);
       const content = readFileSync(fullPath, 'utf-8');
 
       expectedBreakpoints.forEach((breakpoint) => {
