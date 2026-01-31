@@ -84,7 +84,7 @@ describe('RAIDDetail', () => {
     );
 
     const badge = screen.getByText('Risk');
-    expect(badge).toHaveClass('type-badge', 'type-risk');
+    expect(badge).toHaveClass('raid-badge', 'raid-badge-type', 'raid-badge-type-risk');
   });
 
   it('should display status and priority badges', () => {
@@ -97,10 +97,10 @@ describe('RAIDDetail', () => {
     );
 
     const statusBadge = screen.getByText('Open');
-    expect(statusBadge).toHaveClass('status-badge', 'status-open');
+    expect(statusBadge).toHaveClass('raid-badge', 'raid-badge-status', 'raid-badge-status-open');
 
     const priorityBadge = screen.getByText('HIGH');
-    expect(priorityBadge).toHaveClass('priority-badge', 'priority-high');
+    expect(priorityBadge).toHaveClass('raid-badge', 'raid-badge-priority', 'raid-badge-priority-high');
   });
 
   it('should format dates correctly', () => {

@@ -1,0 +1,123 @@
+/* RAID Badge Component Styles */
+
+.raid-badge {
+  display: inline-block;
+  font-weight: 600;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+}
+
+/* Size variants */
+.raid-badge-sm {
+  padding: 0.125rem 0.5rem;
+  font-size: 0.625rem;
+}
+
+.raid-badge-md {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+.raid-badge-lg {
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* Type badges */
+.raid-badge-type-risk {
+  background: #fee;
+  color: #c00;
+}
+
+.raid-badge-type-assumption {
+  background: #fef3e0;
+  color: #c77700;
+}
+
+.raid-badge-type-issue {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.raid-badge-type-dependency {
+  background: #e3f2fd;
+  color: #0277bd;
+}
+
+/* Status badges */
+.raid-badge-status-open {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.raid-badge-status-in_progress {
+  background: #fed7aa;
+  color: #c2410c;
+}
+
+.raid-badge-status-mitigated {
+  background: #e9d5ff;
+  color: #7c3aed;
+}
+
+.raid-badge-status-closed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.raid-badge-status-accepted {
+  background: #d1fae5;
+  color: #047857;
+}
+
+/* Priority badges */
+.raid-badge-priority-critical {
+  background: #fee;
+  color: #c00;
+}
+
+.raid-badge-priority-high {
+  background: #fed7aa;
+  color: #c2410c;
+}
+
+.raid-badge-priority-medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.raid-badge-priority-low {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* Hover effects (optional) */
+.raid-badge-type,
+.raid-badge-status,
+.raid-badge-priority {
+  transition: opacity 0.15s;
+}
+
+.raid-badge-type:hover,
+.raid-badge-status:hover,
+.raid-badge-priority:hover {
+  opacity: 0.9;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .raid-badge-type,
+  .raid-badge-status,
+  .raid-badge-priority {
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .raid-badge {
+    border: 2px solid currentColor;
+  }
+}

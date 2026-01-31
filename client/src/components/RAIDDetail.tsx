@@ -13,6 +13,7 @@ import {
   RAIDLikelihood,
 } from '../types/raid';
 import { showToast } from '../utils/toast';
+import { TypeBadge, StatusBadge, PriorityBadge } from './raid/RAIDBadge';
 import './RAIDDetail.css';
 
 interface RAIDDetailProps {
@@ -95,17 +96,6 @@ export function RAIDDetail({ item, projectKey, onClose }: RAIDDetailProps) {
     setIsEditing(false);
   };
 
-  const getTypeLabel = (type: RAIDType): string => {
-    return type.charAt(0).toUpperCase() + type.slice(1);
-  };
-
-  const getStatusLabel = (status: RAIDStatus): string => {
-    return status
-      .split('_')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
-
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -138,9 +128,7 @@ export function RAIDDetail({ item, projectKey, onClose }: RAIDDetailProps) {
       <div className="raid-detail-modal" onClick={(e) => e.stopPropagation()}>
         <div className="raid-detail-header">
           <div className="raid-detail-title-row">
-            <span className={`type-badge type-${item.type}`}>
-              {getTypeLabel(item.type)}
-            </span>
+            <TypeBadge value={item.type} />
             <h2>{item.id}</h2>
             <button
               className="raid-detail-close"
@@ -362,16 +350,12 @@ export function RAIDDetail({ item, projectKey, onClose }: RAIDDetailProps) {
               <div className="detail-grid">
                 <div className="detail-field">
                   <span className="detail-label">Status</span>
-                  <span className={`status-badge status-${item.status}`}>
-                    {getStatusLabel(item.status)}
-                  </span>
+                  <StatusBadge value={item.status} />
                 </div>
 
                 <div className="detail-field">
                   <span className="detail-label">Priority</span>
-                  <span className={`priority-badge priority-${item.priority}`}>
-                    {item.priority.toUpperCase()}
-                  </span>
+                  <PriorityBadge value={item.priority} />
                 </div>
 
                 <div className="detail-field">

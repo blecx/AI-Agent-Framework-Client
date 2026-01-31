@@ -4,6 +4,7 @@ import apiClient from '../services/apiClient';
 import type { RAIDItem, RAIDType, RAIDStatus, RAIDPriority } from '../types';
 import EmptyState from './ui/EmptyState';
 import { Button } from './ui/Button';
+import { TypeBadge, StatusBadge, PriorityBadge } from './raid/RAIDBadge';
 import './RAIDList.css';
 
 interface RAIDListProps {
@@ -43,49 +44,6 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
       month: 'short',
       day: 'numeric',
     });
-  };
-
-  const getPriorityColor = (priority: RAIDPriority): string => {
-    switch (priority) {
-      case 'critical':
-        return 'priority-critical';
-      case 'high':
-        return 'priority-high';
-      case 'medium':
-        return 'priority-medium';
-      case 'low':
-        return 'priority-low';
-      default:
-        return '';
-    }
-  };
-
-  const getStatusColor = (status: RAIDStatus): string => {
-    switch (status) {
-      case 'open':
-        return 'status-open';
-      case 'in_progress':
-        return 'status-in-progress';
-      case 'mitigated':
-        return 'status-mitigated';
-      case 'closed':
-        return 'status-closed';
-      case 'accepted':
-        return 'status-accepted';
-      default:
-        return '';
-    }
-  };
-
-  const getTypeLabel = (type: RAIDType): string => {
-    return type.charAt(0).toUpperCase() + type.slice(1);
-  };
-
-  const getStatusLabel = (status: RAIDStatus): string => {
-    return status
-      .split('_')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
   };
 
   if (isLoading) {
@@ -259,24 +217,14 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
                 }}
               >
                 <td>
-                  <span className={`type-badge type-${item.type}`}>
-                    {getTypeLabel(item.type)}
-                  </span>
+                  <TypeBadge value={item.type} size="sm" />
                 </td>
                 <td className="raid-title">{item.title}</td>
                 <td>
-                  <span
-                    className={`status-badge ${getStatusColor(item.status)}`}
-                  >
-                    {getStatusLabel(item.status)}
-                  </span>
+                  <StatusBadge value={item.status} size="sm" />
                 </td>
                 <td>
-                  <span
-                    className={`priority-badge ${getPriorityColor(item.priority)}`}
-                  >
-                    {item.priority.toUpperCase()}
-                  </span>
+                  <PriorityBadge value={item.priority} size="sm" />
                 </td>
                 <td>{item.owner}</td>
                 <td className="raid-date">{formatDate(item.created_at)}</td>
