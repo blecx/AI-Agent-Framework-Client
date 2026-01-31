@@ -36,12 +36,14 @@ This client implements a **hybrid approach** combining AI-guided artifact creati
 ## 🚀 Features
 
 ### Chat Interface (Primary)
+
 - **AI-Guided Artifact Creation**: Create project plans, RAID items, workflows via natural language
 - **ISO 21500 Templates**: Backend templates guide AI to ensure compliance
 - **Propose → Review → Apply**: Workflow for reviewing AI-generated artifacts before applying
 - **Step 2 Feature**: Templates guide AI conversations to generate proper ISO 21500 artifacts
 
 ### UI Interface (Secondary)
+
 - **RAID Register**:
   - List view with filters (type, status, priority, owner, date range)
   - Detail/edit view with type-specific fields
@@ -54,13 +56,13 @@ This client implements a **hybrid approach** combining AI-guided artifact creati
 
 ## 🛠️ Tech Stack
 
-- **React 19** + **TypeScript** - Modern React with strict typing
-- **Vite 7** - Fast build tool
+- **React 19** + **TypeScript 5.9** - Modern React with strict typing
+- **Vite 7** - Fast build tool with HMR
 - **TanStack Query v5** - Data fetching and caching
-- **React Router** - URL-based state management
-- **Vitest** - Unit testing (141 tests)
+- **React Router v7** - URL-based state management
+- **Vitest** - Unit testing framework
 - **Playwright** - E2E testing
-- **ESLint** + **Prettier** - Code quality
+- **ESLint 9** - Code quality
 
 ## 📦 Installation
 
@@ -71,18 +73,22 @@ npm install
 ## 🏃 Running
 
 ### Development
+
 ```bash
 npm run dev
 ```
+
 Opens at `http://localhost:5173`
 
 ### Production Build
+
 ```bash
 npm run build
 npm run preview  # Preview production build
 ```
 
 ### Testing
+
 ```bash
 npm run lint                    # Lint code
 npm run test                    # Run unit tests
@@ -94,6 +100,7 @@ npm run e2e                     # Run E2E tests (requires backend)
 ## 🔄 Usage Examples
 
 ### Chat Interface
+
 ```
 User: Create a risk for the project about database migration
 AI:   [Proposes RAID item with ISO 21500 format]
@@ -102,6 +109,7 @@ AI:   [Applies to backend, shows confirmation]
 ```
 
 ### UI Interface
+
 1. **View RAID Items**: Navigate to RAID tab → Browse list
 2. **Filter RAID**: Use filter panel (type/status/priority/owner/date)
 3. **Edit RAID**: Click item → Edit form → Save
@@ -124,10 +132,10 @@ client/
 │   │   └── CommandPanel.tsx   # Chat interface
 │   ├── services/
 │   │   └── apiClient.ts       # API service layer
-│   ├── state/                 # State management (Zustand)
+│   ├── state/                 # State management (React Context + useReducer)
 │   ├── types/                 # TypeScript types
 │   └── test/
-│       ├── unit/              # Unit tests (141 tests)
+│       ├── unit/              # Unit tests (121 passing, 23 test files)
 │       └── e2e/               # Playwright E2E tests
 ├── e2e/                       # E2E test setup
 ├── package.json
@@ -137,8 +145,9 @@ client/
 
 ## 🧪 Testing
 
-### Unit Tests (141 total)
-- **RAID Components**: 76 tests
+### Unit Tests (121 passing, 23 test files)
+
+- **RAID Components**: 76 tests (5 test files)
   - RAIDBadge: 25 tests (type/status/priority variants)
   - RAIDFilters: 14 tests (filter logic, URL sync)
   - RAIDList: 8 tests (list rendering, filtering)
@@ -149,7 +158,10 @@ client/
 - **API Services**: 13 tests (error handling, retries)
 - **Accessibility**: 5 tests (ARIA, keyboard nav)
 
+**Note**: Some tests currently failing (8 failures) - primarily in RAIDList component due to import issues.
+
 ### E2E Tests (Playwright)
+
 - Project creation workflow
 - Proposal → Review → Apply flow
 - Navigation and artifact browsing
@@ -158,23 +170,27 @@ client/
 ## 🔧 Configuration
 
 ### Environment Variables
+
 ```bash
 # .env
 VITE_API_URL=http://localhost:8000  # Backend API URL
 ```
 
 ### API Backend
+
 Requires [AI-Agent-Framework](https://github.com/blecx/AI-Agent-Framework) backend running on port 8000.
 
 ## 📚 Key Concepts
 
 ### Chat-First Hybrid Approach
+
 - **Complex Artifacts → Chat**: Project plans, workflows, detailed RAID items with context
 - **Simple Artifacts → UI**: Quick RAID item adds, browsing, editing
 - **AI Guidance**: Templates ensure ISO 21500 compliance without user needing to know standard
 - **Step 2 Integration**: Templates guide AI conversations to generate proper artifacts
 
 ### Propose → Apply Workflow
+
 1. User requests artifact via chat
 2. AI generates proposal using ISO 21500 templates
 3. User reviews proposal
@@ -182,6 +198,7 @@ Requires [AI-Agent-Framework](https://github.com/blecx/AI-Agent-Framework) backe
 5. UI updates to show new artifact
 
 ### RAID Register
+
 - **R**isks, **A**ssumptions, **I**ssues, **D**ependencies
 - Type-specific fields (risks have impact/likelihood/mitigation)
 - Filterable by type, status, priority, owner, date range
