@@ -331,10 +331,6 @@ test.describe('Performance Tests', () => {
 
       // Try to interact with UI while loading
       // If UI is frozen, this will fail or timeout
-      const loadingIndicator = page.locator(
-        '.loading, .spinner, [aria-busy="true"]',
-      );
-
       // Wait briefly to see if loading indicator appears
       await page.waitForTimeout(100);
 
