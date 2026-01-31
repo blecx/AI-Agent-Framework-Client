@@ -53,3 +53,40 @@
   gap: 0.5rem;
   flex-shrink: 0;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .breadcrumb {
+    padding: 0.5rem;
+  }
+
+  .breadcrumb-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .breadcrumb ol {
+    font-size: 14px;
+    flex-wrap: wrap;
+  }
+
+  .breadcrumb-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .breadcrumb {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .breadcrumb ol {
+    font-size: 13px;
+  }
+
+  .breadcrumb .separator {
+    margin: 0 0.15rem;
+  }
+}

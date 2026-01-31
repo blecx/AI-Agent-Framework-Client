@@ -56,3 +56,16 @@
 .chat-message-user .chat-message-time {
   color: rgba(255, 255, 255, 0.8);
 }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .chat-message-bubble {
+    max-width: 85%;
+    font-size: 14px;
+    padding: 0.625rem 0.75rem;
+  }
+
+  .chat-message-time {
+    font-size: 10px;
+  }
+}

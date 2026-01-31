@@ -65,12 +65,12 @@
 
 .proposal-item:hover {
   background: #f5f5f5;
-  border-color: #4CAF50;
+  border-color: #4caf50;
 }
 
 .proposal-item.selected {
   background: #e8f5e9;
-  border-color: #4CAF50;
+  border-color: #4caf50;
   border-width: 2px;
 }
 
@@ -320,7 +320,7 @@
 }
 
 .btn-primary {
-  background: #4CAF50;
+  background: #4caf50;
   color: white;
 }
 
@@ -348,4 +348,38 @@
   background: #f5f5f5;
   color: #ccc;
   cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .apply-panel {
+    padding: 1.5rem 1rem;
+  }
+
+  .apply-panel h2 {
+    font-size: 1.5rem;
+  }
+
+  .apply-form {
+    padding: 1rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .apply-panel {
+    padding: 1rem 0.75rem;
+  }
+
+  .apply-panel h2 {
+    font-size: 1.25rem;
+  }
+
+  .apply-form {
+    padding: 0.75rem;
+  }
 }
