@@ -1,73 +1,206 @@
-# React + TypeScript + Vite
+# AI Agent Framework - React Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Chat-First Hybrid PM Application** for ISO 21500-based Project Management.
 
-Currently, two official plugins are available:
+## 🎯 Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This client implements a **hybrid approach** combining AI-guided artifact creation with traditional UI:
 
-## React Compiler
+- **Primary Interface:** AI chat for creating complex artifacts (project plans, RAID items, workflows)
+- **Secondary Interface:** Web UI for viewing, editing, and quick-adds
+- **AI-Guided Creation:** Templates guide AI conversations to ensure ISO 21500 compliance
+- **Optional Forms:** Quick-add forms for simple RAID items as alternative to chat
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🏗️ Architecture
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     React Client (Vite)                      │
+├──────────────────────┬──────────────────────────────────────┤
+│   Chat Interface     │         UI Interface                  │
+│  (Primary Creation)  │    (Viewing + Quick-Adds)             │
+├──────────────────────┼──────────────────────────────────────┤
+│ • Natural language   │ • Project list/detail                 │
+│ • Template-guided    │ • RAID register (list/detail/filters) │
+│ • ISO 21500 prompts  │ • Quick-add forms (optional)          │
+│ • Proposal workflow  │ • Artifact browsing                   │
+└──────────────────────┴──────────────────────────────────────┘
+                             │
+                             ↓
+              ┌──────────────────────────┐
+              │   FastAPI Backend        │
+              │   (ISO 21500 Templates)  │
+              └──────────────────────────┘
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🚀 Features
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Chat Interface (Primary)
+- **AI-Guided Artifact Creation**: Create project plans, RAID items, workflows via natural language
+- **ISO 21500 Templates**: Backend templates guide AI to ensure compliance
+- **Propose → Review → Apply**: Workflow for reviewing AI-generated artifacts before applying
+- **Step 2 Feature**: Templates guide AI conversations to generate proper ISO 21500 artifacts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### UI Interface (Secondary)
+- **RAID Register**:
+  - List view with filters (type, status, priority, owner, date range)
+  - Detail/edit view with type-specific fields
+  - Badge components for visual type/status/priority indicators
+  - Optional quick-add modal for simple RAID items
+- **Project Management**:
+  - Project selector and context
+  - Browse artifacts created via chat
+- **Responsive Design**: Works on desktop and mobile
+
+## 🛠️ Tech Stack
+
+- **React 19** + **TypeScript** - Modern React with strict typing
+- **Vite 7** - Fast build tool
+- **TanStack Query v5** - Data fetching and caching
+- **React Router** - URL-based state management
+- **Vitest** - Unit testing (141 tests)
+- **Playwright** - E2E testing
+- **ESLint** + **Prettier** - Code quality
+
+## 📦 Installation
+
+```bash
+npm install
 ```
+
+## 🏃 Running
+
+### Development
+```bash
+npm run dev
+```
+Opens at `http://localhost:5173`
+
+### Production Build
+```bash
+npm run build
+npm run preview  # Preview production build
+```
+
+### Testing
+```bash
+npm run lint                    # Lint code
+npm run test                    # Run unit tests
+npm run test -- --run           # Run tests once
+npm run test -- --coverage      # With coverage
+npm run e2e                     # Run E2E tests (requires backend)
+```
+
+## 🔄 Usage Examples
+
+### Chat Interface
+```
+User: Create a risk for the project about database migration
+AI:   [Proposes RAID item with ISO 21500 format]
+User: apply
+AI:   [Applies to backend, shows confirmation]
+```
+
+### UI Interface
+1. **View RAID Items**: Navigate to RAID tab → Browse list
+2. **Filter RAID**: Use filter panel (type/status/priority/owner/date)
+3. **Edit RAID**: Click item → Edit form → Save
+4. **Quick-Add** (Optional): Click "Add RAID Item" → Fill form → Create
+
+## 📁 Project Structure
+
+```
+client/
+├── src/
+│   ├── components/
+│   │   ├── raid/              # RAID-specific components
+│   │   │   ├── RAIDBadge.tsx  # Type/status/priority badges
+│   │   │   ├── RAIDFilters.tsx # Filter panel
+│   │   │   └── RAIDCreateModal.tsx # Quick-add form
+│   │   ├── ui/                # Reusable UI primitives
+│   │   ├── ProjectView.tsx    # Main project view
+│   │   ├── RAIDList.tsx       # RAID list with filters
+│   │   ├── RAIDDetail.tsx     # RAID detail/edit
+│   │   └── CommandPanel.tsx   # Chat interface
+│   ├── services/
+│   │   └── apiClient.ts       # API service layer
+│   ├── state/                 # State management (Zustand)
+│   ├── types/                 # TypeScript types
+│   └── test/
+│       ├── unit/              # Unit tests (141 tests)
+│       └── e2e/               # Playwright E2E tests
+├── e2e/                       # E2E test setup
+├── package.json
+├── vite.config.ts
+└── vitest.config.ts
+```
+
+## 🧪 Testing
+
+### Unit Tests (141 total)
+- **RAID Components**: 76 tests
+  - RAIDBadge: 25 tests (type/status/priority variants)
+  - RAIDFilters: 14 tests (filter logic, URL sync)
+  - RAIDList: 8 tests (list rendering, filtering)
+  - RAIDDetail: 17 tests (edit, validation, API)
+  - RAIDCreateModal: 12 tests (form validation, submission)
+- **UI Components**: 11 tests (Button, Modal, Table, EmptyState, Skeleton)
+- **State Management**: 20 tests (projects, RAID, workflow, preferences)
+- **API Services**: 13 tests (error handling, retries)
+- **Accessibility**: 5 tests (ARIA, keyboard nav)
+
+### E2E Tests (Playwright)
+- Project creation workflow
+- Proposal → Review → Apply flow
+- Navigation and artifact browsing
+- Error handling
+
+## 🔧 Configuration
+
+### Environment Variables
+```bash
+# .env
+VITE_API_URL=http://localhost:8000  # Backend API URL
+```
+
+### API Backend
+Requires [AI-Agent-Framework](https://github.com/blecx/AI-Agent-Framework) backend running on port 8000.
+
+## 📚 Key Concepts
+
+### Chat-First Hybrid Approach
+- **Complex Artifacts → Chat**: Project plans, workflows, detailed RAID items with context
+- **Simple Artifacts → UI**: Quick RAID item adds, browsing, editing
+- **AI Guidance**: Templates ensure ISO 21500 compliance without user needing to know standard
+- **Step 2 Integration**: Templates guide AI conversations to generate proper artifacts
+
+### Propose → Apply Workflow
+1. User requests artifact via chat
+2. AI generates proposal using ISO 21500 templates
+3. User reviews proposal
+4. User applies → Backend creates artifact
+5. UI updates to show new artifact
+
+### RAID Register
+- **R**isks, **A**ssumptions, **I**ssues, **D**ependencies
+- Type-specific fields (risks have impact/likelihood/mitigation)
+- Filterable by type, status, priority, owner, date range
+- URL-synchronized filters for bookmarking
+
+## 🤝 Contributing
+
+1. Follow existing patterns (React hooks, TypeScript strict mode)
+2. Write tests for new components (Vitest + Testing Library)
+3. Run `npm run lint` before committing
+4. Update this README for new features
+
+## 📄 License
+
+Part of the AI-Agent-Framework project.
+
+## 🔗 Related Documentation
+
+- [Parent Project README](../../README.md)
+- [Development Guide](../docs/DEVELOPMENT.md)
+- [Testing Guide](../docs/TESTING.md)
+- [E2E Testing](./e2e/README.md)
