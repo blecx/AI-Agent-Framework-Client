@@ -12,6 +12,7 @@ import { resolve } from 'path';
  * - Desktop: >1024px
  */
 describe('Responsive Design CSS', () => {
+  // Paths are relative to project root where tests run
   const cssFiles = [
     'src/App.css',
     'src/components/Breadcrumb.css',
@@ -30,6 +31,7 @@ describe('Responsive Design CSS', () => {
 
   cssFiles.forEach((filePath) => {
     it(`should have responsive breakpoints in ${filePath}`, () => {
+      // Working directory is project root, so paths are already correct
       const fullPath = resolve(process.cwd(), filePath);
       const content = readFileSync(fullPath, 'utf-8');
 
