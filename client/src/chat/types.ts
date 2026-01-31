@@ -1,6 +1,6 @@
 /**
  * Chat command types and conversation state management
- * 
+ *
  * This module defines the types for parsing user chat messages into structured commands
  * and managing multi-turn conversation state.
  */
@@ -107,6 +107,7 @@ export interface ChatMessage {
   metadata?: {
     command?: CommandIntent;
     raidId?: string;
+    raidItem?: unknown;
     error?: string;
   };
 }
