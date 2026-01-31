@@ -185,3 +185,35 @@
 .selector-dropdown::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .selector-button {
+    min-width: 150px;
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .selector-dropdown {
+    max-height: 250px;
+  }
+}
+
+@media (max-width: 640px) {
+  .selector-button {
+    min-width: 120px;
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .selector-icon {
+    font-size: 14px;
+  }
+
+  .selector-dropdown {
+    left: -8px;
+    right: -8px;
+    max-height: 200px;
+  }
+}

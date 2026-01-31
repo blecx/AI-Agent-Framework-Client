@@ -24,3 +24,10 @@
 .chat-messages::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .chat-messages-list {
+    padding: 1rem 0.75rem;
+  }
+}

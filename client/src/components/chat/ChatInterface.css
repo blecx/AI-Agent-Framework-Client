@@ -79,3 +79,29 @@
 .chat-cancel-btn:hover {
   background: #c0392b;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chat-interface {
+    max-width: 100%;
+  }
+
+  .chat-header h2 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .chat-header {
+    padding: 1rem;
+  }
+
+  .chat-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .chat-cancel-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}

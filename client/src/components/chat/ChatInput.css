@@ -56,3 +56,20 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .chat-input-container {
+    padding: 0.75rem;
+  }
+
+  .chat-input {
+    font-size: 14px;
+    min-height: 40px;
+  }
+
+  .chat-send-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
