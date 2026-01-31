@@ -1,0 +1,518 @@
+/**
+ * ProjectDashboard Styles
+ * Comprehensive dashboard layout with sections for workflow, RAID, and activity
+ */
+
+.project-dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.project-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.project-info h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #333;
+}
+
+.project-key-badge {
+  padding: 0.25rem 0.75rem;
+  background-color: #e9ecef;
+  color: #495057;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+.project-description {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Dashboard Sections */
+.dashboard-section {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-section h2 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  color: #333;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 0.5rem;
+}
+
+.dashboard-section h3 {
+  margin: 1rem 0 0.75rem 0;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+/* Workflow Section */
+.workflow-state-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.workflow-badge {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+  min-width: 150px;
+}
+
+.state-initiating {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.state-planning {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.state-executing {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.state-monitoring {
+  background-color: #fce4ec;
+  color: #c2185b;
+}
+
+.state-closing {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.state-closed {
+  background-color: #e0e0e0;
+  color: #616161;
+}
+
+.workflow-info {
+  flex: 1;
+}
+
+.workflow-info p {
+  margin: 0.25rem 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* RAID Summary */
+.raid-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.raid-total {
+  text-align: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  color: white;
+}
+
+.raid-total .stat-number {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.raid-total .stat-label {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.type-risk {
+  background-color: #dc3545;
+}
+
+.type-assumption {
+  background-color: #ffc107;
+}
+
+.type-issue {
+  background-color: #fd7e14;
+}
+
+.type-dependency {
+  background-color: #17a2b8;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Status Bars */
+.status-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.status-label {
+  min-width: 120px;
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.status-progress {
+  flex: 1;
+  height: 32px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.status-fill {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: width 0.3s ease;
+}
+
+.status-open {
+  background-color: #007bff;
+}
+
+.status-in-progress {
+  background-color: #ffc107;
+}
+
+.status-closed {
+  background-color: #6c757d;
+}
+
+.status-resolved {
+  background-color: #28a745;
+}
+
+.status-monitored {
+  background-color: #17a2b8;
+}
+
+/* Activity List */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activity-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #007bff;
+}
+
+.activity-icon {
+  flex-shrink: 0;
+}
+
+.event-type-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  gap: 1rem;
+}
+
+.event-type {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.event-time {
+  color: #666;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.activity-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.actor {
+  font-weight: 500;
+  color: #555;
+}
+
+.payload {
+  color: #777;
+}
+
+/* Quick Actions */
+.dashboard-actions {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-actions h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.btn-quick-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-quick-action:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.action-icon {
+  font-size: 1.25rem;
+}
+
+/* Buttons */
+.btn-action {
+  padding: 0.75rem 1.5rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 1rem;
+}
+
+.btn-action:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.btn-retry {
+  padding: 0.75rem 1.5rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-retry:hover {
+  background-color: #5a6268;
+}
+
+/* Loading and Error States */
+.loading-state,
+.error-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+}
+
+.loading-state p,
+.error-state p,
+.empty-state p {
+  margin: 1rem 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+.error-state h3 {
+  margin: 0 0 0.5rem 0;
+  color: #dc3545;
+  font-size: 1.5rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e0e0e0;
+  border-top-color: #007bff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .project-dashboard-container {
+    padding: 1rem;
+  }
+
+  .project-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .project-info h1 {
+    font-size: 1.5rem;
+  }
+
+  .workflow-state-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .workflow-badge {
+    width: 100%;
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .status-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-label {
+    min-width: auto;
+  }
+
+  .activity-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+}
