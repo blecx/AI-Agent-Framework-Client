@@ -10,7 +10,8 @@ export class E2EApiHelper {
   private baseUrl: string;
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || process.env.API_BASE_URL || 'http://localhost:8000';
+    this.baseUrl =
+      baseUrl || process.env.API_BASE_URL || 'http://localhost:8000';
     this.client = axios.create({
       baseURL: this.baseUrl,
       timeout: 30000,
@@ -92,7 +93,7 @@ export class E2EApiHelper {
   async createProposal(projectKey: string, proposalData: object) {
     const response = await this.client.post(
       `/projects/${projectKey}/proposals`,
-      proposalData
+      proposalData,
     );
     return response.data;
   }
@@ -110,7 +111,7 @@ export class E2EApiHelper {
    */
   async applyProposal(projectKey: string, proposalId: string) {
     const response = await this.client.post(
-      `/projects/${projectKey}/proposals/${proposalId}/apply`
+      `/projects/${projectKey}/proposals/${proposalId}/apply`,
     );
     return response.data;
   }
@@ -122,15 +123,106 @@ export class E2EApiHelper {
     try {
       const projects = await this.listProjects();
       const testProjects = projects.filter((p: { key: string }) =>
-        p.key.startsWith(prefix)
+        p.key.startsWith(prefix),
       );
-      
+
       for (const project of testProjects) {
         await this.deleteProject(project.key);
       }
       return true;
     } catch (error) {
       console.error('Error cleaning up test projects:', error);
+      return false;
+    }
+  }
+
+  // ============================================================================
+  // RAID API Methods
+  // ============================================================================
+
+  /**
+   * Create a RAID item
+   */
+  async createRAIDItem(
+    projectKey: string,
+    raidData: {
+      type: 'risk' | 'assumption' | 'issue' | 'dependency';
+      title: string;
+      description: string;
+      status?: string;
+      priority?: string;
+      owner?: string;
+    },
+  ) {
+    const response = await this.client.post(
+      `/projects/${projectKey}/raid`,
+      raidData,
+    );
+    return response.data;
+  }
+
+  /**
+   * Get RAID items for a project
+   */
+  async getRAIDItems(
+    projectKey: string,
+    filters?: {
+      type?: string;
+      status?: string;
+      priority?: string;
+    },
+  ) {
+    const params = new URLSearchParams();
+    if (filters?.type) params.append('type', filters.type);
+    if (filters?.status) params.append('status', filters.status);
+    if (filters?.priority) params.append('priority', filters.priority);
+
+    const queryString = params.toString();
+    const url = `/projects/${projectKey}/raid${queryString ? `?${queryString}` : ''}`;
+
+    const response = await this.client.get(url);
+    return response.data;
+  }
+
+  /**
+   * Get a specific RAID item
+   */
+  async getRAIDItem(projectKey: string, raidId: string) {
+    const response = await this.client.get(
+      `/projects/${projectKey}/raid/${raidId}`,
+    );
+    return response.data;
+  }
+
+  /**
+   * Update a RAID item
+   */
+  async updateRAIDItem(
+    projectKey: string,
+    raidId: string,
+    updates: Partial<{
+      title: string;
+      description: string;
+      status: string;
+      priority: string;
+      owner: string;
+    }>,
+  ) {
+    const response = await this.client.put(
+      `/projects/${projectKey}/raid/${raidId}`,
+      updates,
+    );
+    return response.data;
+  }
+
+  /**
+   * Delete a RAID item
+   */
+  async deleteRAIDItem(projectKey: string, raidId: string) {
+    try {
+      await this.client.delete(`/projects/${projectKey}/raid/${raidId}`);
+      return true;
+    } catch {
       return false;
     }
   }
