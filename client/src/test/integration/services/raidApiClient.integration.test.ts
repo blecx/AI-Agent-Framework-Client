@@ -20,9 +20,6 @@ import type {
   RAIDItemCreate,
   RAIDItemUpdate,
   RAIDItemList,
-  RAIDType,
-  RAIDStatus,
-  RAIDPriority,
 } from '../../../types';
 
 const API_BASE_URL = 'http://localhost:8000';
