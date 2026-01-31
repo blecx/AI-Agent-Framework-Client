@@ -8,6 +8,7 @@
 import { apiClient } from '../services/apiClient';
 import type { ApiResponse, RAIDItem } from '../types';
 import type { RAIDItemCreate } from '../types/raid';
+import { RAIDStatus, RAIDPriority } from '../types/raid';
 import type {
   ConversationState,
   CreateRAIDState,
@@ -39,6 +40,7 @@ export async function executeCommand(
     return {
       success: false,
       message: {
+        id: crypto.randomUUID(),
         role: 'assistant',
         content:
           'Conversation is not complete yet. Please answer all questions first.',
@@ -59,6 +61,7 @@ export async function executeCommand(
       return {
         success: false,
         message: {
+          id: crypto.randomUUID(),
           role: 'assistant',
           content: `Command type "${state.intent}" is not yet supported.`,
           timestamp: new Date(),
@@ -85,6 +88,7 @@ async function executeCreateRAID(
     return {
       success: false,
       message: {
+        id: crypto.randomUUID(),
         role: 'assistant',
         content: 'Missing required fields: type, title, or description.',
         timestamp: new Date(),
@@ -98,9 +102,9 @@ async function executeCreateRAID(
     type: collectedData.type,
     title: collectedData.title,
     description: collectedData.description,
-    status: collectedData.status || 'OPEN',
-    priority: collectedData.priority || 'MEDIUM',
-    owner: collectedData.owner,
+    status: collectedData.status || RAIDStatus.OPEN,
+    priority: collectedData.priority || RAIDPriority.MEDIUM,
+    owner: collectedData.owner || '',
   };
 
   // Call backend API
@@ -113,6 +117,7 @@ async function executeCreateRAID(
     return {
       success: false,
       message: {
+        id: crypto.randomUUID(),
         role: 'assistant',
         content: `Failed to create RAID item: ${response.error || 'Unknown error'}`,
         timestamp: new Date(),
@@ -128,6 +133,7 @@ async function executeCreateRAID(
   return {
     success: true,
     message: {
+      id: crypto.randomUUID(),
       role: 'assistant',
       content: message,
       timestamp: new Date(),
@@ -149,6 +155,7 @@ async function executeEditRAID(
     return {
       success: false,
       message: {
+        id: crypto.randomUUID(),
         role: 'assistant',
         content: 'No RAID item ID specified for editing.',
         timestamp: new Date(),
@@ -168,6 +175,7 @@ async function executeEditRAID(
     return {
       success: false,
       message: {
+        id: crypto.randomUUID(),
         role: 'assistant',
         content: `Failed to update RAID item: ${response.error || 'Unknown error'}`,
         timestamp: new Date(),
@@ -183,6 +191,7 @@ async function executeEditRAID(
   return {
     success: true,
     message: {
+      id: crypto.randomUUID(),
       role: 'assistant',
       content: message,
       timestamp: new Date(),
@@ -234,6 +243,7 @@ function formatRAIDUpdatedMessage(item: RAIDItem): string {
  */
 export function formatApiError(error: string): ChatMessage {
   return {
+    id: crypto.randomUUID(),
     role: 'assistant',
     content: `❌ **Error:** ${error}`,
     timestamp: new Date(),

@@ -9,7 +9,7 @@ import {
   canExecuteCommand,
 } from '../../../chat/chatApi';
 import { CommandType, type CreateRAIDState, type EditRAIDState } from '../../../chat/types';
-import { RAIDType, RAIDStatus, RAIDPriority } from '../../../types/raid';
+import { RAIDType, RAIDStatus, RAIDPriority, type RAIDItem } from '../../../types/raid';
 import * as apiClientModule from '../../../services/apiClient';
 
 // Mock the apiClient
@@ -60,9 +60,8 @@ describe('chatApi', () => {
         currentStep: 2, // All steps complete
       };
 
-      const mockRAIDItem = {
+      const mockRAIDItem: RAIDItem = {
         id: 'RISK-001',
-        projectKey: 'PROJ-001',
         type: RAIDType.RISK,
         title: 'Security Risk',
         description: 'SQL injection vulnerability',
@@ -71,14 +70,15 @@ describe('chatApi', () => {
         owner: 'John Doe',
         impact: null,
         likelihood: null,
-        mitigation_plan: null,
-        next_actions: null,
-        resolution: null,
-        reviewed_by: null,
-        reviewed_at: null,
-        closed_at: null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        mitigation_plan: '',
+        next_actions: [],
+        linked_decisions: [],
+        linked_change_requests: [],
+        target_resolution_date: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        created_by: 'test-user',
+        updated_by: 'test-user',
       };
 
       vi.spyOn(apiClientModule.apiClient, 'createRAIDItem').mockResolvedValue({
@@ -158,25 +158,25 @@ describe('chatApi', () => {
         currentStep: 0,
       };
 
-      const mockRAIDItem = {
+      const mockRAIDItem: RAIDItem = {
         id: 'ASSUMPTION-001',
-        projectKey: 'PROJ-001',
         type: RAIDType.ASSUMPTION,
         title: 'Test Assumption',
         description: 'Test description',
         priority: RAIDPriority.MEDIUM,
         status: RAIDStatus.OPEN,
-        owner: null,
+        owner: '',
         impact: null,
         likelihood: null,
-        mitigation_plan: null,
-        next_actions: null,
-        resolution: null,
-        reviewed_by: null,
-        reviewed_at: null,
-        closed_at: null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        mitigation_plan: '',
+        next_actions: [],
+        linked_decisions: [],
+        linked_change_requests: [],
+        target_resolution_date: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        created_by: 'test-user',
+        updated_by: 'test-user',
       };
 
       const createSpy = vi
@@ -193,9 +193,9 @@ describe('chatApi', () => {
         type: RAIDType.ASSUMPTION,
         title: 'Test Assumption',
         description: 'Test description',
-        status: 'OPEN',
-        priority: 'MEDIUM',
-        owner: undefined,
+        status: RAIDStatus.OPEN,
+        priority: RAIDPriority.MEDIUM,
+        owner: '',
       });
     });
 
@@ -212,25 +212,25 @@ describe('chatApi', () => {
         currentStep: 1,
       };
 
-      const mockRAIDItem = {
+      const mockRAIDItem: RAIDItem = {
         id: 'RISK-001',
-        projectKey: 'PROJ-001',
         type: RAIDType.RISK,
         title: 'Security Risk',
         description: 'SQL injection vulnerability',
         priority: RAIDPriority.LOW,
         status: RAIDStatus.CLOSED,
-        owner: null,
+        owner: '',
         impact: null,
         likelihood: null,
-        mitigation_plan: null,
-        next_actions: null,
-        resolution: null,
-        reviewed_by: null,
-        reviewed_at: null,
-        closed_at: null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        mitigation_plan: '',
+        next_actions: [],
+        linked_decisions: [],
+        linked_change_requests: [],
+        target_resolution_date: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        created_by: 'test-user',
+        updated_by: 'test-user',
       };
 
       vi.spyOn(apiClientModule.apiClient, 'updateRAIDItem').mockResolvedValue({
