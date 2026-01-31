@@ -204,6 +204,31 @@ Requires [AI-Agent-Framework](https://github.com/blecx/AI-Agent-Framework) backe
 - Filterable by type, status, priority, owner, date range
 - URL-synchronized filters for bookmarking
 
+### Understanding Two Different Workflows
+
+⚠️ **Important Distinction**: This application manages **two separate workflow concepts**:
+
+#### 1. **AI Conversation Workflow** (Future: Step 2+)
+- **Purpose**: Tracks the AI agent's conversation state during artifact creation
+- **Example Steps**: "Gathering requirements" → "Validating inputs" → "Generating proposal" → "Awaiting approval"
+- **Visibility**: Shows user where they are in the AI-guided creation process
+- **Component**: Future `WorkflowPanel` or conversation stepper UI
+- **Scope**: Chat interface only
+
+#### 2. **ISO 21500 Project Workflow** (Future: Issue #39)
+- **Purpose**: Tracks the project's lifecycle state according to ISO 21500 standard
+- **States**: Initiation → Planning → Execution → Monitoring & Controlling → Closing → Closed
+- **Visibility**: Shows current project phase for governance and compliance
+- **Component**: Future `WorkflowStageIndicator` component
+- **Scope**: Project-level state, affects both chat and UI interfaces
+- **API**: `/api/v1/projects/{key}/workflow/state` and `/audit-events`
+
+**Why Both Exist:**
+- **Conversation Workflow** = "Where am I in this AI-guided task?"
+- **Project Workflow** = "What phase is my project in according to ISO 21500?"
+
+These are independent: a project in the "Execution" phase (ISO 21500) may have many AI conversations, each with their own conversation workflow steps.
+
 ## 🤝 Contributing
 
 1. Follow existing patterns (React hooks, TypeScript strict mode)
