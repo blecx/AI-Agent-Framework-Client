@@ -226,6 +226,71 @@ export class E2EApiHelper {
       return false;
     }
   }
+
+  // ============================================================================
+  // Workflow API Methods
+  // ============================================================================
+
+  /**
+   * Get workflow state for a project
+   */
+  async getWorkflowState(projectKey: string) {
+    const response = await this.client.get(
+      `/projects/${projectKey}/workflow/state`,
+    );
+    return response.data;
+  }
+
+  /**
+   * Transition workflow state
+   */
+  async transitionWorkflowState(
+    projectKey: string,
+    toState: string,
+    actor?: string,
+    reason?: string,
+  ) {
+    const response = await this.client.patch(
+      `/projects/${projectKey}/workflow/state`,
+      {
+        to_state: toState,
+        actor: actor || 'e2e-test',
+        reason: reason || 'E2E test transition',
+      },
+    );
+    return response.data;
+  }
+
+  /**
+   * Get allowed transitions for a project's current state
+   */
+  async getAllowedTransitions(projectKey: string) {
+    const response = await this.client.get(
+      `/projects/${projectKey}/workflow/allowed-transitions`,
+    );
+    return response.data;
+  }
+
+  /**
+   * Get audit events for a project
+   */
+  async getAuditEvents(
+    projectKey: string,
+    filters?: {
+      event_type?: string;
+      limit?: number;
+    },
+  ) {
+    const params = new URLSearchParams();
+    if (filters?.event_type) params.append('event_type', filters.event_type);
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+
+    const queryString = params.toString();
+    const url = `/projects/${projectKey}/workflow/audit${queryString ? `?${queryString}` : ''}`;
+
+    const response = await this.client.get(url);
+    return response.data;
+  }
 }
 
 export const createApiHelper = (baseUrl?: string) => new E2EApiHelper(baseUrl);
