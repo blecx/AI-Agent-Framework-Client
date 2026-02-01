@@ -32,11 +32,6 @@ export function useRetry(options: RetryOptions = {}) {
     lastError: null,
   });
 
-  const calculateDelay = (attempt: number): number => {
-    const delay = initialDelay * Math.pow(backoffFactor, attempt);
-    return Math.min(delay, maxDelay);
-  };
-
   const executeWithRetry = useCallback(
     async <T>(operation: () => Promise<T>): Promise<T> => {
       let lastError: Error | null = null;
@@ -53,7 +48,11 @@ export function useRetry(options: RetryOptions = {}) {
 
           // Don't retry on last attempt
           if (attempt < maxAttempts - 1) {
-            const delay = calculateDelay(attempt);
+            // Calculate delay inline to avoid dependency issues
+            const delay = Math.min(
+              initialDelay * Math.pow(backoffFactor, attempt),
+              maxDelay
+            );
             await new Promise(resolve => setTimeout(resolve, delay));
           }
         }
