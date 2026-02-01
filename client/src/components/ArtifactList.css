@@ -1,0 +1,114 @@
+/* ArtifactList Component Styles */
+
+.artifact-list {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.artifact-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.artifact-list-header h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: #1a1a1a;
+}
+
+.btn-create-artifact {
+  padding: 0.625rem 1.25rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-create-artifact:hover {
+  background-color: #0056b3;
+}
+
+.artifact-list-loading,
+.artifact-list-error {
+  padding: 2rem;
+  text-align: center;
+  font-size: 1.125rem;
+}
+
+.artifact-list-error {
+  color: #dc3545;
+}
+
+.artifact-list-empty {
+  padding: 3rem 2rem;
+  text-align: center;
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  color: #6c757d;
+}
+
+.artifact-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.artifact-list-table thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.artifact-list-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.artifact-list-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.artifact-list-table th.sortable:hover {
+  background-color: #e9ecef;
+}
+
+.artifact-list-table tbody tr {
+  border-bottom: 1px solid #dee2e6;
+  transition: background-color 0.2s;
+}
+
+.artifact-list-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.artifact-row {
+  cursor: pointer;
+}
+
+.artifact-row:hover {
+  background-color: #f8f9fa;
+}
+
+.artifact-list-table td {
+  padding: 1rem;
+  color: #212529;
+}
+
+.artifact-name {
+  font-weight: 500;
+  color: #007bff;
+}
