@@ -172,6 +172,237 @@ test.describe('Feature Tests', () => {
 });
 ```
 
+## Web UI E2E Setup
+
+### Overview
+
+The E2E test suite provides comprehensive browser-based testing using **Playwright**. It includes:
+
+- **Page Object Model**: Maintainable, reusable page objects for all major UI components
+- **Visual Regression Testing**: Screenshot comparison to detect visual changes
+- **Accessibility Testing**: Automated ARIA and WCAG compliance checks
+- **Performance Testing**: Lighthouse CI integration for performance budgets
+
+### Prerequisites
+
+Before running E2E tests, ensure the backend API is running:
+
+```bash
+# Option 1: Use the automated setup script
+cd client
+./e2e/setup-backend.sh
+
+# Option 2: Start backend manually via Docker
+cd ~/projects/AI-Agent-Framework
+docker compose up -d
+
+# Option 3: Start backend manually via Python
+cd ~/projects/AI-Agent-Framework
+source .venv/bin/activate
+cd apps/api && PROJECT_DOCS_PATH=../../projectDocs uvicorn main:app --reload
+```
+
+Verify backend is running:
+
+```bash
+curl http://localhost:8000/health
+# Should return: {"status":"healthy","docs_path":"..."}
+```
+
+### Running Web UI E2E Tests
+
+```bash
+cd client
+
+# Run all E2E tests
+npm run test:e2e
+
+# Run specific test suite
+npm run test:e2e -- 01-project-creation.spec.ts
+
+# Run tests with page objects
+npm run test:e2e -- 11-page-object-examples.spec.ts
+
+# Run visual regression tests
+npm run test:e2e:visual
+
+# Run accessibility tests
+npm run test:e2e:a11y
+
+# Run in headed mode (see browser)
+npm run test:e2e -- --headed
+
+# Run in debug mode
+npm run test:e2e -- --debug
+
+# Update visual baselines (after intentional UI changes)
+npm run test:e2e:update-snapshots
+```
+
+### Page Object Model
+
+The E2E tests use a **Page Object Model** pattern for cleaner, more maintainable tests. Page objects encapsulate UI interaction logic:
+
+**Available Page Objects**:
+
+- **`ProjectViewPage`**: Project list, creation, navigation
+- **`ArtifactEditorPage`**: Artifact viewing and editing
+- **`ProposalListPage`**: Proposal list view and creation
+- **`ProposalReviewModalPage`**: Proposal diff visualization and review
+- **`AuditViewerPage`**: Audit results display and interaction
+
+**Example using Page Objects**:
+
+```typescript
+import { test, expect } from '../fixtures';
+import { ProjectViewPage, ProposalListPage } from '../page-objects';
+
+test('should create project and proposal', async ({ page, uniqueProjectKey }) => {
+  const projectView = new ProjectViewPage(page);
+  const proposalList = new ProposalListPage(page);
+  
+  // Create project
+  await projectView.goto();
+  const response = await projectView.createProject(
+    uniqueProjectKey,
+    'My Project',
+    'Project description'
+  );
+  expect(response.status()).toBe(200);
+  
+  // Create proposal
+  await proposalList.goto(uniqueProjectKey);
+  await proposalList.createProposal('My Proposal', 'Description');
+  await proposalList.verifyProposalExists('My Proposal');
+});
+```
+
+### Visual Regression Testing
+
+Visual regression tests capture screenshots and compare them to baselines:
+
+**Running Visual Tests**:
+
+```bash
+# Run visual regression tests
+npm run test:e2e:visual
+
+# Update baselines after intentional UI changes
+npm run test:e2e:update-snapshots
+```
+
+**Creating Visual Tests**:
+
+```typescript
+test('should match baseline for project list', async ({ page }) => {
+  await page.goto('/projects');
+  await page.waitForLoadState('networkidle');
+  
+  // Compare full page
+  await expect(page).toHaveScreenshot('project-list.png', {
+    maxDiffPixels: 100,  // Allow small differences
+    threshold: 0.2,      // 20% tolerance
+  });
+  
+  // Compare specific component
+  await expect(page.locator('.project-card')).toHaveScreenshot('project-card.png');
+  
+  // Mask dynamic content
+  await expect(page).toHaveScreenshot('proposals.png', {
+    mask: [page.locator('.timestamp')],  // Hide timestamps
+  });
+});
+```
+
+**Visual Test Features**:
+
+- Full page screenshots
+- Component-level screenshots
+- Responsive testing (mobile, tablet, desktop)
+- Dark mode testing
+- Error state screenshots
+- Timestamp masking for dynamic content
+
+### Accessibility Testing
+
+Accessibility tests ensure WCAG 2.1 AA compliance using **@axe-core/playwright**:
+
+**Running Accessibility Tests**:
+
+```bash
+npm run test:e2e:a11y
+```
+
+**Creating Accessibility Tests**:
+
+```typescript
+import AxeBuilder from '@axe-core/playwright';
+
+test('should have no a11y violations', async ({ page }) => {
+  await page.goto('/projects');
+  
+  // Run axe accessibility scan
+  const accessibilityScanResults = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .analyze();
+  
+  expect(accessibilityScanResults.violations).toEqual([]);
+});
+
+test('should have proper ARIA labels', async ({ page }) => {
+  await page.goto('/projects');
+  const button = page.locator('button:has-text("Create")');
+  await expect(button).toHaveAttribute('aria-label', /.+/);
+});
+
+test('should support keyboard navigation', async ({ page }) => {
+  await page.goto('/projects');
+  await page.keyboard.press('Tab');
+  const focused = page.locator(':focus');
+  await expect(focused).toBeVisible();
+});
+```
+
+**Accessibility Test Coverage**:
+
+- WCAG 2.1 Level A and AA compliance
+- Proper ARIA labels and roles
+- Keyboard navigation support
+- Focus indicators
+- Heading hierarchy
+- Color contrast
+- Alt text for images
+
+### Test Execution Guidelines
+
+**CI Integration**:
+
+- E2E tests are **disabled in CI by default** (by design)
+- Use the `run-e2e` label to enable E2E in specific PRs
+- Backend E2E testing is done via the backend CLI client
+- Client E2E tests are for local development and debugging
+
+**Local Development**:
+
+1. Start backend (see Prerequisites above)
+2. Run tests: `npm run test:e2e`
+3. Review failures in `playwright-report/` HTML report
+4. Re-run failed tests: `npm run test:e2e -- --last-failed`
+
+**Test Isolation**:
+
+- All tests use unique project keys (timestamp + random)
+- Tests can run in parallel or in any order
+- No shared state between tests
+- Each test cleans up its own data
+
+**Performance Guidelines**:
+
+- Full E2E suite should complete in < 10 minutes
+- Use API helpers for setup (faster than UI)
+- Verify via UI, confirm via API
+- Parallel execution enabled (configurable workers)
+
 ## Setup
 
 ### Prerequisites

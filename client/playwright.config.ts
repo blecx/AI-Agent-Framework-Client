@@ -39,6 +39,14 @@ export default defineConfig({
     navigationTimeout: 30000,
   },
 
+  // Visual comparison settings
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixels: 100,
+      threshold: 0.2,
+    },
+  },
+
   projects: [
     {
       name: 'chromium',
