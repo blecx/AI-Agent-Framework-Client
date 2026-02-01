@@ -6,10 +6,13 @@ import ProposePanel from './ProposePanel';
 import ApplyPanel from './ApplyPanel';
 import CommandPanel from './ProjectCommandPanel';
 import { ArtifactList } from './ArtifactList';
+import { AuditViewer } from './AuditViewer';
+import { AuditBadge } from './AuditBadge';
+import { AuditApiClient } from '../services/AuditApiClient';
 import Skeleton from './ui/Skeleton';
 import './ProjectView.css';
 
-type TabType = 'overview' | 'propose' | 'apply' | 'commands' | 'artifacts';
+type TabType = 'overview' | 'propose' | 'apply' | 'commands' | 'artifacts' | 'audit';
 
 export default function ProjectView() {
   const { key } = useParams<{ key: string }>();
@@ -32,6 +35,20 @@ export default function ProjectView() {
       return response.data;
     },
     enabled: !!key,
+  });
+
+  // Fetch audit data for badge
+  const { data: auditData } = useQuery({
+    queryKey: ['audit', key],
+    queryFn: async () => {
+      if (!key) throw new Error('Project key is required');
+      const client = new AuditApiClient();
+      return await client.getAuditResults(key);
+    },
+    enabled: !!key,
+    retry: false,
+    // Don't throw on error - audit might not exist yet
+    throwOnError: false,
   });
 
   if (isLoading) {
@@ -93,6 +110,16 @@ export default function ProjectView() {
             <p className="project-key">Key: {project.key}</p>
           </div>
         </div>
+        <div className="header-right">
+          {auditData && (
+            <AuditBadge
+              errorCount={auditData.summary.errors}
+              warningCount={auditData.summary.warnings}
+              infoCount={auditData.summary.info}
+              onClick={() => setActiveTab('audit')}
+            />
+          )}
+        </div>
       </header>
 
       <nav className="project-tabs">
@@ -125,6 +152,12 @@ export default function ProjectView() {
           onClick={() => setActiveTab('artifacts')}
         >
           Artifacts
+        </button>
+        <button
+          className={`tab ${activeTab === 'audit' ? 'active' : ''}`}
+          onClick={() => setActiveTab('audit')}
+        >
+          Audit
         </button>
       </nav>
 
@@ -212,6 +245,7 @@ export default function ProjectView() {
             }}
           />
         )}
+        {activeTab === 'audit' && key && <AuditViewer projectKey={key} />}
       </div>
     </div>
   );

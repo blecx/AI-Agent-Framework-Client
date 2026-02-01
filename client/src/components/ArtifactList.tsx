@@ -5,6 +5,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { ArtifactApiClient, type Artifact } from '../services/ArtifactApiClient';
+import { AuditApiClient } from '../services/AuditApiClient';
 import './ArtifactList.css';
 
 interface ArtifactListProps {
@@ -26,8 +27,10 @@ export const ArtifactList: React.FC<ArtifactListProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [auditIssuesMap, setAuditIssuesMap] = useState<Record<string, { hasErrors: boolean; hasWarnings: boolean }>>({});
 
   const apiClient = useMemo(() => new ArtifactApiClient(), []);
+  const auditClient = useMemo(() => new AuditApiClient(), []);
 
   useEffect(() => {
     const fetchArtifacts = async () => {
@@ -47,6 +50,35 @@ export const ArtifactList: React.FC<ArtifactListProps> = ({
       fetchArtifacts();
     }
   }, [projectKey, apiClient]);
+
+  useEffect(() => {
+    const fetchAuditData = async () => {
+      try {
+        const auditResult = await auditClient.getAuditResults(projectKey);
+        const issuesMap: Record<string, { hasErrors: boolean; hasWarnings: boolean }> = {};
+        
+        auditResult.issues.forEach((issue) => {
+          if (!issuesMap[issue.artifact]) {
+            issuesMap[issue.artifact] = { hasErrors: false, hasWarnings: false };
+          }
+          if (issue.severity === 'error') {
+            issuesMap[issue.artifact].hasErrors = true;
+          } else if (issue.severity === 'warning') {
+            issuesMap[issue.artifact].hasWarnings = true;
+          }
+        });
+        
+        setAuditIssuesMap(issuesMap);
+      } catch {
+        // Audit data is optional - don't show error
+        setAuditIssuesMap({});
+      }
+    };
+
+    if (projectKey) {
+      fetchAuditData();
+    }
+  }, [projectKey, auditClient]);
 
   const sortedArtifacts = useMemo(() => {
     const sorted = [...artifacts];
@@ -110,6 +142,9 @@ export const ArtifactList: React.FC<ArtifactListProps> = ({
         <table className="artifact-list-table">
           <thead>
             <tr>
+              <th className="artifact-status-col" title="Audit Status">
+                Status
+              </th>
               <th onClick={() => handleSort('name')} className="sortable">
                 Name {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
               </th>
@@ -120,17 +155,31 @@ export const ArtifactList: React.FC<ArtifactListProps> = ({
             </tr>
           </thead>
           <tbody>
-            {sortedArtifacts.map((artifact) => (
-              <tr
-                key={artifact.path}
-                onClick={() => handleArtifactClick(artifact)}
-                className="artifact-row"
-              >
-                <td className="artifact-name">{artifact.name}</td>
-                <td>{artifact.type}</td>
-                <td>{artifact.versions?.[0]?.date || 'N/A'}</td>
-              </tr>
-            ))}
+            {sortedArtifacts.map((artifact) => {
+              const auditStatus = auditIssuesMap[artifact.name] || { hasErrors: false, hasWarnings: false };
+              const statusIcon = auditStatus.hasErrors ? '✗' : auditStatus.hasWarnings ? '⚠' : '✓';
+              const statusClass = auditStatus.hasErrors ? 'error' : auditStatus.hasWarnings ? 'warning' : 'success';
+              const statusTitle = auditStatus.hasErrors
+                ? 'Has errors'
+                : auditStatus.hasWarnings
+                ? 'Has warnings'
+                : 'Complete';
+
+              return (
+                <tr
+                  key={artifact.path}
+                  onClick={() => handleArtifactClick(artifact)}
+                  className="artifact-row"
+                >
+                  <td className={`artifact-status artifact-status--${statusClass}`} title={statusTitle}>
+                    {statusIcon}
+                  </td>
+                  <td className="artifact-name">{artifact.name}</td>
+                  <td>{artifact.type}</td>
+                  <td>{artifact.versions?.[0]?.date || 'N/A'}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}
