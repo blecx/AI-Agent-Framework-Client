@@ -223,11 +223,23 @@ Requires [AI-Agent-Framework](https://github.com/blecx/AI-Agent-Framework) backe
 - Filterable by type, status, priority, owner, date range
 - URL-synchronized filters for bookmarking
 
+### Audit Results Viewer
+
+- **Audit Results**: View artifact compliance issues with severity filtering
+- **Severity Levels**: Error (red), Warning (yellow), Info (blue)
+- **Issue Details**: Shows artifact name, field, and validation message
+- **Quick Fix Links**: Jump directly to artifact editor with field pre-focused
+- **Run Audit**: Trigger new audit scan to validate all artifacts
+- **Filtering**: Filter by severity level (all, errors, warnings, info)
+- **Summary**: Visual summary showing count of issues by severity
+- **Timestamp**: Shows when audit was last run
+
 ### Understanding Two Different Workflows
 
 ⚠️ **Important Distinction**: This application manages **two separate workflow concepts**:
 
 #### 1. **AI Conversation Workflow** (Future: Step 2+)
+
 - **Purpose**: Tracks the AI agent's conversation state during artifact creation
 - **Example Steps**: "Gathering requirements" → "Validating inputs" → "Generating proposal" → "Awaiting approval"
 - **Visibility**: Shows user where they are in the AI-guided creation process
@@ -235,6 +247,7 @@ Requires [AI-Agent-Framework](https://github.com/blecx/AI-Agent-Framework) backe
 - **Scope**: Chat interface only
 
 #### 2. **ISO 21500 Project Workflow** (Future: Issue #39)
+
 - **Purpose**: Tracks the project's lifecycle state according to ISO 21500 standard
 - **States**: Initiation → Planning → Execution → Monitoring & Controlling → Closing → Closed
 - **Visibility**: Shows current project phase for governance and compliance
@@ -243,6 +256,7 @@ Requires [AI-Agent-Framework](https://github.com/blecx/AI-Agent-Framework) backe
 - **API**: `/api/v1/projects/{key}/workflow/state` and `/audit-events`
 
 **Why Both Exist:**
+
 - **Conversation Workflow** = "Where am I in this AI-guided task?"
 - **Project Workflow** = "What phase is my project in according to ISO 21500?"
 

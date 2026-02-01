@@ -112,3 +112,25 @@
   font-weight: 500;
   color: #007bff;
 }
+/* Audit Status Column */
+.artifact-status-col {
+  width: 80px;
+  text-align: center;
+}
+
+.artifact-status {
+  text-align: center;
+  font-size: 1.125rem;
+}
+
+.artifact-status--success {
+  color: #28a745;
+}
+
+.artifact-status--warning {
+  color: #ffc107;
+}
+
+.artifact-status--error {
+  color: #dc3545;
+}

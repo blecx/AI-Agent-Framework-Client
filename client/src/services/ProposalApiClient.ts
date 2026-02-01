@@ -35,8 +35,9 @@ export class ProposalApiClient {
   private client: AxiosInstance;
 
   constructor(baseUrl?: string) {
-    const apiBaseUrl = baseUrl || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-    
+    const apiBaseUrl =
+      baseUrl || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
     this.client = axios.create({
       baseURL: apiBaseUrl,
       headers: {
@@ -49,10 +50,13 @@ export class ProposalApiClient {
   /**
    * Create a new proposal
    */
-  async createProposal(projectKey: string, proposal: ProposalCreate): Promise<Proposal> {
+  async createProposal(
+    projectKey: string,
+    proposal: ProposalCreate,
+  ): Promise<Proposal> {
     const response = await this.client.post<Proposal>(
       `/api/v1/projects/${projectKey}/proposals`,
-      proposal
+      proposal,
     );
     return response.data;
   }
@@ -63,7 +67,7 @@ export class ProposalApiClient {
   async listProposals(
     projectKey: string,
     statusFilter?: ProposalStatus,
-    changeType?: ChangeType
+    changeType?: ChangeType,
   ): Promise<Proposal[]> {
     const params: Record<string, string> = {};
     if (statusFilter) params.status_filter = statusFilter;
@@ -71,7 +75,7 @@ export class ProposalApiClient {
 
     const response = await this.client.get<Proposal[]>(
       `/api/v1/projects/${projectKey}/proposals`,
-      { params }
+      { params },
     );
     return response.data;
   }
@@ -81,9 +85,32 @@ export class ProposalApiClient {
    */
   async getProposal(projectKey: string, proposalId: string): Promise<Proposal> {
     const response = await this.client.get<Proposal>(
-      `/api/v1/projects/${projectKey}/proposals/${proposalId}`
+      `/api/v1/projects/${projectKey}/proposals/${proposalId}`,
     );
     return response.data;
+  }
+
+  /**
+   * Apply a proposal (accept and merge changes)
+   */
+  async applyProposal(projectKey: string, proposalId: string): Promise<void> {
+    await this.client.post(
+      `/api/v1/projects/${projectKey}/proposals/${proposalId}/apply`,
+    );
+  }
+
+  /**
+   * Reject a proposal with optional reason
+   */
+  async rejectProposal(
+    projectKey: string,
+    proposalId: string,
+    reason?: string,
+  ): Promise<void> {
+    await this.client.post(
+      `/api/v1/projects/${projectKey}/proposals/${proposalId}/reject`,
+      { reason },
+    );
   }
 }
 
