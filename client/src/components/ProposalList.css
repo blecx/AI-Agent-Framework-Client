@@ -1,9 +1,9 @@
-/* ProposalList Styles */
+/**
+ * ProposalList Styles
+ */
 
-.proposal-list-container {
-  padding: 1.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
+.proposal-list {
+  padding: 1rem;
 }
 
 .proposal-list-header {
@@ -11,148 +11,133 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 1rem;
 }
 
 .proposal-list-header h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: var(--text-primary, #1a1a1a);
 }
 
-.proposal-list-filters {
+.filter-controls {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.proposal-list-filters label {
-  font-size: 0.9rem;
-  color: var(--text-secondary, #666);
+.filter-controls label {
+  font-weight: 500;
 }
 
-.proposal-status-filter {
+.filter-controls select {
   padding: 0.5rem;
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 0.9rem;
-  background: white;
-  cursor: pointer;
-}
-
-.proposal-list-loading,
-.proposal-list-error {
-  text-align: center;
-  padding: 2rem;
-  color: var(--text-secondary, #666);
-}
-
-.proposal-list-error {
-  color: var(--error-color, #d32f2f);
-}
-
-.proposal-list-table-wrapper {
-  overflow-x: auto;
-  border: 1px solid var(--border-color, #e0e0e0);
-  border-radius: 8px;
-  background: white;
 }
 
 .proposal-list-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .proposal-list-table thead {
-  background: var(--table-header-bg, #f5f5f5);
-  border-bottom: 2px solid var(--border-color, #e0e0e0);
+  background: #f5f5f5;
 }
 
 .proposal-list-table th {
-  padding: 0.75rem 1rem;
+  padding: 0.75rem;
   text-align: left;
   font-weight: 600;
-  color: var(--text-primary, #1a1a1a);
+  border-bottom: 2px solid #ddd;
+}
+
+.proposal-list-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.proposal-list-table th.sortable:hover {
+  background: #e8e8e8;
 }
 
 .proposal-list-table td {
-  padding: 0.75rem 1rem;
-  border-top: 1px solid var(--border-color, #e0e0e0);
+  padding: 0.75rem;
+  border-bottom: 1px solid #eee;
 }
 
-.proposal-list-table tbody tr:hover {
-  background: var(--row-hover-bg, #f9f9f9);
+.proposal-row:hover {
+  background: #f9f9f9;
 }
 
-.proposal-id {
-  font-family: 'Monaco', 'Courier New', monospace;
-  font-size: 0.85rem;
-  color: var(--text-secondary, #666);
-}
-
-.proposal-target {
-  font-weight: 500;
-  color: var(--text-primary, #1a1a1a);
-}
-
-.proposal-date {
-  color: var(--text-secondary, #666);
-  white-space: nowrap;
-}
-
-.proposal-author {
-  color: var(--text-secondary, #666);
-}
-
-.proposal-status-badge {
+.status-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: capitalize;
 }
 
-.proposal-status-pending {
+.status-pending {
   background: #fff3cd;
   color: #856404;
 }
 
-.proposal-status-accepted {
+.status-accepted {
   background: #d4edda;
   color: #155724;
 }
 
-.proposal-status-rejected {
+.status-rejected {
   background: #f8d7da;
   color: #721c24;
 }
 
-.proposal-view-link {
-  color: var(--link-color, #1976d2);
-  text-decoration: none;
-  font-weight: 500;
+.btn-view-proposal {
+  padding: 0.4rem 1rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
-.proposal-view-link:hover {
-  text-decoration: underline;
+.btn-view-proposal:hover {
+  background: #0056b3;
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-  .proposal-list-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.proposal-list-empty {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+  background: #f9f9f9;
+  border-radius: 4px;
+  border: 1px dashed #ccc;
+}
 
-  .proposal-list-table {
-    font-size: 0.85rem;
-  }
+.proposal-list-loading,
+.proposal-list-error {
+  padding: 2rem;
+  text-align: center;
+}
 
-  .proposal-list-table th,
-  .proposal-list-table td {
-    padding: 0.5rem 0.75rem;
-  }
+.proposal-list-error {
+  color: #d32f2f;
+  background: #ffebee;
+  border-radius: 4px;
+}
+
+.proposal-id,
+.proposal-target {
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.status-header.filtered {
+  font-style: italic;
 }

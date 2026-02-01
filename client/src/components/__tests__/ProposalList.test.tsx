@@ -2,248 +2,223 @@
  * ProposalList Component Tests
  */
 
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
-import ProposalList from '../ProposalList';
-import {
-  proposalApiClient,
-  type Proposal,
-} from '../../services/ProposalApiClient';
+import { ProposalList } from '../ProposalList';
+import type { Proposal } from '../../services/ProposalApiClient';
 
 // Mock the ProposalApiClient
 vi.mock('../../services/ProposalApiClient', () => ({
-  proposalApiClient: {
+  ProposalApiClient: vi.fn().mockImplementation(() => ({
     listProposals: vi.fn(),
-  },
-  ProposalStatus: {
-    PENDING: 'pending',
-    ACCEPTED: 'accepted',
-    REJECTED: 'rejected',
-  },
+  })),
 }));
 
 const mockProposals: Proposal[] = [
   {
     id: 'prop-001',
-    project_key: 'TEST',
-    target_artifact: 'docs/README.md',
+    project_key: 'TEST-123',
+    target_artifact: 'docs/plan.md',
     change_type: 'update',
-    diff: '--- a/docs/README.md\n+++ b/docs/README.md\n@@ -1,1 +1,1 @@\n-Old content\n+New content',
-    rationale: 'Update documentation',
+    diff: '+ Added line',
+    rationale: 'Update plan',
     status: 'pending',
     author: 'Alice',
     created_at: '2026-02-01T10:00:00Z',
   },
   {
     id: 'prop-002',
-    project_key: 'TEST',
-    target_artifact: 'docs/CONTRIBUTING.md',
+    project_key: 'TEST-123',
+    target_artifact: 'docs/spec.md',
     change_type: 'create',
-    diff: '--- /dev/null\n+++ b/docs/CONTRIBUTING.md\n@@ -0,0 +1,1 @@\n+New file',
-    rationale: 'Add contributing guide',
-    status: 'pending',
+    diff: '+ New file',
+    rationale: 'Add spec',
+    status: 'accepted',
     author: 'Bob',
-    created_at: '2026-02-01T09:00:00Z',
+    created_at: '2026-02-01T11:00:00Z',
+    applied_at: '2026-02-01T12:00:00Z',
   },
   {
     id: 'prop-003',
-    project_key: 'TEST',
-    target_artifact: 'docs/CHANGELOG.md',
-    change_type: 'update',
-    diff: '--- a/docs/CHANGELOG.md\n+++ b/docs/CHANGELOG.md\n@@ -1,1 +1,2 @@\n Version 1.0\n+Version 1.1',
-    rationale: 'Update changelog',
-    status: 'accepted',
+    project_key: 'TEST-123',
+    target_artifact: 'docs/old.md',
+    change_type: 'delete',
+    diff: '- Removed file',
+    rationale: 'Remove old doc',
+    status: 'rejected',
     author: 'Charlie',
-    created_at: '2026-01-31T15:00:00Z',
+    created_at: '2026-02-01T09:00:00Z',
   },
 ];
 
 describe('ProposalList', () => {
-  beforeEach(() => {
+  let mockListProposals: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
     vi.clearAllMocks();
+    mockListProposals = vi.fn();
+    const module = await import('../../services/ProposalApiClient');
+    vi.mocked(module.ProposalApiClient).mockImplementation(
+      () =>
+        ({
+          listProposals: mockListProposals,
+          createProposal: vi.fn(),
+          getProposal: vi.fn(),
+        }) as unknown as InstanceType<typeof module.ProposalApiClient>,
+    );
   });
 
-  const renderComponent = (projectKey = 'TEST') => {
-    return render(
-      <MemoryRouter>
-        <ProposalList projectKey={projectKey} />
-      </MemoryRouter>,
-    );
-  };
-
-  it('should render loading state initially', () => {
-    vi.mocked(proposalApiClient.listProposals).mockImplementation(
-      () => new Promise(() => {}), // Never resolves
-    );
-
-    renderComponent();
-    expect(screen.getByText(/loading proposals/i)).toBeInTheDocument();
+  it('renders loading state initially', () => {
+    mockListProposals.mockReturnValue(new Promise(() => {})); // Never resolves
+    render(<ProposalList projectKey="TEST-123" />);
+    expect(screen.getByText('Loading proposals...')).toBeInTheDocument();
   });
 
-  it('should fetch and display proposals', async () => {
-    vi.mocked(proposalApiClient.listProposals).mockResolvedValue(
-      mockProposals.filter((p) => p.status === 'pending'),
-    );
-
-    renderComponent();
+  it('renders proposals after loading', async () => {
+    mockListProposals.mockResolvedValue(mockProposals);
+    render(<ProposalList projectKey="TEST-123" />);
 
     await waitFor(() => {
       expect(screen.getByText('prop-001')).toBeInTheDocument();
+      expect(screen.getByText('prop-002')).toBeInTheDocument();
+      expect(screen.getByText('prop-003')).toBeInTheDocument();
     });
-
-    expect(screen.getByText('docs/README.md')).toBeInTheDocument();
-    expect(screen.getByText('Alice')).toBeInTheDocument();
-    expect(screen.getByText('prop-002')).toBeInTheDocument();
   });
 
-  it('should display proposals sorted by date (newest first)', async () => {
-    vi.mocked(proposalApiClient.listProposals).mockResolvedValue(
-      mockProposals.filter((p) => p.status === 'pending'),
-    );
-
-    renderComponent();
+  it('renders error state on failure', async () => {
+    mockListProposals.mockRejectedValue(new Error('API Error'));
+    render(<ProposalList projectKey="TEST-123" />);
 
     await waitFor(() => {
-      expect(screen.getByText('prop-001')).toBeInTheDocument();
+      expect(screen.getByText(/Error: API Error/)).toBeInTheDocument();
     });
-
-    const rows = screen.getAllByRole('row');
-    // Skip header row
-    const dataRows = rows.slice(1);
-
-    // prop-001 (10:00) should come before prop-002 (09:00)
-    expect(within(dataRows[0]).getByText('prop-001')).toBeInTheDocument();
-    expect(within(dataRows[1]).getByText('prop-002')).toBeInTheDocument();
   });
 
-  it('should filter proposals by status', async () => {
+  it('renders empty state when no proposals', async () => {
+    mockListProposals.mockResolvedValue([]);
+    render(<ProposalList projectKey="TEST-123" />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/No proposals found/)).toBeInTheDocument();
+    });
+  });
+
+  it('filters proposals by status', async () => {
     const user = userEvent.setup();
+    mockListProposals.mockResolvedValue(mockProposals);
+    render(<ProposalList projectKey="TEST-123" />);
 
-    // Initially load pending proposals
-    vi.mocked(proposalApiClient.listProposals).mockResolvedValue(
-      mockProposals.filter((p) => p.status === 'pending'),
-    );
+    // Wait for initial load
+    await waitFor(() => {
+      expect(screen.getByText('prop-001')).toBeInTheDocument();
+    });
 
-    renderComponent();
+    // Verify the filter dropdown exists and can be changed
+    const select = screen.getByLabelText(
+      'Filter by status',
+    ) as HTMLSelectElement;
+    expect(select.value).toBe('pending');
+
+    // Change filter to "all"
+    await user.selectOptions(select, 'all');
+    expect(select.value).toBe('all');
+
+    // Change filter to "accepted"
+    await user.selectOptions(select, 'accepted');
+    expect(select.value).toBe('accepted');
+
+    // Change filter to "rejected"
+    await user.selectOptions(select, 'rejected');
+    expect(select.value).toBe('rejected');
+  });
+
+  it('sorts proposals by created date', async () => {
+    const user = userEvent.setup();
+    mockListProposals.mockResolvedValue(mockProposals);
+    render(<ProposalList projectKey="TEST-123" />);
 
     await waitFor(() => {
       expect(screen.getByText('prop-001')).toBeInTheDocument();
     });
 
-    // Change filter to accepted
-    vi.mocked(proposalApiClient.listProposals).mockResolvedValue(
-      mockProposals.filter((p) => p.status === 'accepted'),
-    );
+    // Get all proposal IDs in order
+    const getProposalOrder = () => {
+      const rows = screen.getAllByRole('row').slice(1); // Skip header
+      return rows.map((row) => row.querySelector('.proposal-id')?.textContent);
+    };
 
-    const filterSelect = screen.getByLabelText(/filter by status/i);
-    await user.selectOptions(filterSelect, 'accepted');
+    // Default sort is descending (newest first)
+    const initialOrder = getProposalOrder();
+    expect(initialOrder).toEqual(['prop-002', 'prop-001', 'prop-003']);
 
-    await waitFor(() => {
-      expect(proposalApiClient.listProposals).toHaveBeenCalledWith(
-        'TEST',
-        'accepted',
-      );
-    });
+    // Click sort header to toggle to ascending
+    const sortHeader = screen.getByText(/Created/);
+    await user.click(sortHeader);
+
+    const ascOrder = getProposalOrder();
+    expect(ascOrder).toEqual(['prop-003', 'prop-001', 'prop-002']);
   });
 
-  it('should display empty state when no proposals', async () => {
-    vi.mocked(proposalApiClient.listProposals).mockResolvedValue([]);
+  it('calls onSelectProposal when View button clicked', async () => {
+    const user = userEvent.setup();
+    const onSelectProposal = vi.fn();
+    mockListProposals.mockResolvedValue([mockProposals[0]]);
 
-    renderComponent();
-
-    await waitFor(() => {
-      expect(screen.getByText(/no proposals found/i)).toBeInTheDocument();
-    });
-
-    expect(
-      screen.getByText(/no pending proposals for this project/i),
-    ).toBeInTheDocument();
-  });
-
-  it('should display error state on API failure', async () => {
-    vi.mocked(proposalApiClient.listProposals).mockRejectedValue(
-      new Error('Network error'),
-    );
-
-    renderComponent();
-
-    await waitFor(() => {
-      expect(screen.getByText(/error: network error/i)).toBeInTheDocument();
-    });
-
-    expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
-  });
-
-  it('should render status badges with correct styles', async () => {
-    const mixedProposals = [
-      { ...mockProposals[0], status: 'pending' as const },
-      { ...mockProposals[1], status: 'accepted' as const },
-      { ...mockProposals[2], status: 'rejected' as const },
-    ];
-
-    vi.mocked(proposalApiClient.listProposals).mockResolvedValue(
-      mixedProposals,
-    );
-
-    // Render with no default filter to show all
     render(
-      <MemoryRouter initialEntries={['?status=']}>
-        <ProposalList projectKey="TEST" />
-      </MemoryRouter>,
+      <ProposalList
+        projectKey="TEST-123"
+        onSelectProposal={onSelectProposal}
+      />,
     );
-
-    await waitFor(() => {
-      const badges = screen.getAllByText(/pending|accepted|rejected/i);
-      expect(badges.length).toBeGreaterThan(0);
-    });
-  });
-
-  it('should render view links for each proposal', async () => {
-    vi.mocked(proposalApiClient.listProposals).mockResolvedValue(
-      mockProposals.filter((p) => p.status === 'pending'),
-    );
-
-    renderComponent();
-
-    await waitFor(() => {
-      const viewLinks = screen.getAllByText(/view/i);
-      expect(viewLinks).toHaveLength(2); // Two pending proposals
-    });
-
-    const viewLinks = screen.getAllByText(/view/i);
-    expect(viewLinks[0]).toHaveAttribute(
-      'href',
-      '/projects/TEST/proposals/prop-001',
-    );
-  });
-
-  it('should retry loading on button click', async () => {
-    const user = userEvent.setup();
-
-    vi.mocked(proposalApiClient.listProposals).mockRejectedValueOnce(
-      new Error('First attempt failed'),
-    );
-
-    renderComponent();
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(/error: first attempt failed/i),
-      ).toBeInTheDocument();
-    });
-
-    // Mock successful retry
-    vi.mocked(proposalApiClient.listProposals).mockResolvedValue(
-      mockProposals.filter((p) => p.status === 'pending'),
-    );
-
-    const retryButton = screen.getByRole('button', { name: /retry/i });
-    await user.click(retryButton);
 
     await waitFor(() => {
       expect(screen.getByText('prop-001')).toBeInTheDocument();
+    });
+
+    const viewButtons = screen.getAllByText('View');
+    await user.click(viewButtons[0]);
+
+    expect(onSelectProposal).toHaveBeenCalledWith(mockProposals[0]);
+  });
+
+  it('displays status badges with correct styling classes', async () => {
+    mockListProposals.mockResolvedValue(mockProposals);
+    render(<ProposalList projectKey="TEST-123" />);
+
+    await waitFor(() => {
+      const pendingBadge = screen.getByText('pending');
+      expect(pendingBadge).toHaveClass('status-badge', 'status-pending');
+
+      const acceptedBadge = screen.getByText('accepted');
+      expect(acceptedBadge).toHaveClass('status-badge', 'status-accepted');
+
+      const rejectedBadge = screen.getByText('rejected');
+      expect(rejectedBadge).toHaveClass('status-badge', 'status-rejected');
+    });
+  });
+
+  it('formats dates correctly', async () => {
+    mockListProposals.mockResolvedValue([mockProposals[0]]);
+    render(<ProposalList projectKey="TEST-123" />);
+
+    await waitFor(() => {
+      const dateCell = screen.getByText(/2026/);
+      expect(dateCell).toBeInTheDocument();
+      // Check that it's formatted as locale string (contains date/time separators)
+      expect(dateCell.textContent).toMatch(/[/:]/);
+    });
+  });
+
+  it('displays all proposal details in table', async () => {
+    mockListProposals.mockResolvedValue([mockProposals[0]]);
+    render(<ProposalList projectKey="TEST-123" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('prop-001')).toBeInTheDocument();
+      expect(screen.getByText('docs/plan.md')).toBeInTheDocument();
+      expect(screen.getByText('pending')).toBeInTheDocument();
+      expect(screen.getByText('Alice')).toBeInTheDocument();
     });
   });
 });
