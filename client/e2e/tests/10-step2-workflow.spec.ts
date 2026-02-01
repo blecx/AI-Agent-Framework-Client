@@ -13,7 +13,7 @@
  */
 
 import { test, expect } from '../fixtures';
-import { switchToTab, waitForNavigation } from '../helpers/ui-helpers';
+import { switchToTab } from '../helpers/ui-helpers';
 
 test.describe('Step 2: Artifact Editor Workflow', () => {
   test('should navigate to artifact editor and edit fields', async ({
