@@ -85,6 +85,25 @@ export class ProposalApiClient {
     );
     return response.data;
   }
+
+  /**
+   * Apply a proposal (accept and merge changes)
+   */
+  async applyProposal(projectKey: string, proposalId: string): Promise<void> {
+    await this.client.post(
+      `/api/v1/projects/${projectKey}/proposals/${proposalId}/apply`
+    );
+  }
+
+  /**
+   * Reject a proposal with optional reason
+   */
+  async rejectProposal(projectKey: string, proposalId: string, reason?: string): Promise<void> {
+    await this.client.post(
+      `/api/v1/projects/${projectKey}/proposals/${proposalId}/reject`,
+      { reason }
+    );
+  }
 }
 
 // Singleton instance
