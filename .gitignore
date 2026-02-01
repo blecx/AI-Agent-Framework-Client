@@ -26,8 +26,10 @@ client/build/
 .env.*.local
 client/.env.local
 
-# IDE files
-.vscode/
+# IDE files (allow .vscode/settings.json and tasks.json)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
 .idea/
 *.swp
 *.swo
