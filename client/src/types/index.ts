@@ -4,6 +4,7 @@
 
 export * from './raid';
 export * from './workflow';
+export * from './template';
 
 // Project types
 export interface Project {
