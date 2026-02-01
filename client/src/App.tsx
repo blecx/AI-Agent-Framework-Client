@@ -157,6 +157,10 @@ function App() {
                             element={<ApplyPanelWrapper />}
                           />
                           <Route
+                            path="/projects/:projectKey/artifacts"
+                            element={<ProjectView />}
+                          />
+                          <Route
                             path="/project/:key"
                             element={<ProjectView />}
                           />
