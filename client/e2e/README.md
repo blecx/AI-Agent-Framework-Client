@@ -27,6 +27,7 @@ The E2E test suite validates the complete client-backend integration through the
 ### Important: E2E Tests Are for Local Development Only
 
 **E2E tests with the backend are NOT run in CI.** Backend E2E testing should be done using the CLI client included in the backend repository (`blecx/AI-Agent-Framework`). This approach:
+
 - Avoids cross-repository dependencies in CI
 - Keeps backend testing within the backend repository
 - Allows client PRs to pass without backend access
@@ -37,6 +38,7 @@ For future adoption, E2E tests can be enabled in CI by adding the `run-e2e` labe
 ### Test Independence
 
 **CRITICAL**: All tests are designed to be **strongly independent**:
+
 - Each test creates unique project keys using timestamps and random strings
 - Tests do not rely on shared state or artifacts from other tests
 - Tests can run in any order or in parallel
@@ -62,6 +64,7 @@ cd client
 ```
 
 This script will:
+
 - Check if backend is already running
 - Start backend via Docker Compose if available
 - Start backend via Python venv if available
@@ -268,21 +271,21 @@ test.describe('Feature Name', () => {
       key: uniqueProjectKey,
       name: `Test ${Date.now()}`,
     };
-    
+
     // 2. Navigate
     await page.goto('/projects');
-    
+
     // 3. Interact
     await page.click('button:has-text("Create Project")');
     await page.fill('#projectKey', projectData.key);
-    
+
     // 4. Wait for response
     const response = await page.waitForResponse(/\/projects/);
-    
+
     // 5. Assert
     expect(response.status()).toBe(200);
     await expect(page.locator('.project-card')).toBeVisible();
-    
+
     // 6. Verify via API
     const project = await apiHelper.getProject(projectData.key);
     expect(project.key).toBe(projectData.key);
@@ -308,17 +311,20 @@ test.describe('Feature Name', () => {
 ### Helper Functions
 
 **Test Data** (`test-data.ts`):
+
 - `generateProjectKey()` - Unique project key
 - `generateProjectData()` - Complete project data
 - `generateProposalData()` - Proposal data
 
 **API Helpers** (`api-helpers.ts`):
+
 - `apiHelper.checkHealth()` - Health check
 - `apiHelper.createProject()` - Create project via API
 - `apiHelper.getProject()` - Get project
 - `apiHelper.cleanupTestProjects()` - Clean up test data
 
 **UI Helpers** (`ui-helpers.ts`):
+
 - `navigateToProjects()` - Navigate to projects page
 - `waitForToast()` - Wait for toast notification
 - `createProjectViaUI()` - Create project through UI
@@ -329,6 +335,7 @@ test.describe('Feature Name', () => {
 ### Smart Dependency Resolution in CI
 
 E2E tests in CI now include **intelligent dependency resolution** that automatically:
+
 - Clones the backend repository if needed
 - Installs all backend dependencies
 - Starts the backend using the best available method
@@ -337,6 +344,7 @@ E2E tests in CI now include **intelligent dependency resolution** that automatic
 ### When E2E Tests Run
 
 E2E tests run automatically when:
+
 - Pushing to the `main` branch, OR
 - A PR is labeled with `run-e2e`
 
@@ -345,6 +353,7 @@ E2E tests run automatically when:
 The workflow implements a **two-run strategy**:
 
 **First Run: Attempt Full Resolution**
+
 1. Checkout client repository
 2. Setup Node.js and Python
 3. Attempt backend dependency resolution:
@@ -357,6 +366,7 @@ The workflow implements a **two-run strategy**:
 6. Upload all diagnostic artifacts
 
 **Second Run: Fallback with Clear Messaging**
+
 - If all resolution attempts fail:
   - Display detailed skip message
   - List all attempted methods
@@ -408,6 +418,7 @@ For more information:
 ### Running E2E in CI
 
 **For Pull Requests:**
+
 1. Add the `run-e2e` label to your PR
 2. CI automatically attempts dependency resolution
 3. Tests run if backend is available
@@ -423,20 +434,23 @@ E2E tests run automatically on every push.
 ✅ **Clear logging** - Detailed logs of all resolution attempts  
 ✅ **Diagnostic artifacts** - Logs uploaded for debugging  
 ✅ **Actionable messages** - Clear instructions when tests skip  
-✅ **Non-blocking** - PRs not blocked by unresolvable dependencies  
+✅ **Non-blocking** - PRs not blocked by unresolvable dependencies
 
 ### Monitoring CI
 
 **Artifacts Available:**
 
 Always uploaded:
+
 - `backend-setup-log` - Complete resolution attempt logs
 
 When tests run:
+
 - `playwright-report` - HTML test report with full details
 - `backend-logs` - Backend runtime logs
 
 When tests fail:
+
 - `test-screenshots` - Screenshots from failed tests
 - Trace files for debugging
 
@@ -445,6 +459,7 @@ When tests fail:
 ### Documentation
 
 For complete details, see:
+
 - **[E2E CI Dependency Resolution](../../docs/E2E-CI-DEPENDENCY-RESOLUTION.md)** - Resolution strategy and logging
 - **[E2E CI Setup Guide](../../docs/E2E-CI-SETUP.md)** - Configuration and troubleshooting
 - **[E2E Testing Approach](../../docs/E2E-TESTING-APPROACH.md)** - Overall E2E strategy
@@ -465,6 +480,7 @@ For complete details, see:
    - Download `backend-setup-log`
 
 2. **Review the log** to see which resolution methods failed:
+
    ```
    ✗ Failed to clone backend repository
    ✗ Docker Compose failed to start
@@ -526,10 +542,11 @@ For complete details, see:
    - Missing environment variables (add to workflow)
 
 3. **Fix in backend**:
+
    ```python
    # Ensure backend binds to all interfaces
    uvicorn.run(app, host="0.0.0.0", port=8000)
-   
+
    # Ensure health endpoint exists
    @app.get("/health")
    async def health():
@@ -541,6 +558,7 @@ For complete details, see:
 Before pushing workflow changes:
 
 1. **Test setup script locally**:
+
    ```bash
    export LOG_FILE=/tmp/test-setup.log
    bash client/e2e/setup-backend.sh
@@ -548,6 +566,7 @@ Before pushing workflow changes:
    ```
 
 2. **Create a test branch**:
+
    ```bash
    git checkout -b test/ci-e2e
    git push origin test/ci-e2e
@@ -565,6 +584,7 @@ Before pushing workflow changes:
 **Problem**: Tests fail with "API is not ready" or connection errors.
 
 **Solution**:
+
 ```bash
 # Check if backend is running
 curl http://localhost:8000/health
@@ -580,6 +600,7 @@ cd ../AI-Agent-Framework && docker compose up -d
 **Problem**: Error about port 3000 or 8000 already in use.
 
 **Solution**:
+
 ```bash
 # Find process using port
 lsof -i :3000
@@ -595,6 +616,7 @@ export API_BASE_URL=http://localhost:8001
 **Problem**: Tests pass individually but fail when run together.
 
 **Solution**:
+
 - Check test independence - ensure each test uses `uniqueProjectKey`
 - Run tests sequentially: `npx playwright test --workers=1`
 - Check for shared state or race conditions
@@ -604,6 +626,7 @@ export API_BASE_URL=http://localhost:8001
 **Problem**: Tests timeout waiting for elements or responses.
 
 **Solution**:
+
 ```bash
 # Increase timeouts in playwright.config.ts
 timeout: 120000,  # 2 minutes
@@ -621,6 +644,7 @@ tail -f /tmp/backend-e2e.log  # if using Python
 **Problem**: Tests pass on local machine but fail in GitHub Actions.
 
 **Solution**:
+
 - Check environment variables are set correctly in CI
 - Verify backend starts properly (check CI logs)
 - Ensure Playwright browsers are installed: `npx playwright install --with-deps`
@@ -650,6 +674,109 @@ If test projects accumulate:
 
 curl -X DELETE http://localhost:8000/projects/e2e-project-*
 ```
+
+## Step 2: Artifact, Proposal, and Audit Testing
+
+### Overview
+
+Step 2 E2E tests validate the complete workflow for template-driven artifact management, proposal creation/review, and audit viewing. These tests are in `e2e/tests/10-step2-workflow.spec.ts`.
+
+### Test Scenarios Covered
+
+1. **Artifact Editor Workflow** - Navigate to artifact editor, edit fields, save, and verify persistence
+2. **Artifact List and Filtering** - View artifact list, apply filters by type, navigate to editor
+3. **Proposal Creation** - Create new proposal through UI, fill form, submit, verify in list
+4. **Proposal Apply Workflow** - View proposal list, open proposal, apply changes, verify artifact updated
+5. **Proposal Reject Workflow** - View proposal list, open proposal, reject with reason, verify status change
+6. **Audit Viewer** - View audit results, filter by severity, click links to navigate to artifacts
+7. **Full End-to-End Workflow** - Complete workflow from project creation through proposal apply and audit
+
+### Running Step 2 Tests
+
+```bash
+# Run all Step 2 tests
+npm run test:e2e -- tests/10-step2-workflow
+
+# Run specific scenario
+npx playwright test --grep "Artifact Editor Workflow"
+npx playwright test --grep "Proposal Creation"
+npx playwright test --grep "Full End-to-End"
+
+# Run with UI for debugging
+npm run test:e2e:ui -- tests/10-step2-workflow
+
+# Run in headed mode to watch execution
+npx playwright test --headed tests/10-step2-workflow.spec.ts
+```
+
+### Step 2 Test Helpers
+
+The file `e2e/helpers/step2-helpers.ts` provides reusable utilities:
+
+- `navigateToArtifactEditor()` - Navigate to artifact editor for specific artifact
+- `fillArtifactField()` - Fill form field in artifact editor
+- `saveArtifact()` - Save artifact and wait for confirmation
+- `navigateToArtifactList()` - Navigate to artifact list view
+- `filterArtifactsByType()` - Apply artifact type filter
+- `createProposalViaUI()` - Create proposal through UI form
+- `applyProposalViaUI()` - Apply proposal and handle confirmation dialog
+- `rejectProposalViaUI()` - Reject proposal with reason
+- `navigateToAuditViewer()` - Navigate to audit viewer
+- `filterAuditBySeverity()` - Filter audit results by severity level
+- `verifyProposalInList()` - Verify proposal appears in list
+
+### Step 2 Test Dependencies
+
+**Backend Requirements:**
+
+- All Step 2 backend endpoints must be implemented (#69-#77)
+- Template API (`/api/v1/templates`)
+- Artifact API (`/api/v1/projects/{key}/artifacts`)
+- Proposal API (`/api/v1/projects/{key}/proposals`)
+- Audit API (`/api/v1/projects/{key}/audit`)
+
+**Frontend Requirements:**
+
+- All Step 2 UX components must be implemented (#102-#108)
+- ArtifactEditor component
+- ArtifactList component
+- ProposalList component
+- ProposalReview component
+- AuditViewer component
+
+### Expected Test Execution Time
+
+- **Individual scenarios**: 5-10 seconds each
+- **Full Step 2 suite**: < 90 seconds total
+- Tests are deterministic and should pass consistently
+
+### Troubleshooting Step 2 Tests
+
+**Problem**: Artifact editor not loading
+
+**Solution**: Verify backend templates API is accessible and returning templates. Check that artifact generation has been run for the project.
+
+**Problem**: Proposals not appearing in list
+
+**Solution**: Ensure proposal creation API completed successfully. Check backend logs for proposal creation errors.
+
+**Problem**: Audit results empty
+
+**Solution**: Audit events are created after proposal apply/reject actions. First apply or reject a proposal to generate audit events.
+
+**Problem**: Tests timing out
+
+**Solution**: Step 2 tests include defensive timeouts and fallback logic. Check that backend is responding within 10 seconds. Increase timeout in playwright.config.ts if needed.
+
+### Step 2 Test Data
+
+Tests use the existing E2E fixtures:
+
+- `apiClient` - SRP-compliant API client factory
+- `apiHelper` - Legacy API helper (backward compatibility)
+- `uniqueProjectKey` - Generates unique project key per test
+
+Tests create minimal data needed and clean up automatically via fixtures.
 
 ## Additional Resources
 

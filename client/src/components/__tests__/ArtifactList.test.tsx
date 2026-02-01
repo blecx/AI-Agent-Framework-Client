@@ -171,7 +171,7 @@ describe('ArtifactList', () => {
 
     const rows = screen.getAllByRole('row');
     // Skip header row (index 0)
-    const artifactNames = rows.slice(1).map(row => within(row).getAllByRole('cell')[0].textContent);
+    const artifactNames = rows.slice(1).map(row => within(row).getAllByRole('cell')[1].textContent);
     
     expect(artifactNames).toEqual(['charter.md', 'raid.md', 'wbs.md']);
   });
@@ -196,7 +196,7 @@ describe('ArtifactList', () => {
     await user.click(nameHeader);
 
     const rows = screen.getAllByRole('row');
-    const artifactNames = rows.slice(1).map(row => within(row).getAllByRole('cell')[0].textContent);
+    const artifactNames = rows.slice(1).map(row => within(row).getAllByRole('cell')[1].textContent);
     
     expect(artifactNames).toEqual(['wbs.md', 'raid.md', 'charter.md']);
   });
@@ -219,7 +219,7 @@ describe('ArtifactList', () => {
     await user.click(dateHeader);
 
     const rows = screen.getAllByRole('row');
-    const artifactNames = rows.slice(1).map(row => within(row).getAllByRole('cell')[0].textContent);
+    const artifactNames = rows.slice(1).map(row => within(row).getAllByRole('cell')[1].textContent);
     
     // Sorted by date ascending: wbs (Jan 10) -> charter (Jan 15) -> raid (Jan 20)
     expect(artifactNames).toEqual(['wbs.md', 'charter.md', 'raid.md']);
