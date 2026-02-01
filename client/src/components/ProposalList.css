@@ -1,0 +1,143 @@
+/**
+ * ProposalList Styles
+ */
+
+.proposal-list {
+  padding: 1rem;
+}
+
+.proposal-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.proposal-list-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-controls label {
+  font-weight: 500;
+}
+
+.filter-controls select {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.proposal-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.proposal-list-table thead {
+  background: #f5f5f5;
+}
+
+.proposal-list-table th {
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #ddd;
+}
+
+.proposal-list-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.proposal-list-table th.sortable:hover {
+  background: #e8e8e8;
+}
+
+.proposal-list-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #eee;
+}
+
+.proposal-row:hover {
+  background: #f9f9f9;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-accepted {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.btn-view-proposal {
+  padding: 0.4rem 1rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn-view-proposal:hover {
+  background: #0056b3;
+}
+
+.proposal-list-empty {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+  background: #f9f9f9;
+  border-radius: 4px;
+  border: 1px dashed #ccc;
+}
+
+.proposal-list-loading,
+.proposal-list-error {
+  padding: 2rem;
+  text-align: center;
+}
+
+.proposal-list-error {
+  color: #d32f2f;
+  background: #ffebee;
+  border-radius: 4px;
+}
+
+.proposal-id,
+.proposal-target {
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.status-header.filtered {
+  font-style: italic;
+}
