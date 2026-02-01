@@ -5,10 +5,11 @@ import apiClient from '../services/apiClient';
 import ProposePanel from './ProposePanel';
 import ApplyPanel from './ApplyPanel';
 import CommandPanel from './ProjectCommandPanel';
+import { ArtifactList } from './ArtifactList';
 import Skeleton from './ui/Skeleton';
 import './ProjectView.css';
 
-type TabType = 'overview' | 'propose' | 'apply' | 'commands';
+type TabType = 'overview' | 'propose' | 'apply' | 'commands' | 'artifacts';
 
 export default function ProjectView() {
   const { key } = useParams<{ key: string }>();
@@ -119,6 +120,12 @@ export default function ProjectView() {
         >
           Commands
         </button>
+        <button
+          className={`tab ${activeTab === 'artifacts' ? 'active' : ''}`}
+          onClick={() => setActiveTab('artifacts')}
+        >
+          Artifacts
+        </button>
       </nav>
 
       <div className="project-content">
@@ -192,6 +199,19 @@ export default function ProjectView() {
         {activeTab === 'propose' && key && <ProposePanel projectKey={key} />}
         {activeTab === 'apply' && key && <ApplyPanel projectKey={key} />}
         {activeTab === 'commands' && key && <CommandPanel projectKey={key} />}
+        {activeTab === 'artifacts' && key && (
+          <ArtifactList
+            projectKey={key}
+            onCreateNew={() => {
+              // TODO: Open template selector modal
+              console.log('Create new artifact');
+            }}
+            onSelectArtifact={(artifact) => {
+              // TODO: Open ArtifactEditor modal/view
+              console.log('Selected artifact:', artifact);
+            }}
+          />
+        )}
       </div>
     </div>
   );
