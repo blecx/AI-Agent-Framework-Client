@@ -22,15 +22,17 @@ export const test = base.extend<TestFixtures>({
   apiClient: async ({}, use) => {
     const apiBaseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
     const client = new ApiClientFactory(apiBaseUrl);
-    
+
     // Wait for API to be ready before running tests
     const isReady = await client.waitForReady(30000);
     if (!isReady) {
-      throw new Error('API is not ready. Please ensure the backend is running.');
+      throw new Error(
+        'API is not ready. Please ensure the backend is running.',
+      );
     }
-    
+
     await use(client);
-    
+
     // Cleanup after test - remove test projects
     await client.projects.cleanup('e2e-');
   },
@@ -41,15 +43,17 @@ export const test = base.extend<TestFixtures>({
   apiHelper: async ({}, use) => {
     const apiBaseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
     const helper = new E2EApiHelper(apiBaseUrl);
-    
+
     // Wait for API to be ready before running tests
     const isReady = await helper.waitForApi(30000);
     if (!isReady) {
-      throw new Error('API is not ready. Please ensure the backend is running.');
+      throw new Error(
+        'API is not ready. Please ensure the backend is running.',
+      );
     }
-    
+
     await use(helper);
-    
+
     // Cleanup after test - remove test projects
     await helper.cleanupTestProjects('e2e-');
   },
