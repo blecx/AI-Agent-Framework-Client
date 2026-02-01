@@ -69,6 +69,8 @@ class ApiClient {
   private client: AxiosInstance;
   private baseUrl: string;
   private apiKey?: string;
+  private maxRetries = 3;
+  private retryDelay = 1000;
 
   constructor() {
     this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
@@ -83,13 +85,48 @@ class ApiClient {
       timeout: 30000,
     });
 
-    // Add response interceptor for error handling
+    // Add response interceptor for error handling with retry
     this.client.interceptors.response.use(
       (response) => response,
-      (error: AxiosError) => {
+      async (error: AxiosError) => {
+        const config = error.config as AxiosRequestConfig & { retryCount?: number };
+        
+        // Retry logic for network errors and 5xx server errors
+        if (config && this.shouldRetry(error)) {
+          config.retryCount = config.retryCount || 0;
+          
+          if (config.retryCount < this.maxRetries) {
+            config.retryCount += 1;
+            const delay = this.retryDelay * Math.pow(2, config.retryCount - 1);
+            
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return this.client.request(config);
+          }
+        }
+        
         handleApiClientAxiosError(error);
       },
     );
+  }
+
+  private shouldRetry(error: AxiosError): boolean {
+    // Retry on network errors
+    if (!error.response) {
+      return true;
+    }
+    
+    // Retry on 5xx server errors
+    const status = error.response.status;
+    if (status >= 500 && status < 600) {
+      return true;
+    }
+    
+    // Retry on 408 (Request Timeout) and 429 (Too Many Requests)
+    if (status === 408 || status === 429) {
+      return true;
+    }
+    
+    return false;
   }
 
   /**

@@ -3,9 +3,12 @@
  * Template-driven form for creating/editing artifacts
  */
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import type { Template, JSONSchemaProperty } from '../types/template';
 import { templateApiClient } from '../services/TemplateApiClient';
+import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
+import { FormSkeleton } from './LoadingSkeleton';
+import { useToast } from '../hooks/useToast';
 import './ArtifactEditor.css';
 
 export interface ArtifactEditorProps {
@@ -28,6 +31,15 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const toast = useToast();
+
+  // Warn on unsaved changes
+  const { isBlocked, confirmNavigation, cancelNavigation } = useUnsavedChanges({
+    when: hasChanges,
+  });
 
   const isFormValid = useMemo(() => {
     if (!template) return false;
@@ -131,6 +143,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
 
   const handleFieldChange = (fieldName: string, value: unknown) => {
     setFormData((prev) => ({ ...prev, [fieldName]: value }));
+    setHasChanges(true);
     // Clear error on change
     setErrors((prev) => {
       const newErrors = { ...prev };
@@ -139,21 +152,56 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
     });
   };
 
-  const handleSave = () => {
-    if (validateForm()) {
-      onSave?.(formData);
+  const handleSave = async () => {
+    if (!validateForm()) {
+      toast.showError('Please fix validation errors before saving');
+      return;
+    }
+
+    setIsSaving(true);
+    const previousData = { ...formData };
+
+    try {
+      // Optimistic update - call onSave immediately
+      await onSave?.(formData);
+      setHasChanges(false);
+      toast.showSuccess('Artifact saved successfully');
+    } catch (err) {
+      // Rollback on error
+      setFormData(previousData);
+      const errorMsg = err instanceof Error ? err.message : 'Failed to save artifact';
+      toast.showError(errorMsg);
+      console.error('Save error:', err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Keyboard navigation handlers
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Escape to cancel
+    if (e.key === 'Escape' && onCancel) {
+      e.preventDefault();
+      onCancel();
     }
   };
 
   const renderField = (fieldName: string, fieldSchema: JSONSchemaProperty, fieldId: string) => {
     const value = formData[fieldName];
     const label = fieldSchema.title || fieldName;
+    const isRequired = template?.schema.required?.includes(fieldName);
+    const commonProps = {
+      id: fieldId,
+      'aria-required': isRequired,
+      'aria-invalid': !!errors[fieldName],
+      'aria-describedby': errors[fieldName] ? `${fieldId}-error` : fieldSchema.description ? `${fieldId}-desc` : undefined,
+    };
 
     // Render based on field type and format
     if (fieldSchema.enum) {
       return (
         <select
-          id={fieldId}
+          {...commonProps}
           value={value as string || ''}
           onChange={(e) => handleFieldChange(fieldName, e.target.value)}
           className={errors[fieldName] ? 'error' : ''}
@@ -171,7 +219,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
     if (fieldSchema.format === 'date') {
       return (
         <input
-          id={fieldId}
+          {...commonProps}
           type="date"
           value={value as string || ''}
           onChange={(e) => handleFieldChange(fieldName, e.target.value)}
@@ -183,7 +231,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
     if (fieldSchema.format === 'textarea' || fieldSchema.maxLength && fieldSchema.maxLength > 200) {
       return (
         <textarea
-          id={fieldId}
+          {...commonProps}
           value={value as string || ''}
           onChange={(e) => handleFieldChange(fieldName, e.target.value)}
           rows={6}
@@ -195,7 +243,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
     if (fieldSchema.type === 'number') {
       return (
         <input
-          id={fieldId}
+          {...commonProps}
           type="number"
           value={value as number || ''}
           onChange={(e) => handleFieldChange(fieldName, parseFloat(e.target.value))}
@@ -207,7 +255,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
     // Default: text input
     return (
       <input
-        id={fieldId}
+        {...commonProps}
         type="text"
         value={value as string || ''}
         onChange={(e) => handleFieldChange(fieldName, e.target.value)}
@@ -217,26 +265,56 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
   };
 
   if (loading) {
-    return <div className="artifact-editor loading">Loading template...</div>;
+    return (
+      <div className="artifact-editor" aria-busy="true" aria-label="Loading template">
+        <FormSkeleton fields={5} />
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="artifact-editor error">{error}</div>;
+    return (
+      <div className="artifact-editor error" role="alert" aria-live="assertive">
+        {error}
+      </div>
+    );
   }
 
   if (!template) {
-    return <div className="artifact-editor error">Template not found</div>;
+    return (
+      <div className="artifact-editor error" role="alert">
+        Template not found
+      </div>
+    );
   }
 
   return (
-    <div className="artifact-editor">
+    <div className="artifact-editor" onKeyDown={handleKeyDown}>
+      {/* Unsaved changes warning dialog */}
+      {isBlocked && (
+        <div className="unsaved-changes-dialog" role="dialog" aria-modal="true" aria-labelledby="unsaved-dialog-title">
+          <div className="dialog-content">
+            <h3 id="unsaved-dialog-title">Unsaved Changes</h3>
+            <p>You have unsaved changes. Are you sure you want to leave?</p>
+            <div className="dialog-actions">
+              <button onClick={cancelNavigation} className="btn-primary">
+                Stay
+              </button>
+              <button onClick={confirmNavigation} className="btn-secondary">
+                Leave
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <h2>
         {template.name}
         <span className="template-type">{template.artifact_type}</span>
       </h2>
       <p className="template-description">{template.description}</p>
 
-      <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+      <form ref={formRef} onSubmit={(e) => { e.preventDefault(); handleSave(); }} aria-label="Artifact editor form">
         {Object.entries(template.schema.properties).map(([fieldName, fieldSchema]) => {
           const isRequired = template.schema.required?.includes(fieldName);
           const label = fieldSchema.title || fieldName;
@@ -246,14 +324,16 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
             <div key={fieldName} className="form-field">
               <label htmlFor={fieldId}>
                 {label}
-                {isRequired && <span className="required">*</span>}
+                {isRequired && <span className="required" aria-label="required">*</span>}
               </label>
               {fieldSchema.description && (
-                <p className="field-description">{fieldSchema.description}</p>
+                <p id={`${fieldId}-desc`} className="field-description">{fieldSchema.description}</p>
               )}
               {renderField(fieldName, fieldSchema, fieldId)}
               {errors[fieldName] && (
-                <span className="field-error">{errors[fieldName]}</span>
+                <span id={`${fieldId}-error`} className="field-error" role="alert" aria-live="polite">
+                  {errors[fieldName]}
+                </span>
               )}
             </div>
           );
@@ -263,9 +343,10 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
           <button
             type="submit"
             className="btn-primary"
-            disabled={!isFormValid}
+            disabled={!isFormValid || isSaving}
+            aria-busy={isSaving}
           >
-            Save
+            {isSaving ? 'Saving...' : 'Save'}
           </button>
           {onCancel && (
             <button type="button" className="btn-secondary" onClick={onCancel}>
