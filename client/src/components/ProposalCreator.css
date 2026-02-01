@@ -1,0 +1,144 @@
+/* ProposalCreator styles */
+
+.proposal-creator {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.proposal-creator h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.proposal-creator-artifact {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.proposal-creator-loading {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+}
+
+.proposal-creator-error {
+  background: #ffebee;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  border: 1px solid #ef5350;
+}
+
+.proposal-creator-editor,
+.proposal-creator-rationale,
+.proposal-creator-author {
+  margin-bottom: 20px;
+}
+
+.proposal-creator-editor label,
+.proposal-creator-rationale label,
+.proposal-creator-author label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.proposal-creator-textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.proposal-creator-textarea:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.proposal-creator-author input {
+  width: 300px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.proposal-creator-preview {
+  margin: 20px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 16px;
+  background: #fafafa;
+}
+
+.proposal-creator-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.proposal-creator-preview h3 {
+  margin: 0;
+  color: #333;
+}
+
+.proposal-creator-toggle {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.proposal-creator-toggle:hover {
+  background: #f5f5f5;
+}
+
+.proposal-creator-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.proposal-creator-submit,
+.proposal-creator-cancel {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.proposal-creator-submit {
+  background: #4CAF50;
+  color: white;
+}
+
+.proposal-creator-submit:hover:not(:disabled) {
+  background: #45a049;
+}
+
+.proposal-creator-submit:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.proposal-creator-cancel {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.proposal-creator-cancel:hover:not(:disabled) {
+  background: #e0e0e0;
+}

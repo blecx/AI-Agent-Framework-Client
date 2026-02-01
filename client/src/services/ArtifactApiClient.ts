@@ -48,3 +48,6 @@ export class ArtifactApiClient {
     return response.data;
   }
 }
+
+// Singleton instance
+export const artifactApiClient = new ArtifactApiClient();
