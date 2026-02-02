@@ -213,9 +213,50 @@ jobs:
         working-directory: client
         run: npm run lint
 
+      - name: Run tests with coverage
+        working-directory: client
+        run: npm run test:coverage
+
+      - name: Check coverage thresholds
+        working-directory: client
+        run: |
+          echo "📊 Coverage report generated"
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "Coverage summary:"
+            cat coverage/coverage-summary.json | jq '.total'
+          fi
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: client/coverage/
+          retention-days: 30
+
       - name: Build
         working-directory: client
         run: npm run build
+
+      - name: Check bundle size
+        working-directory: client
+        run: npm run check:bundle-size
+
+      - name: Check for console errors in build
+        working-directory: client
+        run: |
+          echo "🔍 Checking for console errors in production build..."
+          if grep -r "console\.\(log\|error\|warn\|debug\)" dist/ --include="*.js" 2>/dev/null; then
+            echo "⚠️  Warning: Console statements found in production build"
+            echo "Consider removing console statements or using a build plugin to strip them"
+            # This is a warning, not a failure for now
+          else
+            echo "✅ No console errors found in production build"
+          fi
+
+      - name: Validate documentation
+        working-directory: client
+        run: npm run check:docs
 
       - name: Run tests
         working-directory: client
@@ -376,3 +417,96 @@ jobs:
           name: backend-logs
           path: /tmp/backend-e2e.log
           if-no-files-found: ignore
+
+  # Lighthouse CI for performance and accessibility testing
+  # Runs on main branch or when 'run-lighthouse' label is present
+  lighthouse:
+    runs-on: ubuntu-latest
+    needs: client-ci
+    # Run on main branch or when 'run-lighthouse' label is present
+    if: github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'run-lighthouse')
+
+    steps:
+      - name: Checkout client repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'client/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Build for Lighthouse
+        working-directory: client
+        run: npm run build
+
+      - name: Start preview server
+        working-directory: client
+        run: |
+          npm run preview &
+          echo $! > preview.pid
+          sleep 5
+          curl http://localhost:5173 || echo "Preview server not ready yet"
+
+      - name: Run Lighthouse CI
+        working-directory: client
+        run: |
+          npm run lighthouse:ci || {
+            echo ""
+            echo "═══════════════════════════════════════════════════════════"
+            echo "LIGHTHOUSE CI FAILED"
+            echo "═══════════════════════════════════════════════════════════"
+            echo ""
+            echo "One or more Lighthouse thresholds were not met:"
+            echo "  - Performance: Minimum 80"
+            echo "  - Accessibility: Minimum 90"
+            echo "  - Best Practices: Minimum 80"
+            echo ""
+            echo "💡 REMEDIATION STEPS:"
+            echo ""
+            echo "Performance (< 80):"
+            echo "  1. Optimize images (use WebP, lazy loading)"
+            echo "  2. Reduce JavaScript bundle size"
+            echo "  3. Implement code splitting"
+            echo "  4. Use CDN for static assets"
+            echo "  5. Enable compression (gzip/brotli)"
+            echo ""
+            echo "Accessibility (< 90):"
+            echo "  1. Add ARIA labels to interactive elements"
+            echo "  2. Ensure sufficient color contrast"
+            echo "  3. Add alt text to images"
+            echo "  4. Ensure keyboard navigation works"
+            echo "  5. Fix any axe-core violations"
+            echo ""
+            echo "Best Practices (< 80):"
+            echo "  1. Fix browser console errors"
+            echo "  2. Use HTTPS in production"
+            echo "  3. Avoid deprecated APIs"
+            echo "  4. Fix security vulnerabilities"
+            echo ""
+            echo "View detailed report in Lighthouse CI artifacts"
+            echo "═══════════════════════════════════════════════════════════"
+            exit 1
+          }
+
+      - name: Stop preview server
+        if: always()
+        working-directory: client
+        run: |
+          if [ -f preview.pid ]; then
+            kill $(cat preview.pid) || true
+            rm preview.pid
+          fi
+
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: client/.lighthouseci/
+          retention-days: 30
