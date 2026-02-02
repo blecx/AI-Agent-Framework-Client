@@ -118,7 +118,7 @@ describe('RAID API Client Integration Tests', () => {
       const result = await apiClient.listRAIDItems(TEST_PROJECT_KEY);
       expect(result.success).toBe(false);
       expect(result.error).toBeTruthy(); // Contains error details
-    });
+    }, 10000); // Increased timeout for retry logic (PR #122 added 3 retries with exponential backoff)
 
     it('should apply filters correctly', async () => {
       const mockFilteredResponse: RAIDItemList = {
