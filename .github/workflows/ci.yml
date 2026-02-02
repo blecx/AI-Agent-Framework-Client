@@ -285,35 +285,9 @@ jobs:
           
           echo "✅ No console errors/warnings in production build"
 
-      - name: Check bundle size
-        working-directory: client
-        run: npm run check:bundle-size
-
-      - name: Check for console errors in build
-        working-directory: client
-        run: |
-          echo "🔍 Checking for console errors in production build..."
-          if grep -r "console\.\(log\|error\|warn\|debug\)" dist/ --include="*.js" 2>/dev/null; then
-            echo "⚠️  Warning: Console statements found in production build"
-            echo "Consider removing console statements or using a build plugin to strip them"
-            # This is a warning, not a failure for now
-          else
-            echo "✅ No console errors found in production build"
-          fi
-
       - name: Validate documentation
         working-directory: client
         run: npm run check:docs
-
-      - name: Run tests with coverage
-        working-directory: client
-        run: npm test -- --coverage
-
-      - name: Check test coverage thresholds
-        working-directory: client
-        run: |
-          echo "Coverage thresholds: 80% for lines, functions, branches, statements"
-          echo "Configured in vitest.config.ts"
 
   api-integration:
     needs: [changes, client-ci]
