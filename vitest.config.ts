@@ -12,7 +12,7 @@ export default defineConfig({
     exclude: [...configDefaults.exclude, 'client/e2e/**'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text', 'json', 'html', 'json-summary'],
       exclude: [
         ...(configDefaults.coverage?.exclude ?? []),
         'src/test/',
@@ -21,6 +21,15 @@ export default defineConfig({
         '**/*.config.*',
         '**/mockData.ts',
       ],
+      // Coverage thresholds: Set at current baseline to prevent regression
+      // Goal: Incrementally increase as new tests are added
+      // Target: 80% for all new files
+      thresholds: {
+        lines: 59,
+        functions: 61,
+        branches: 76,
+        statements: 59,
+      },
     },
   },
 });

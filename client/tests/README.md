@@ -855,13 +855,39 @@ Tests run automatically on:
 - Every push to any branch
 - Every pull request
 
-**Workflow**: `.github/workflows/client-ci.yml`
+**Workflow**: `.github/workflows/ci.yml`
 
 **Jobs**:
 
 1. **Lint**: Code style and TypeScript checks
-2. **Unit & Integration Tests**: All Vitest tests
-3. **E2E Tests**: Playwright tests (Chromium only in CI)
+2. **Unit & Integration Tests**: All Vitest tests with coverage
+3. **Build**: TypeScript compilation and Vite build
+4. **Bundle Size Check**: Ensures main bundle < 500KB gzipped
+5. **Documentation Validation**: Verifies tests/README.md is current
+6. **E2E Tests**: Playwright tests (on main or with `run-e2e` label)
+7. **Lighthouse CI**: Performance/accessibility checks (on main or with `run-lighthouse` label)
+
+### Quality Gates
+
+All PRs must pass these quality gates before merging:
+
+#### Required Gates (Always Run)
+
+1. **PR Template Validation**: All required sections present and filled
+2. **Repository Hygiene**: No forbidden env files committed
+3. **Linting**: ESLint passes with no errors
+4. **Test Coverage**: 80%+ coverage for lines, functions, branches, statements
+5. **Build Success**: TypeScript compiles and Vite builds without warnings
+6. **Bundle Size**: Main bundle < 500KB gzipped
+7. **Console Errors**: No console.* in production build (warning)
+8. **Documentation**: tests/README.md is current and complete
+9. **Unit Tests**: All tests pass
+
+#### Optional Gates (Main Branch or Labeled)
+
+10. **API Integration**: Tests against real backend API (auto-triggered on API code changes)
+11. **E2E Tests**: Full browser tests (add `run-e2e` label to PR)
+12. **Lighthouse CI**: Performance ≥ 80, Accessibility ≥ 90 (add `run-lighthouse` label to PR)
 
 ### CI Test Commands
 
@@ -869,24 +895,94 @@ Tests run automatically on:
 # Lint
 npm run lint
 
-# Unit + Integration tests
-npm test -- --run
+# Unit + Integration tests with coverage
+npm run test:coverage
+
+# Build
+npm run build
+
+# Bundle size check
+npm run check:bundle-size
+
+# Documentation validation
+npm run check:docs
 
 # E2E tests
 npm run test:e2e
+
+# Lighthouse CI (requires preview server running)
+npm run preview &
+npm run lighthouse:ci
 ```
 
 ### CI Optimization
 
 - **Parallelization**: Tests run in parallel where possible
 - **Caching**: node_modules cached between runs
-- **Selective execution**: Only E2E tests skip UI components tests in CI
+- **Coverage Upload**: Coverage reports uploaded as artifacts
+- **Smart E2E**: E2E tests only run when needed (main branch or labeled)
+- **Lighthouse on Demand**: Performance tests triggered via label
+
+### Artifacts
+
+CI uploads these artifacts for debugging:
+
+- **coverage-report**: Test coverage HTML report
+- **playwright-report**: E2E test results with traces
+- **test-screenshots**: Screenshots from failed E2E tests
+- **backend-logs**: API logs from E2E tests
+- **lighthouse-report**: Performance/accessibility reports
+
+**Downloading artifacts**:
+
+```bash
+# List run artifacts
+gh run view <RUN_ID>
+
+# Download specific artifact
+gh run download <RUN_ID> -n coverage-report
+```
+
+### Triggering Optional Gates
+
+**E2E Tests**:
+
+```bash
+gh pr edit <PR_NUMBER> --add-label run-e2e
+```
+
+**Lighthouse CI**:
+
+```bash
+gh pr edit <PR_NUMBER> --add-label run-lighthouse
+```
+
+### CI Failure Remediation
+
+See **[docs/ci-cd.md](../../docs/ci-cd.md)** for comprehensive troubleshooting guide with:
+
+- Detailed failure scenarios
+- Step-by-step remediation instructions
+- Common issues and solutions
+- Performance optimization tips
+- Accessibility compliance guide
 
 ## Coverage Requirements
 
-### Overall Target: 80%+
+### Overall Target: 80%+ (CI Enforced)
 
-- **Unit tests**: Target 85%+ coverage
+The CI pipeline enforces these minimum coverage thresholds:
+
+- **Lines**: 80%
+- **Functions**: 80%
+- **Branches**: 80%
+- **Statements**: 80%
+
+PRs that reduce coverage below these thresholds will fail CI.
+
+### Component-Level Targets
+
+- **Unit tests**: Target 85%+ coverage for new components
 - **Integration tests**: Critical API paths covered
 - **E2E tests**: All major user journeys covered
 
@@ -896,13 +992,33 @@ npm run test:e2e
 cd client
 
 # Run tests with coverage
-npm test -- --coverage
+npm run test:coverage
 
 # Generate HTML coverage report
 npm test -- --coverage --reporter=html
 
 # View report
 open coverage/index.html
+
+# Check coverage summary
+cat coverage/coverage-summary.json | jq '.total'
+```
+
+### Coverage Configuration
+
+Coverage settings are configured in `vitest.config.ts`:
+
+```typescript
+coverage: {
+  provider: 'v8',
+  reporter: ['text', 'json', 'html', 'lcov'],
+  thresholds: {
+    lines: 80,
+    functions: 80,
+    branches: 80,
+    statements: 80,
+  },
+}
 ```
 
 ### Coverage by Area

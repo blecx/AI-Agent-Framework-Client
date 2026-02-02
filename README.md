@@ -1,5 +1,8 @@
 # AI-Agent-Framework-Client
 
+[![Client CI](https://github.com/blecx/AI-Agent-Framework-Client/workflows/Client%20CI/badge.svg)](https://github.com/blecx/AI-Agent-Framework-Client/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A modern web client that connects to the AI-Agent-Framework API, providing project management capabilities, document change proposals, command execution, and API testing.
 
 ## ⚡ Quick Start
@@ -22,6 +25,7 @@ docker compose -f docker-compose.production.yml up -d
 - **[Development Setup](docs/DEVELOPMENT.md)** - Full development environment guide
 - **[Testing Guide](docs/TESTING.md)** - Manual testing workflows and validation
 - **[E2E Testing Guide](client/e2e/README.md)** - Playwright E2E test setup and usage
+- **[CI/CD Guide](docs/ci-cd.md)** - Quality gates, validation, and troubleshooting
 - **[Production Deployment](docs/PRODUCTION.md)** - Production setup, security, and scaling
 - **[Deployment Guide](DEPLOYMENT.md)** - Docker and environment configuration
 - **[UI Component Library](docs/UI-COMPONENTS.md)** - Shared typed UI primitives and demo route
