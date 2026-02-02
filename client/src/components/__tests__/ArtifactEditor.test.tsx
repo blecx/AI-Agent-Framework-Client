@@ -16,6 +16,25 @@ vi.mock('../../services/TemplateApiClient', () => ({
   },
 }));
 
+// Mock useToast hook to avoid ToastProvider requirement
+vi.mock('../../hooks/useToast', () => ({
+  useToast: () => ({
+    showSuccess: vi.fn(),
+    showError: vi.fn(),
+    showInfo: vi.fn(),
+    showWarning: vi.fn(),
+  }),
+}));
+
+// Mock useUnsavedChanges hook to avoid react-router dependency
+vi.mock('../../hooks/useUnsavedChanges', () => ({
+  useUnsavedChanges: () => ({
+    isBlocked: false,
+    confirmNavigation: vi.fn(),
+    cancelNavigation: vi.fn(),
+  }),
+}));
+
 describe('ArtifactEditor', () => {
   const mockTemplate: Template = {
     id: 'pmp-01',
@@ -66,7 +85,10 @@ describe('ArtifactEditor', () => {
 
     render(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
 
-    expect(screen.getByText('Loading template...')).toBeInTheDocument();
+    // PR #122 changed loading state to use LoadingSkeleton with aria attributes
+    const loadingElement = screen.getByLabelText('Loading template');
+    expect(loadingElement).toBeInTheDocument();
+    expect(loadingElement).toHaveAttribute('aria-busy', 'true');
   });
 
   it('renders error when template fails to load', async () => {

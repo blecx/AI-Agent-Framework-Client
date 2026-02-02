@@ -1,10 +1,14 @@
 /**
  * Audit Events API Service
- * Handles audit event retrieval and querying
+ * Handles audit event retrieval and querying, plus audit execution
  */
 
 import { ApiClient } from './client';
-import { AuditEventQuery, AuditEventList } from '../../types/api';
+import {
+  AuditEventQuery,
+  AuditEventList,
+  AuditResult,
+} from '../../types/api';
 
 export class AuditService {
   private client: ApiClient;
@@ -55,5 +59,32 @@ export class AuditService {
     until: string,
   ): Promise<AuditEventList> {
     return this.getAuditEvents(projectKey, { since, until });
+  }
+
+  /**
+   * Run audit rules on a project
+   */
+  async runAudit(
+    projectKey: string,
+    ruleSet?: string[],
+  ): Promise<AuditResult> {
+    return this.client.post<AuditResult>(
+      `/api/v1/projects/${projectKey}/audit`,
+      ruleSet ? { rule_set: ruleSet } : {},
+    );
+  }
+
+  /**
+   * Get latest audit results (from history)
+   */
+  async getAuditResults(
+    projectKey: string,
+    limit: number = 1,
+  ): Promise<AuditResult[]> {
+    const response = await this.client.get<{ results: AuditResult[] }>(
+      `/api/v1/projects/${projectKey}/audit/history`,
+      { params: { limit } },
+    );
+    return response.results || [];
   }
 }
