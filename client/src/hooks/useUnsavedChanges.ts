@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useCallback, useRef } from 'react';
-import { useBeforeUnload, useBlocker } from 'react-router-dom';
+import { useBeforeUnload, useBlocker, type BlockerFunction } from 'react-router-dom';
 
 export interface UseUnsavedChangesOptions {
   when: boolean;
@@ -36,8 +36,8 @@ export function useUnsavedChanges(options: UseUnsavedChangesOptions) {
 
   // Block navigation within the app (react-router)
   const blocker = useBlocker(
-    useCallback(
-      ({ currentLocation, nextLocation }: { currentLocation: any; nextLocation: any }) => {
+    useCallback<BlockerFunction>(
+      ({ currentLocation, nextLocation }) => {
         return when && currentLocation.pathname !== nextLocation.pathname;
       },
       [when]
