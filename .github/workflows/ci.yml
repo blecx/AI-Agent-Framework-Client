@@ -270,20 +270,8 @@ jobs:
           
           echo "✅ Bundle size check passed (${GZIP_SIZE_KB} KB < ${MAX_SIZE_KB} KB)"
 
-      - name: Check production build for console errors
-        working-directory: client
-        run: |
-          set -euo pipefail
-          echo "Checking production build for console.error/console.warn..."
-          
-          # Search for console.error and console.warn in built files
-          if grep -rn "console\.\(error\|warn\)" dist/assets/*.js 2>/dev/null; then
-            echo "❌ Found console.error or console.warn in production build"
-            echo "   Remove or guard console statements for production"
-            exit 1
-          fi
-          
-          echo "✅ No console errors/warnings in production build"
+      # Note: Console error check removed - too many false positives from React library code
+      # ESLint no-console rule is sufficient for catching developer console statements
 
       - name: Validate documentation
         working-directory: client
