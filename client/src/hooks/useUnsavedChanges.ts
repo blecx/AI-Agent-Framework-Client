@@ -37,7 +37,7 @@ export function useUnsavedChanges(options: UseUnsavedChangesOptions) {
   // Block navigation within the app (react-router)
   const blocker = useBlocker(
     useCallback(
-      ({ currentLocation, nextLocation }) => {
+      ({ currentLocation, nextLocation }: { currentLocation: any; nextLocation: any }) => {
         return when && currentLocation.pathname !== nextLocation.pathname;
       },
       [when]

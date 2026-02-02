@@ -3,7 +3,7 @@
  * Automated ARIA and keyboard navigation tests
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -205,7 +205,7 @@ describe('Accessibility Tests', () => {
     });
 
     it('form submission should work with Enter key', async () => {
-      const onSubmit = vi.fn(e => e.preventDefault());
+      const onSubmit = vi.fn((e: React.FormEvent) => e.preventDefault());
       render(
         <form onSubmit={onSubmit}>
           <input type="text" />

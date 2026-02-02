@@ -268,6 +268,31 @@ export interface ValidationError {
   type: string;
 }
 
+// ==================== Audit Types ====================
+
+export enum AuditSeverity {
+  ERROR = 'error',
+  WARNING = 'warning',
+  INFO = 'info',
+}
+
+export interface AuditIssue {
+  rule: string;
+  severity: AuditSeverity;
+  message: string;
+  artifact: string;
+  item_id?: string;
+  field?: string;
+}
+
+export interface AuditResult {
+  issues: AuditIssue[];
+  completeness_score: number;
+  rule_violations: Record<string, number>;
+  total_issues: number;
+  timestamp?: string;
+}
+
 // ==================== Common Response Types ====================
 
 export interface HealthResponse {
