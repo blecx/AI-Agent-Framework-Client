@@ -240,6 +240,53 @@ jobs:
 
       - name: Check bundle size
         working-directory: client
+        run: |
+          set -euo pipefail
+          echo "Checking bundle size limits..."
+          
+          # Find the main JS bundle
+          MAIN_JS=$(find dist/assets -name 'index-*.js' | head -n 1)
+          
+          if [ -z "$MAIN_JS" ]; then
+            echo "Error: Could not find main bundle"
+            exit 1
+          fi
+          
+          # Get gzipped size
+          GZIP_SIZE=$(gzip -c "$MAIN_JS" | wc -c)
+          GZIP_SIZE_KB=$((GZIP_SIZE / 1024))
+          MAX_SIZE_KB=500
+          
+          echo "Main bundle: $(basename "$MAIN_JS")"
+          echo "Gzipped size: ${GZIP_SIZE_KB} KB"
+          echo "Limit: ${MAX_SIZE_KB} KB"
+          
+          if [ "$GZIP_SIZE_KB" -gt "$MAX_SIZE_KB" ]; then
+            echo "❌ Bundle size exceeds limit!"
+            echo "   Current: ${GZIP_SIZE_KB} KB"
+            echo "   Maximum: ${MAX_SIZE_KB} KB"
+            exit 1
+          fi
+          
+          echo "✅ Bundle size check passed (${GZIP_SIZE_KB} KB < ${MAX_SIZE_KB} KB)"
+
+      - name: Check production build for console errors
+        working-directory: client
+        run: |
+          set -euo pipefail
+          echo "Checking production build for console.error/console.warn..."
+          
+          # Search for console.error and console.warn in built files
+          if grep -rn "console\.\(error\|warn\)" dist/assets/*.js 2>/dev/null; then
+            echo "❌ Found console.error or console.warn in production build"
+            echo "   Remove or guard console statements for production"
+            exit 1
+          fi
+          
+          echo "✅ No console errors/warnings in production build"
+
+      - name: Check bundle size
+        working-directory: client
         run: npm run check:bundle-size
 
       - name: Check for console errors in build
@@ -258,9 +305,15 @@ jobs:
         working-directory: client
         run: npm run check:docs
 
-      - name: Run tests
+      - name: Run tests with coverage
         working-directory: client
-        run: npm test
+        run: npm test -- --coverage
+
+      - name: Check test coverage thresholds
+        working-directory: client
+        run: |
+          echo "Coverage thresholds: 80% for lines, functions, branches, statements"
+          echo "Configured in vitest.config.ts"
 
   api-integration:
     needs: [changes, client-ci]
