@@ -7,6 +7,9 @@ import { apiClient } from '../../../services/apiClient';
 import { showToast } from '../../../utils/toast';
 import { RAIDType, RAIDStatus, RAIDPriority } from '../../../types/raid';
 
+// Note: RAIDCreateModal refactored to use sub-components (TypeSection, DetailsSection, MetadataSection, DatesSection).
+// These tests remain valid as they test the public API of RAIDCreateModal, not implementation details.
+
 vi.mock('../../../services/apiClient');
 vi.mock('../../../utils/toast');
 
