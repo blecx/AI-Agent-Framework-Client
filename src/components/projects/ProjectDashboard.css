@@ -127,6 +127,27 @@
   font-size: 0.9rem;
 }
 
+/* Workflow Details (with WorkflowStageIndicator) */
+.workflow-details {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.workflow-status-text {
+  margin: 0.5rem 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.workflow-updated {
+  margin: 0.5rem 0 1rem 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+
 /* RAID Summary */
 .raid-summary {
   display: flex;

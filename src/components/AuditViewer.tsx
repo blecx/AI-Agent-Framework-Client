@@ -21,7 +21,9 @@ export const AuditViewer: React.FC<AuditViewerProps> = ({ projectKey }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const apiClient = new ApiClient();
+  const apiClient = new ApiClient({
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
+  });
   const auditService = new AuditService(apiClient);
 
   // Load latest audit results on mount

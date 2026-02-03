@@ -60,6 +60,11 @@ export const WorkflowStageIndicator: React.FC<WorkflowStageIndicatorProps> = ({
     (stage) => stage.state === currentState,
   );
 
+  // Calculate completion percentage based on current stage
+  const completionPercentage = currentIndex >= 0 
+    ? Math.round(((currentIndex + 1) / WORKFLOW_STAGES.length) * 100)
+    : 0;
+
   const getStageStatus = (
     stage: StageInfo,
     index: number,
@@ -92,9 +97,14 @@ export const WorkflowStageIndicator: React.FC<WorkflowStageIndicatorProps> = ({
 
   return (
     <div className="workflow-stage-indicator bg-white rounded-lg shadow p-4">
-      <h3 className="text-sm font-medium text-gray-700 mb-3">
-        Project Workflow
-      </h3>
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="text-sm font-medium text-gray-700">
+          Project Workflow
+        </h3>
+        <div className="text-sm font-semibold text-blue-600">
+          {completionPercentage}% Complete
+        </div>
+      </div>
       <div className="flex items-center gap-2">
         {WORKFLOW_STAGES.map((stage, index) => {
           const status = getStageStatus(stage, index);
