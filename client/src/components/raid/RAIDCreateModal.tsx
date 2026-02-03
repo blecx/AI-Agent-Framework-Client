@@ -33,7 +33,7 @@ export function RAIDCreateModal({ projectKey, onClose }: RAIDCreateModalProps) {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleFieldChange = (field: keyof RAIDItemCreate, value: any) => {
+  const handleFieldChange = (field: keyof RAIDItemCreate, value: string | null) => {
     setFormData({ ...formData, [field]: value });
   };
 

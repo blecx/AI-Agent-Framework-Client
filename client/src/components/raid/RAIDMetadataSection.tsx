@@ -10,7 +10,7 @@ import {
 interface RAIDMetadataSectionProps {
   formData: RAIDItemCreate;
   errors: Record<string, string>;
-  onChange: (field: keyof RAIDItemCreate, value: any) => void;
+  onChange: (field: keyof RAIDItemCreate, value: string | null) => void;
 }
 
 export function RAIDMetadataSection({

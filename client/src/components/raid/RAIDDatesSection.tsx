@@ -2,7 +2,7 @@ import type { RAIDItemCreate } from '../../types/raid';
 
 interface RAIDDatesSectionProps {
   formData: RAIDItemCreate;
-  onChange: (field: keyof RAIDItemCreate, value: any) => void;
+  onChange: (field: keyof RAIDItemCreate, value: string | null) => void;
   onNextActionChange: (index: number, value: string) => void;
   onAddNextAction: () => void;
   onRemoveNextAction: (index: number) => void;

@@ -3,7 +3,7 @@ import type { RAIDItemCreate } from '../../types/raid';
 interface RAIDDetailsSectionProps {
   formData: RAIDItemCreate;
   errors: Record<string, string>;
-  onChange: (field: keyof RAIDItemCreate, value: any) => void;
+  onChange: (field: keyof RAIDItemCreate, value: string | null) => void;
 }
 
 export function RAIDDetailsSection({
