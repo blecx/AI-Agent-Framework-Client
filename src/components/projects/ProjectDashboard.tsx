@@ -18,6 +18,8 @@ import {
   WorkflowState,
   AuditEvent,
 } from '../../types/api';
+import { CommandPanel } from '../commands/CommandPanel';
+import { ProposalModal } from '../proposals/ProposalModal';
 import './ProjectDashboard.css';
 
 interface RAIDSummary {
@@ -71,6 +73,11 @@ export const ProjectDashboard: React.FC = () => {
   const [recentEvents, setRecentEvents] = useState<AuditEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Command and Proposal state
+  const [showProposal, setShowProposal] = useState(false);
+  const [currentProposalId, setCurrentProposalId] = useState<string | null>(null);
+  const [currentProposalData, setCurrentProposalData] = useState<any>(null);
 
   useEffect(() => {
     if (currentProjectKey) {
@@ -161,6 +168,26 @@ export const ProjectDashboard: React.FC = () => {
     return stateMap[state] || 'state-default';
   };
 
+  const handleCommandProposed = (proposalId: string, proposalData: any) => {
+    setCurrentProposalId(proposalId);
+    setCurrentProposalData(proposalData);
+    setShowProposal(true);
+  };
+
+  const handleProposalApplied = () => {
+    setShowProposal(false);
+    setCurrentProposalId(null);
+    setCurrentProposalData(null);
+    // Reload dashboard to show updated data
+    loadDashboardData();
+  };
+
+  const handleProposalClosed = () => {
+    setShowProposal(false);
+    setCurrentProposalId(null);
+    setCurrentProposalData(null);
+  };
+
   if (!currentProjectKey) {
     return null;
   }
@@ -204,6 +231,14 @@ export const ProjectDashboard: React.FC = () => {
         {project.description && (
           <p className="project-description">{project.description}</p>
         )}
+      </div>
+
+      {/* Command Panel Section */}
+      <div className="dashboard-section command-section">
+        <CommandPanel
+          projectKey={currentProjectKey}
+          onCommandProposed={handleCommandProposed}
+        />
       </div>
 
       {/* Workflow State Section */}
@@ -368,6 +403,17 @@ export const ProjectDashboard: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Proposal Modal */}
+      {showProposal && currentProposalId && currentProposalData && (
+        <ProposalModal
+          projectKey={currentProjectKey}
+          proposalId={currentProposalId}
+          proposalData={currentProposalData}
+          onClose={handleProposalClosed}
+          onApplied={handleProposalApplied}
+        />
+      )}
     </div>
   );
 };
