@@ -2,14 +2,12 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../services/apiClient';
 import type { RAIDItemCreate } from '../../types/raid';
-import {
-  RAIDType,
-  RAIDStatus,
-  RAIDPriority,
-  RAIDImpactLevel,
-  RAIDLikelihood,
-} from '../../types/raid';
+import { RAIDType, RAIDStatus, RAIDPriority } from '../../types/raid';
 import { showToast } from '../../utils/toast';
+import { RAIDTypeSection } from './RAIDTypeSection';
+import { RAIDDetailsSection } from './RAIDDetailsSection';
+import { RAIDMetadataSection } from './RAIDMetadataSection';
+import { RAIDDatesSection } from './RAIDDatesSection';
 import './RAIDCreateModal.css';
 
 interface RAIDCreateModalProps {
@@ -34,6 +32,10 @@ export function RAIDCreateModal({ projectKey, onClose }: RAIDCreateModalProps) {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleFieldChange = (field: keyof RAIDItemCreate, value: string | null) => {
+    setFormData({ ...formData, [field]: value });
+  };
 
   const createMutation = useMutation({
     mutationFn: async (data: RAIDItemCreate) => {
@@ -127,8 +129,6 @@ export function RAIDCreateModal({ projectKey, onClose }: RAIDCreateModalProps) {
     setFormData({ ...formData, next_actions: newActions });
   };
 
-  const isRisk = formData.type === RAIDType.RISK;
-
   return (
     <div className="raid-create-overlay" onClick={onClose}>
       <div
@@ -154,252 +154,24 @@ export function RAIDCreateModal({ projectKey, onClose }: RAIDCreateModalProps) {
 
         <form className="raid-create-form" onSubmit={handleSubmit} noValidate>
           <div className="raid-create-content">
-            <div className="form-group">
-              <label htmlFor="type">
-                Type <span className="required">*</span>
-              </label>
-              <select
-                id="type"
-                value={formData.type}
-                onChange={(e) =>
-                  setFormData({ ...formData, type: e.target.value as RAIDType })
-                }
-                required
-              >
-                <option value={RAIDType.RISK}>Risk</option>
-                <option value={RAIDType.ASSUMPTION}>Assumption</option>
-                <option value={RAIDType.ISSUE}>Issue</option>
-                <option value={RAIDType.DEPENDENCY}>Dependency</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="title">
-                Title <span className="required">*</span>
-              </label>
-              <input
-                id="title"
-                type="text"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                className={errors.title ? 'error' : ''}
-                required
-              />
-              {errors.title && (
-                <span className="error-message">{errors.title}</span>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="description">
-                Description <span className="required">*</span>
-              </label>
-              <textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                className={errors.description ? 'error' : ''}
-                rows={4}
-                required
-              />
-              {errors.description && (
-                <span className="error-message">{errors.description}</span>
-              )}
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="status">Status</label>
-                <select
-                  id="status"
-                  value={formData.status}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      status: e.target.value as RAIDStatus,
-                    })
-                  }
-                >
-                  <option value={RAIDStatus.OPEN}>Open</option>
-                  <option value={RAIDStatus.IN_PROGRESS}>In Progress</option>
-                  <option value={RAIDStatus.MITIGATED}>Mitigated</option>
-                  <option value={RAIDStatus.CLOSED}>Closed</option>
-                  <option value={RAIDStatus.ACCEPTED}>Accepted</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="priority">Priority</label>
-                <select
-                  id="priority"
-                  value={formData.priority}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      priority: e.target.value as RAIDPriority,
-                    })
-                  }
-                >
-                  <option value={RAIDPriority.LOW}>Low</option>
-                  <option value={RAIDPriority.MEDIUM}>Medium</option>
-                  <option value={RAIDPriority.HIGH}>High</option>
-                  <option value={RAIDPriority.CRITICAL}>Critical</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="owner">
-                Owner <span className="required">*</span>
-              </label>
-              <input
-                id="owner"
-                type="text"
-                value={formData.owner}
-                onChange={(e) =>
-                  setFormData({ ...formData, owner: e.target.value })
-                }
-                className={errors.owner ? 'error' : ''}
-                required
-              />
-              {errors.owner && (
-                <span className="error-message">{errors.owner}</span>
-              )}
-            </div>
-
-            {isRisk && (
-              <>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="impact">
-                      Impact <span className="required">*</span>
-                    </label>
-                    <select
-                      id="impact"
-                      value={formData.impact || ''}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          impact: e.target.value as RAIDImpactLevel,
-                        })
-                      }
-                      className={errors.impact ? 'error' : ''}
-                      required
-                    >
-                      <option value="">Select Impact</option>
-                      <option value={RAIDImpactLevel.LOW}>Low</option>
-                      <option value={RAIDImpactLevel.MEDIUM}>Medium</option>
-                      <option value={RAIDImpactLevel.HIGH}>High</option>
-                      <option value={RAIDImpactLevel.VERY_HIGH}>
-                        Very High
-                      </option>
-                    </select>
-                    {errors.impact && (
-                      <span className="error-message">{errors.impact}</span>
-                    )}
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="likelihood">
-                      Likelihood <span className="required">*</span>
-                    </label>
-                    <select
-                      id="likelihood"
-                      value={formData.likelihood || ''}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          likelihood: e.target.value as RAIDLikelihood,
-                        })
-                      }
-                      className={errors.likelihood ? 'error' : ''}
-                      required
-                    >
-                      <option value="">Select Likelihood</option>
-                      <option value={RAIDLikelihood.VERY_UNLIKELY}>
-                        Very Unlikely
-                      </option>
-                      <option value={RAIDLikelihood.UNLIKELY}>Unlikely</option>
-                      <option value={RAIDLikelihood.POSSIBLE}>Possible</option>
-                      <option value={RAIDLikelihood.LIKELY}>Likely</option>
-                      <option value={RAIDLikelihood.VERY_LIKELY}>
-                        Very Likely
-                      </option>
-                    </select>
-                    {errors.likelihood && (
-                      <span className="error-message">{errors.likelihood}</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="mitigation_plan">Mitigation Plan</label>
-                  <textarea
-                    id="mitigation_plan"
-                    value={formData.mitigation_plan || ''}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        mitigation_plan: e.target.value,
-                      })
-                    }
-                    rows={3}
-                  />
-                </div>
-              </>
-            )}
-
-            <div className="form-group">
-              <label htmlFor="target_resolution_date">
-                Target Resolution Date
-              </label>
-              <input
-                id="target_resolution_date"
-                type="date"
-                value={formData.target_resolution_date || ''}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    target_resolution_date: e.target.value || null,
-                  })
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Next Actions</label>
-              {(formData.next_actions || []).map((action, index) => (
-                <div key={index} className="next-action-row">
-                  <input
-                    type="text"
-                    value={action}
-                    onChange={(e) =>
-                      handleNextActionChange(index, e.target.value)
-                    }
-                    placeholder="Enter action..."
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeNextAction(index)}
-                    className="remove-action-btn"
-                    aria-label="Remove action"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={addNextAction}
-                className="add-action-btn"
-              >
-                + Add Action
-              </button>
-            </div>
+            <RAIDTypeSection formData={formData} onChange={handleFieldChange} />
+            <RAIDDetailsSection
+              formData={formData}
+              errors={errors}
+              onChange={handleFieldChange}
+            />
+            <RAIDMetadataSection
+              formData={formData}
+              errors={errors}
+              onChange={handleFieldChange}
+            />
+            <RAIDDatesSection
+              formData={formData}
+              onChange={handleFieldChange}
+              onNextActionChange={handleNextActionChange}
+              onAddNextAction={addNextAction}
+              onRemoveNextAction={removeNextAction}
+            />
           </div>
 
           <div className="raid-create-footer">
