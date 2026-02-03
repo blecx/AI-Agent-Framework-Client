@@ -18,8 +18,10 @@ import {
   WorkflowState,
   AuditEvent,
 } from '../../types/api';
+import { WorkflowStageIndicator } from '../workflow/WorkflowStageIndicator';
 import { CommandPanel } from '../commands/CommandPanel';
 import { ProposalModal } from '../proposals/ProposalModal';
+import { ArtifactBrowser } from './ArtifactBrowser';
 import './ProjectDashboard.css';
 
 interface RAIDSummary {
@@ -73,11 +75,13 @@ export const ProjectDashboard: React.FC = () => {
   const [recentEvents, setRecentEvents] = useState<AuditEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Command and Proposal state
-  const [showProposal, setShowProposal] = useState(false);
-  const [currentProposalId, setCurrentProposalId] = useState<string | null>(null);
-  const [currentProposalData, setCurrentProposalData] = useState<any>(null);
+  
+  // Proposal modal state
+  const [proposalModalOpen, setProposalModalOpen] = useState(false);
+  const [currentProposal, setCurrentProposal] = useState<{
+    id: string;
+    data: any;
+  } | null>(null);
 
   useEffect(() => {
     if (currentProjectKey) {
@@ -155,37 +159,21 @@ export const ProjectDashboard: React.FC = () => {
       minute: '2-digit',
     });
   };
-
-  const getWorkflowStateClass = (state: string): string => {
-    const stateMap: Record<string, string> = {
-      Initiating: 'state-initiating',
-      Planning: 'state-planning',
-      Executing: 'state-executing',
-      Monitoring: 'state-monitoring',
-      Closing: 'state-closing',
-      Closed: 'state-closed',
-    };
-    return stateMap[state] || 'state-default';
-  };
-
   const handleCommandProposed = (proposalId: string, proposalData: any) => {
-    setCurrentProposalId(proposalId);
-    setCurrentProposalData(proposalData);
-    setShowProposal(true);
+    setCurrentProposal({ id: proposalId, data: proposalData });
+    setProposalModalOpen(true);
   };
 
   const handleProposalApplied = () => {
-    setShowProposal(false);
-    setCurrentProposalId(null);
-    setCurrentProposalData(null);
-    // Reload dashboard to show updated data
+    setProposalModalOpen(false);
+    setCurrentProposal(null);
+    // Reload dashboard to show new artifacts
     loadDashboardData();
   };
 
-  const handleProposalClosed = () => {
-    setShowProposal(false);
-    setCurrentProposalId(null);
-    setCurrentProposalData(null);
+  const handleProposalClose = () => {
+    setProposalModalOpen(false);
+    setCurrentProposal(null);
   };
 
   if (!currentProjectKey) {
@@ -233,43 +221,35 @@ export const ProjectDashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Command Panel Section */}
-      <div className="dashboard-section command-section">
-        <CommandPanel
-          projectKey={currentProjectKey}
-          onCommandProposed={handleCommandProposed}
-        />
-      </div>
-
       {/* Workflow State Section */}
       <div className="dashboard-section workflow-section">
-        <h2>Current Workflow State</h2>
+        <h2>Current Workflow Phase</h2>
         {workflowState ? (
-          <div className="workflow-state-card">
-            <div
-              className={`workflow-badge ${getWorkflowStateClass(workflowState.current_state)}`}
-            >
-              {workflowState.current_state}
-            </div>
-            <div className="workflow-info">
-              <p>Last updated: {formatDate(workflowState.updated_at)}</p>
+          <>
+            <WorkflowStageIndicator
+              currentState={workflowState.current_state}
+              allowedTransitions={workflowState.allowed_transitions}
+            />
+            <div className="workflow-details">
+              <p className="workflow-status-text">
+                Current Phase: <strong>{workflowState.current_state}</strong>
+              </p>
+              <p className="workflow-updated">
+                Last updated: {formatDate(workflowState.updated_at)}
+              </p>
               {workflowState.allowed_transitions &&
                 workflowState.allowed_transitions.length > 0 && (
-                  <p>
-                    Allowed transitions:{' '}
-                    {workflowState.allowed_transitions.join(', ')}
-                  </p>
+                  <button
+                    onClick={() =>
+                      navigate(`/projects/${currentProjectKey}/workflow`)
+                    }
+                    className="btn-action"
+                  >
+                    Transition to Next Phase
+                  </button>
                 )}
             </div>
-            <button
-              onClick={() =>
-                navigate(`/projects/${currentProjectKey}/workflow`)
-              }
-              className="btn-action"
-            >
-              Transition State
-            </button>
-          </div>
+          </>
         ) : (
           <div className="empty-state">
             <p>No workflow state available</p>
@@ -342,6 +322,21 @@ export const ProjectDashboard: React.FC = () => {
         )}
       </div>
 
+      {/* Command Execution Section */}
+      <div className="dashboard-section command-section">
+        <h2>Execute Commands</h2>
+        <CommandPanel
+          projectKey={currentProjectKey}
+          onCommandProposed={handleCommandProposed}
+        />
+      </div>
+
+      {/* Artifact Browser Section */}
+      <div className="dashboard-section artifact-section">
+        <h2>Project Artifacts</h2>
+        <ArtifactBrowser projectKey={currentProjectKey} />
+      </div>
+
       {/* Recent Activity Section */}
       <div className="dashboard-section activity-section">
         <h2>Recent Activity</h2>
@@ -405,12 +400,12 @@ export const ProjectDashboard: React.FC = () => {
       </div>
 
       {/* Proposal Modal */}
-      {showProposal && currentProposalId && currentProposalData && (
+      {proposalModalOpen && currentProposal && (
         <ProposalModal
           projectKey={currentProjectKey}
-          proposalId={currentProposalId}
-          proposalData={currentProposalData}
-          onClose={handleProposalClosed}
+          proposalId={currentProposal.id}
+          proposalData={currentProposal.data}
+          onClose={handleProposalClose}
           onApplied={handleProposalApplied}
         />
       )}

@@ -1,10 +1,25 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useProject } from '../contexts/ProjectContext';
+import { useEffect } from 'react';
 
 export function Home() {
+  const { currentProjectKey } = useProject();
+  const navigate = useNavigate();
+
+  // If user has a project selected, redirect to project dashboard
+  useEffect(() => {
+    if (currentProjectKey) {
+      navigate(`/projects/${currentProjectKey}`);
+    }
+  }, [currentProjectKey, navigate]);
+
   return (
     <div className="home-page" style={{ padding: '2rem' }}>
       <h1>AI Agent Framework</h1>
       <p>Welcome to the AI Agent Framework Client</p>
+      <p className="workflow-status">
+        Get started by creating a project to manage your workflow phases
+      </p>
       <div
         className="quick-links"
         style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}
