@@ -1,0 +1,50 @@
+key,de,en,context,area
+nav.projects,Projekte,Projects,Navigation,nav
+nav.guidedBuilder,Guided Builder,Guided Builder,Navigation,nav
+nav.artifactBuilder,Artifact Builder,Artifact Builder,Navigation,nav
+nav.readinessBuilder,Readiness Builder,Readiness Builder,Navigation,nav
+nav.raid,RAID,RAID,Navigation,nav
+nav.history,Historie,History,Navigation,nav
+nav.sync,Sync,Sync,Navigation,nav
+nav.conflicts,Konflikte,Conflicts,Navigation,nav
+nav.advancedTools,Advanced Tools,Advanced Tools,Navigation,nav
+help.concept.guidedCoAuthoring,Guided Co-Authoring,Guided Co-Authoring,Help concept label,help
+conn.state.online,Online,Online,Connection state,conn
+conn.state.offline,Offline,Offline,Connection state,conn
+conn.state.reconnecting,Verbinde…,Reconnecting…,Connection state,conn
+conn.state.degraded,Eingeschränkt,Degraded,Connection state,conn
+conn.action.workOffline,Offline weiterarbeiten,Work offline,Connection action,conn
+conn.action.retry,Erneut versuchen,Retry,Connection action,conn
+banner.offline,Offline: Änderungen werden lokal gespeichert. Sync später möglich.,Offline: changes are saved locally. You can sync later.,Global banner,banner
+banner.degraded,Eingeschränkte Verbindung: Sync kann fehlschlagen.,Limited connection: sync may fail.,Global banner,banner
+projects.list.title,Projekte,Projects,Screen title,projects
+projects.list.cta.new,Neues Projekt,New project,CTA,projects
+projects.list.cta.import,Importieren,Import,CTA,projects
+projects.list.empty.title,Noch keine Projekte,No projects yet,Empty,projects
+projects.list.empty.text,Erstelle ein Projekt oder importiere einen bestehenden Workspace.,Create a project or import an existing workspace.,Empty,projects
+projects.create.title,Projekt anlegen,Create project,Dialog,projects
+projects.create.cta.create,Projekt erstellen,Create project,CTA,projects
+projects.create.cta.cancel,Abbrechen,Cancel,CTA,projects
+gb.title,Guided Builder,Guided Builder,Module,gb
+ac.title,Assisted Creation,Assisted Creation,Flow,ac
+ac.entry.cta.start,Assisted Creation starten,Start Assisted Creation,CTA,ac
+ac.controls.pause,Pausieren,Pause,Control,ac
+ac.controls.resume,Fortsetzen,Resume,Control,ac
+ac.controls.saveDraft,Entwurf speichern,Save draft,Control,ac
+ac.controls.saveSnapshot,Snapshot speichern,Save snapshot,Control,ac
+ac.controls.exit,Beenden,Exit,Control,ac
+ac.state.blocked.label,Blockiert,Blocked,State,ac
+ac.state.blocked.helper,Du kannst pausieren und später fortsetzen. Der aktuelle Stand bleibt erhalten.,You can pause and continue later. Your progress is saved.,Helper,ac
+art.list.title,Artefakte,Artifacts,Module,art
+art.list.cta.create,Artefakt erstellen,Create artifact,CTA,art
+art.action.improveAi,Mit AI verbessern,Improve with AI,Action,art
+proposal.review.title,Review: Vorschlag anwenden,Review: apply proposal,Screen,proposal
+proposal.action.apply,Anwenden,Apply,CTA,proposal
+proposal.action.reject,Verwerfen,Reject,CTA,proposal
+rd.title,Readiness Builder,Readiness Builder,Module,rd
+rd.cta.startAssessment,Prüfung starten,Start assessment,CTA,rd
+rd.cta.showGaps,Lücken anzeigen,View gaps,CTA,rd
+sync.title,Sync,Sync,Module,sync
+sync.cta.start,Sync starten,Start sync,CTA,sync
+sync.state.conflict,Konflikt,Conflict,State,sync
+sync.cta.openConflicts,Konflikte öffnen,Open conflicts,CTA,sync
