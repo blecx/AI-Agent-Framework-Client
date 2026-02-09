@@ -1,0 +1,119 @@
+{
+  "meta": {
+    "generatedOn": "2026-02-09",
+    "locale": "de-DE"
+  },
+  "nav": {
+    "projects": "Projekte",
+    "guidedBuilder": "Guided Builder",
+    "artifactBuilder": "Artifact Builder",
+    "readinessBuilder": "Readiness Builder",
+    "raid": "RAID",
+    "history": "Historie",
+    "sync": "Sync",
+    "conflicts": "Konflikte",
+    "advancedTools": "Advanced Tools"
+  },
+  "help": {
+    "concept": {
+      "guidedCoAuthoring": "Guided Co-Authoring"
+    }
+  },
+  "conn": {
+    "state": {
+      "online": "Online",
+      "offline": "Offline",
+      "reconnecting": "Verbinde…",
+      "degraded": "Eingeschränkt"
+    },
+    "action": {
+      "workOffline": "Offline weiterarbeiten",
+      "retry": "Erneut versuchen"
+    }
+  },
+  "banner": {
+    "offline": "Offline: Änderungen werden lokal gespeichert. Sync später möglich.",
+    "degraded": "Eingeschränkte Verbindung: Sync kann fehlschlagen."
+  },
+  "projects": {
+    "list": {
+      "title": "Projekte",
+      "cta": {
+        "new": "Neues Projekt",
+        "import": "Importieren"
+      },
+      "empty": {
+        "title": "Noch keine Projekte",
+        "text": "Erstelle ein Projekt oder importiere einen bestehenden Workspace."
+      }
+    },
+    "create": {
+      "title": "Projekt anlegen",
+      "cta": {
+        "create": "Projekt erstellen",
+        "cancel": "Abbrechen"
+      }
+    }
+  },
+  "gb": {
+    "title": "Guided Builder"
+  },
+  "ac": {
+    "title": "Assisted Creation",
+    "entry": {
+      "cta": {
+        "start": "Assisted Creation starten"
+      }
+    },
+    "controls": {
+      "pause": "Pausieren",
+      "resume": "Fortsetzen",
+      "saveDraft": "Entwurf speichern",
+      "saveSnapshot": "Snapshot speichern",
+      "exit": "Beenden"
+    },
+    "state": {
+      "blocked": {
+        "label": "Blockiert",
+        "helper": "Du kannst pausieren und später fortsetzen. Der aktuelle Stand bleibt erhalten."
+      }
+    }
+  },
+  "art": {
+    "list": {
+      "title": "Artefakte",
+      "cta": {
+        "create": "Artefakt erstellen"
+      }
+    },
+    "action": {
+      "improveAi": "Mit AI verbessern"
+    }
+  },
+  "proposal": {
+    "review": {
+      "title": "Review: Vorschlag anwenden"
+    },
+    "action": {
+      "apply": "Anwenden",
+      "reject": "Verwerfen"
+    }
+  },
+  "rd": {
+    "title": "Readiness Builder",
+    "cta": {
+      "startAssessment": "Prüfung starten",
+      "showGaps": "Lücken anzeigen"
+    }
+  },
+  "sync": {
+    "title": "Sync",
+    "cta": {
+      "start": "Sync starten",
+      "openConflicts": "Konflikte öffnen"
+    },
+    "state": {
+      "conflict": "Konflikt"
+    }
+  }
+}

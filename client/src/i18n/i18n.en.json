@@ -1,0 +1,119 @@
+{
+  "meta": {
+    "generatedOn": "2026-02-09",
+    "locale": "en-US"
+  },
+  "nav": {
+    "projects": "Projects",
+    "guidedBuilder": "Guided Builder",
+    "artifactBuilder": "Artifact Builder",
+    "readinessBuilder": "Readiness Builder",
+    "raid": "RAID",
+    "history": "History",
+    "sync": "Sync",
+    "conflicts": "Conflicts",
+    "advancedTools": "Advanced Tools"
+  },
+  "help": {
+    "concept": {
+      "guidedCoAuthoring": "Guided Co-Authoring"
+    }
+  },
+  "conn": {
+    "state": {
+      "online": "Online",
+      "offline": "Offline",
+      "reconnecting": "Reconnecting…",
+      "degraded": "Degraded"
+    },
+    "action": {
+      "workOffline": "Work offline",
+      "retry": "Retry"
+    }
+  },
+  "banner": {
+    "offline": "Offline: changes are saved locally. You can sync later.",
+    "degraded": "Limited connection: sync may fail."
+  },
+  "projects": {
+    "list": {
+      "title": "Projects",
+      "cta": {
+        "new": "New project",
+        "import": "Import"
+      },
+      "empty": {
+        "title": "No projects yet",
+        "text": "Create a project or import an existing workspace."
+      }
+    },
+    "create": {
+      "title": "Create project",
+      "cta": {
+        "create": "Create project",
+        "cancel": "Cancel"
+      }
+    }
+  },
+  "gb": {
+    "title": "Guided Builder"
+  },
+  "ac": {
+    "title": "Assisted Creation",
+    "entry": {
+      "cta": {
+        "start": "Start Assisted Creation"
+      }
+    },
+    "controls": {
+      "pause": "Pause",
+      "resume": "Resume",
+      "saveDraft": "Save draft",
+      "saveSnapshot": "Save snapshot",
+      "exit": "Exit"
+    },
+    "state": {
+      "blocked": {
+        "label": "Blocked",
+        "helper": "You can pause and continue later. Your progress is saved."
+      }
+    }
+  },
+  "art": {
+    "list": {
+      "title": "Artifacts",
+      "cta": {
+        "create": "Create artifact"
+      }
+    },
+    "action": {
+      "improveAi": "Improve with AI"
+    }
+  },
+  "proposal": {
+    "review": {
+      "title": "Review: apply proposal"
+    },
+    "action": {
+      "apply": "Apply",
+      "reject": "Reject"
+    }
+  },
+  "rd": {
+    "title": "Readiness Builder",
+    "cta": {
+      "startAssessment": "Start assessment",
+      "showGaps": "View gaps"
+    }
+  },
+  "sync": {
+    "title": "Sync",
+    "cta": {
+      "start": "Start sync",
+      "openConflicts": "Open conflicts"
+    },
+    "state": {
+      "conflict": "Conflict"
+    }
+  }
+}
