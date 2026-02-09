@@ -112,13 +112,13 @@ export default function ProjectList() {
     <div className="project-list-container">
       <header className="project-list-header">
         <h1>Projects</h1>
-        <button
-          className="btn-primary"
+        <Button
+          variant="primary"
           data-testid="create-project-button"
           onClick={() => setShowCreateForm(!showCreateForm)}
         >
           {showCreateForm ? 'Cancel' : '+ Create Project'}
-        </button>
+        </Button>
       </header>
 
       {error && <div className="error-message">{error}</div>}
