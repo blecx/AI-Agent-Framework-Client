@@ -18,6 +18,7 @@ import UiLibraryDemo from './components/UiLibraryDemo';
 import { ToastProvider } from './components/ToastContext';
 import ToastContainer from './components/ToastContainer';
 import ErrorBoundary from './components/ErrorBoundary';
+import LanguageSwitcher from './components/LanguageSwitcher';
 import apiClient from './services/apiClient';
 import { ProjectsStateProvider } from './state/projectsState';
 import { RaidStateProvider } from './state/raidState';
@@ -120,6 +121,7 @@ function Navigation() {
           {connectionStatus === 'connected' && 'Connected'}
           {connectionStatus === 'disconnected' && 'Disconnected'}
         </span>
+        <LanguageSwitcher />
       </div>
     </nav>
   );
