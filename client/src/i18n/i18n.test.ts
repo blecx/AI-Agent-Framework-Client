@@ -5,8 +5,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import enTranslations from '../client/src/i18n/i18n.en.json';
-import deTranslations from '../client/src/i18n/i18n.de.json';
+import enTranslations from './i18n.en.json';
+import deTranslations from './i18n.de.json';
 
 describe('i18n Translation Catalogs', () => {
   describe('English (en) translations', () => {
@@ -16,7 +16,7 @@ describe('i18n Translation Catalogs', () => {
     });
 
     it('should not be empty', () => {
-      expect(Object.keys(enTranslations)).length).toBeGreaterThan(0);
+      expect(Object.keys(enTranslations).length).toBeGreaterThan(0);
     });
 
     it('should have string values for all keys', () => {
