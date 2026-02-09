@@ -20,11 +20,11 @@ describe('i18n Translation Catalogs', () => {
     });
 
     it('should have string values for all keys', () => {
-      const checkStrings = (obj: any, path = ''): void => {
+      const checkStrings = (obj: Record<string, unknown>, path = ''): void => {
         Object.entries(obj).forEach(([key, value]) => {
           const currentPath = path ? `${path}.${key}` : key;
           if (typeof value === 'object' && value !== null) {
-            checkStrings(value, currentPath);
+            checkStrings(value as Record<string, unknown>, currentPath);
           } else {
             expect(typeof value).toBe('string');
           }
@@ -45,11 +45,11 @@ describe('i18n Translation Catalogs', () => {
     });
 
     it('should have string values for all keys', () => {
-      const checkStrings = (obj: any, path = ''): void => {
+      const checkStrings = (obj: Record<string, unknown>, path = ''): void => {
         Object.entries(obj).forEach(([key, value]) => {
           const currentPath = path ? `${path}.${key}` : key;
           if (typeof value === 'object' && value !== null) {
-            checkStrings(value, currentPath);
+            checkStrings(value as Record<string, unknown>, currentPath);
           } else {
             expect(typeof value).toBe('string');
           }
@@ -68,11 +68,11 @@ describe('i18n Translation Catalogs', () => {
     });
 
     it('should have consistent nested key structure', () => {
-      const getKeys = (obj: any, prefix = ''): string[] => {
+      const getKeys = (obj: Record<string, unknown>, prefix = ''): string[] => {
         return Object.entries(obj).flatMap(([key, value]) => {
           const path = prefix ? `${prefix}.${key}` : key;
           if (typeof value === 'object' && value !== null) {
-            return getKeys(value, path);
+            return getKeys(value as Record<string, unknown>, path);
           }
           return [path];
         });
@@ -86,14 +86,14 @@ describe('i18n Translation Catalogs', () => {
     });
 
     it('should not have empty translation strings', () => {
-      const checkNoEmpty = (obj: any, path = ''): void => {
+      const checkNoEmpty = (obj: Record<string, unknown>, path = ''): void => {
         Object.entries(obj).forEach(([key, value]) => {
           const currentPath = path ? `${path}.${key}` : key;
           if (typeof value === 'object' && value !== null) {
-            checkNoEmpty(value, currentPath);
+            checkNoEmpty(value as Record<string, unknown>, currentPath);
           } else {
             expect(value).not.toBe('');
-            expect(value.trim().length).toBeGreaterThan(0);
+            expect((value as string).trim().length).toBeGreaterThan(0);
           }
         });
       };
