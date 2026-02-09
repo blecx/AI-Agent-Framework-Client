@@ -72,6 +72,10 @@
   gap: 0.5rem;
 }
 
+.nav-status .language-switcher {
+  margin-left: 0.5rem;
+}
+
 .status-indicator {
   font-size: 1rem;
 }
