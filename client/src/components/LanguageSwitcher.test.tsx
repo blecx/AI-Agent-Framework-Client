@@ -49,7 +49,7 @@ describe('LanguageSwitcher', () => {
     });
 
     it('defaults to "EN" if language is undefined', () => {
-      mockI18n.language = undefined as any;
+      mockI18n.language = undefined as unknown as string;
       render(<LanguageSwitcher />);
       expect(screen.getByText('EN')).toBeInTheDocument();
     });
