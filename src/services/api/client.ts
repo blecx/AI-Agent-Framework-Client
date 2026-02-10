@@ -4,7 +4,13 @@
  */
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios';
-import { ApiError } from '../../types/api';
+import { z } from 'zod';
+import {
+  AppError,
+  createNetworkError,
+  createValidationError,
+  createApiError,
+} from '../../types/errors';
 
 export interface ApiClientConfig {
   baseURL: string;
@@ -121,27 +127,66 @@ export class ApiClient {
   }
 
   /**
-   * Convert Axios error to ApiError
+   * Convert Axios error to AppError with discriminated union types
    */
-  private handleError(error: unknown): ApiError {
+  private handleError(error: unknown): AppError {
     if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError<{ detail: string }>;
+      const axiosError = error as AxiosError<{ detail?: string }>;
 
-      return {
-        detail:
-          axiosError.response?.data?.detail ||
-          axiosError.message ||
-          'An unknown error occurred',
-        status: axiosError.response?.status,
-        timestamp: new Date().toISOString(),
-      };
+      // Network errors (no response received)
+      if (!axiosError.response) {
+        const isTimeout = axiosError.code === 'ECONNABORTED';
+        return createNetworkError(
+          axiosError.message || 'Network error occurred',
+          !isTimeout, // timeouts are not retryable
+          axiosError.code,
+          axiosError,
+        );
+      }
+
+      // API errors (got response from server)
+      const status = axiosError.response.status;
+      const detail = axiosError.response.data?.detail;
+
+      return createApiError(
+        detail || axiosError.message || 'API error occurred',
+        status,
+        detail,
+        axiosError,
+      );
     }
 
-    return {
-      detail:
-        error instanceof Error ? error.message : 'An unknown error occurred',
-      timestamp: new Date().toISOString(),
-    };
+    // Unknown error type
+    return createNetworkError(
+      error instanceof Error ? error.message : 'Unknown error occurred',
+      false,
+      undefined,
+      error instanceof Error ? error : undefined,
+    );
+  }
+
+  /**
+   * Validate response data with Zod schema
+   */
+  private validateResponse<T>(data: unknown, schema: z.ZodSchema<T>): T {
+    try {
+      return schema.parse(data);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw createValidationError(
+          'Response validation failed',
+          undefined,
+          error.issues,
+          error,
+        );
+      }
+      throw createValidationError(
+        'Unknown validation error',
+        undefined,
+        undefined,
+        error instanceof Error ? error : undefined,
+      );
+    }
   }
 
   /**
@@ -150,6 +195,18 @@ export class ApiClient {
   async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.get<T>(url, config);
     return response.data;
+  }
+
+  /**
+   * GET request with Zod validation
+   */
+  async getValidated<T>(
+    url: string,
+    schema: z.ZodSchema<T>,
+    config?: AxiosRequestConfig,
+  ): Promise<T> {
+    const response = await this.client.get<T>(url, config);
+    return this.validateResponse(response.data, schema);
   }
 
   /**
@@ -162,6 +219,19 @@ export class ApiClient {
   ): Promise<T> {
     const response = await this.client.post<T>(url, data, config);
     return response.data;
+  }
+
+  /**
+   * POST request with Zod validation
+   */
+  async postValidated<T, D = unknown>(
+    url: string,
+    data: D,
+    schema: z.ZodSchema<T>,
+    config?: AxiosRequestConfig,
+  ): Promise<T> {
+    const response = await this.client.post<T>(url, data, config);
+    return this.validateResponse(response.data, schema);
   }
 
   /**

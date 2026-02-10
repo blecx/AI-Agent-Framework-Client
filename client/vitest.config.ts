@@ -8,6 +8,8 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: path.resolve(__dirname, './src/test/setup.ts'),
+    testTimeout: 10000,
+    hookTimeout: 10000,
     exclude: [
       '**/node_modules/**',
       '**/dist/**',

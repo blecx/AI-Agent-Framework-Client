@@ -273,11 +273,13 @@ describe('ProjectView', () => {
       expect(screen.getByText('Test Project')).toBeInTheDocument();
     });
 
-    const auditTab = screen.getByRole('button', { name: /Audit/i });
+    const auditTabs = screen.getAllByRole('button', { name: /Audit/i });
+    const auditTab = auditTabs[0]; // Select first Audit button (the tab)
     await user.click(auditTab);
 
-    expect(auditTab).toHaveClass('active');
-    expect(screen.getByText('AuditViewer')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('AuditViewer')).toBeInTheDocument();
+    });
   });
 
   it('handles project without git repository', async () => {

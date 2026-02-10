@@ -6,6 +6,10 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import MockAdapter from 'axios-mock-adapter';
 import { ApiClient } from '../../../services/api/client';
+import {
+  isNetworkError,
+  isApiError,
+} from '../../../types/errors';
 
 describe('ApiClient', () => {
   let apiClient: ApiClient;
@@ -117,35 +121,61 @@ describe('ApiClient', () => {
     it('should handle 404 error', async () => {
       mockAxios.onGet('/test').reply(404, { detail: 'Not found' });
 
-      await expect(apiClient.get('/test')).rejects.toMatchObject({
-        detail: 'Not found',
-        status: 404,
-      });
+      try {
+        await apiClient.get('/test');
+        expect.fail('Should have thrown error');
+      } catch (error: any) {
+        expect(isApiError(error)).toBe(true);
+        if (isApiError(error)) {
+          expect(error.status).toBe(404);
+          expect(error.detail).toBe('Not found');
+        }
+      }
     });
 
     it('should handle 500 error', async () => {
       mockAxios.onGet('/test').reply(500, { detail: 'Server error' });
 
-      await expect(apiClient.get('/test')).rejects.toMatchObject({
-        detail: 'Server error',
-        status: 500,
-      });
+      try {
+        await apiClient.get('/test');
+        expect.fail('Should have thrown error');
+      } catch (error: any) {
+        expect(isApiError(error)).toBe(true);
+        if (isApiError(error)) {
+          expect(error.status).toBe(500);
+          expect(error.detail).toBe('Server error');
+        }
+      }
     });
 
     it('should handle network error', async () => {
       mockAxios.onGet('/test').networkError();
 
-      await expect(apiClient.get('/test')).rejects.toMatchObject({
-        detail: expect.stringContaining('Network Error'),
-      });
+      try {
+        await apiClient.get('/test');
+        expect.fail('Should have thrown error');
+      } catch (error: any) {
+        expect(isNetworkError(error)).toBe(true);
+        if (isNetworkError(error)) {
+          expect(error.message).toContain('Network Error');
+          expect(error.isRetryable).toBe(true);
+        }
+      }
     });
 
     it('should handle timeout', async () => {
       mockAxios.onGet('/test').timeout();
 
-      await expect(apiClient.get('/test')).rejects.toMatchObject({
-        detail: expect.stringContaining('timeout'),
-      });
+      try {
+        await apiClient.get('/test');
+        expect.fail('Should have thrown error');
+      } catch (error: any) {
+        expect(isNetworkError(error)).toBe(true);
+        if (isNetworkError(error)) {
+          expect(error.message.toLowerCase()).toContain('timeout');
+          expect(error.isRetryable).toBe(false);
+        }
+      }
     });
   });
 

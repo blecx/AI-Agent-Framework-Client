@@ -1,14 +1,18 @@
 /**
  * Projects API Service
- * Handles all project-related API calls
+ * Handles all project-related API calls with type-safe validation
  */
 
+import { z } from 'zod';
 import { ApiClient } from './client';
 import {
   ProjectCreate,
   ProjectInfo,
   ProjectUpdate,
   ProjectState,
+  ProjectCreateSchema,
+  ProjectInfoSchema,
+  ProjectStateSchema,
 } from '../../types/api';
 
 export class ProjectsService {
@@ -19,26 +23,36 @@ export class ProjectsService {
   }
 
   /**
-   * List all projects
+   * List all projects with validation
    */
   async listProjects(): Promise<ProjectInfo[]> {
-    return this.client.get<ProjectInfo[]>('/api/v1/projects');
+    return this.client.getValidated(
+      '/api/v1/projects',
+      z.array(ProjectInfoSchema),
+    );
   }
 
   /**
-   * Get project by key
+   * Get project by key with validation
    */
   async getProject(projectKey: string): Promise<ProjectInfo> {
-    return this.client.get<ProjectInfo>(`/api/v1/projects/${projectKey}`);
+    return this.client.getValidated(
+      `/api/v1/projects/${projectKey}`,
+      ProjectInfoSchema,
+    );
   }
 
   /**
-   * Create new project
+   * Create new project with validation
    */
   async createProject(project: ProjectCreate): Promise<ProjectInfo> {
-    return this.client.post<ProjectInfo, ProjectCreate>(
+    // Validate input before sending
+    ProjectCreateSchema.parse(project);
+
+    return this.client.postValidated<ProjectInfo, ProjectCreate>(
       '/api/v1/projects',
       project,
+      ProjectInfoSchema,
     );
   }
 
@@ -63,11 +77,12 @@ export class ProjectsService {
   }
 
   /**
-   * Get project state
+   * Get project state with validation
    */
   async getProjectState(projectKey: string): Promise<ProjectState> {
-    return this.client.get<ProjectState>(
+    return this.client.getValidated(
       `/api/v1/projects/${projectKey}/state`,
+      ProjectStateSchema,
     );
   }
 }

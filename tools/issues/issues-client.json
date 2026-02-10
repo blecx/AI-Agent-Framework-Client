@@ -1,0 +1,52 @@
+{
+  "issues": [
+    {
+      "title": "Implement i18n framework integration",
+      "body": "## Goal\n\nIntegrate react-i18next or similar i18n framework to enable runtime language switching using the translation catalogs added in PR #130.\n\n## Acceptance Criteria\n\n- [ ] react-i18next (or chosen framework) installed and configured\n- [ ] i18n provider wraps app at root level\n- [ ] Translation hook available to all components\n- [ ] Catalogs loaded from `client/src/i18n/i18n.{en,de}.json`\n- [ ] Default language set to browser preference with fallback to English\n- [ ] Tests verify translation loading and key resolution\n\n## Technical Approach\n\n1. Install `react-i18next` + `i18next`\n2. Configure i18next instance in `client/src/i18n/config.ts`\n3. Import translation resources from JSON files\n4. Wrap App component with I18nextProvider\n5. Create example usage in one component\n\n## Related\n\n- Depends on: PR #130 (merged)\n- Blocks: Language switcher component\n\n## Validation\n\n- [ ] `npm install` completes successfully\n- [ ] `npm run build` passes\n- [ ] `npm test` passes with new i18n tests\n- [ ] Manual test: Change browser language, verify UI strings update",
+      "labels": ["enhancement", "client", "ui"],
+      "assignees": []
+    },
+    {
+      "title": "Add language switcher component",
+      "body": "## Goal\n\nCreate a dropdown/toggle component that allows users to switch between English and German UI languages at runtime.\n\n## Acceptance Criteria\n\n- [ ] Language switcher component in app header/navbar\n- [ ] Displays current language (en/de)\n- [ ] Clicking opens dropdown with available languages\n- [ ] Selecting language updates all UI strings immediately\n- [ ] Language preference persisted to localStorage\n- [ ] Keyboard accessible (Tab, Enter, Escape)\n- [ ] Unit tests cover language switching logic\n\n## Design Notes\n\n- Use flag icons or language codes (EN/DE)\n- Match existing UI theme and styling\n- Mobile-responsive design\n\n## Dependencies\n\n- Requires: i18n framework integration (issue TBD)\n\n## Validation\n\n- [ ] Component renders in header\n- [ ] Switching languages updates visible strings\n- [ ] Page refresh maintains selected language\n- [ ] Accessibility audit passes (keyboard + screen reader)",
+      "labels": ["enhancement", "ui", "client"],
+      "assignees": []
+    },
+    {
+      "title": "Address UX review findings from REGEN_2026-02-09",
+      "body": "## Goal\n\nImplement UI/UX improvements identified in the UX review document added in PR #130.\n\n## Scope\n\nSee `docs/ux/UI-Client_UX-Review_Workflow-Findings-Recommendation_REGEN_2026-02-09.md` for detailed findings.\n\n## High Priority Items\n\n- [ ] Improve navigation clarity (breadcrumbs or context indicators)\n- [ ] Add loading states for async operations\n- [ ] Standardize button styles and hierarchy\n- [ ] Improve error message visibility and actionability\n- [ ] Add empty states for lists/grids\n\n## Medium Priority Items\n\n- [ ] Enhance form validation feedback\n- [ ] Add keyboard shortcuts documentation\n- [ ] Improve mobile responsiveness\n- [ ] Add tooltips for complex actions\n\n## Acceptance Criteria\n\n- [ ] All high-priority items implemented\n- [ ] Changes reviewed against original UX document\n- [ ] Before/after screenshots documented\n- [ ] Accessibility standards maintained\n\n## Validation\n\n- [ ] Manual testing of updated workflows\n- [ ] Lighthouse accessibility score ≥ 90\n- [ ] Cross-browser testing (Chrome, Firefox, Safari)",
+      "labels": ["enhancement", "ux", "ui"],
+      "assignees": []
+    },
+    {
+      "title": "Improve test coverage for React components",
+      "body": "## Goal\n\nIncrease unit test coverage for client components to ≥ 80% line coverage.\n\n## Current State\n\nTest coverage is inconsistent across components. Many components lack tests for:\n- User interaction handlers\n- Conditional rendering paths\n- Error states\n- Edge cases\n\n## Acceptance Criteria\n\n- [ ] All components in `client/src/components/` have test files\n- [ ] Line coverage ≥ 80% overall\n- [ ] Branch coverage ≥ 70%\n- [ ] Critical user flows have integration tests\n- [ ] Tests run in CI pipeline\n\n## Priority Components\n\n1. ProjectView.tsx\n2. CommandPanel.tsx\n3. ProposalModal.tsx\n4. ArtifactsList.tsx\n\n## Testing Strategy\n\n- Use Vitest + React Testing Library\n- Mock API calls with MSW (Mock Service Worker)\n- Test user interactions (click, type, navigate)\n- Verify accessibility attributes\n\n## Validation\n\n- [ ] `npm test -- --coverage` shows ≥ 80% coverage\n- [ ] CI passes all tests\n- [ ] Coverage report uploaded to artifacts",
+      "labels": ["testing", "integration"],
+      "assignees": []
+    },
+    {
+      "title": "Refactor ProjectApiClient for better type safety",
+      "body": "## Goal\n\nImprove type safety and error handling in the ProjectApiClient following SRP principles from PR #101.\n\n## Current Issues\n\n- Mixed concerns (API client + domain logic)\n- Weak error handling (generic errors)\n- Missing request/response type guards\n- No retry logic for transient failures\n\n## Acceptance Criteria\n\n- [ ] Separate concerns: API client vs domain logic\n- [ ] Strong TypeScript types (no `any`)\n- [ ] Explicit error types with discriminated unions\n- [ ] Retry logic for 5xx errors (exponential backoff)\n- [ ] Request/response validation with Zod or similar\n- [ ] Unit tests for error scenarios\n\n## Technical Approach\n\n1. Extract domain types to separate file\n2. Add Zod schemas for API responses\n3. Implement retry wrapper with exponential backoff\n4. Create custom error classes (NetworkError, ValidationError, etc.)\n5. Add request interceptor for auth tokens\n\n## Validation\n\n- [ ] TypeScript compilation passes (strict mode)\n- [ ] Unit tests cover all error paths\n- [ ] Integration tests verify retry behavior\n- [ ] No ESLint violations",
+      "labels": ["refactor", "types", "api"],
+      "assignees": []
+    },
+    {
+      "title": "Add E2E tests for critical user workflows",
+      "body": "## Goal\n\nCreate end-to-end tests for the most critical user workflows using Playwright.\n\n## Critical Workflows\n\n1. **Project creation and selection**\n   - Create new project\n   - List projects\n   - Select project to make active\n\n2. **Command execution**\n   - Select command from dropdown\n   - Provide inputs/parameters\n   - Execute and view output\n\n3. **Proposal review and apply**\n   - View proposal diff\n   - Approve/reject changes\n   - Apply accepted changes\n\n4. **Artifact management**\n   - View artifact list\n   - Open artifact editor\n   - Save changes\n\n## Acceptance Criteria\n\n- [ ] Playwright installed and configured\n- [ ] E2E tests for all 4 critical workflows\n- [ ] Tests run against local dev server\n- [ ] CI integration with screenshots on failure\n- [ ] Test data fixtures for reproducibility\n\n## Validation\n\n- [ ] `npm run test:e2e` passes all workflows\n- [ ] Tests complete in < 5 minutes\n- [ ] CI runs E2E tests on PRs\n- [ ] Failure screenshots captured and uploaded",
+      "labels": ["testing", "e2e"],
+      "assignees": []
+    },
+    {
+      "title": "Performance optimization: bundle size reduction",
+      "body": "## Goal\n\nReduce production bundle size by ≥ 20% through code splitting, tree shaking, and dependency optimization.\n\n## Current State\n\n- Bundle size: ~290 KB (from recent build)\n- No code splitting (single bundle)\n- Several large dependencies included in main bundle\n\n## Acceptance Criteria\n\n- [ ] Bundle size < 230 KB (20% reduction)\n- [ ] Code splitting for routes/lazy loading\n- [ ] Analyze and optimize heavy dependencies\n- [ ] Enable tree shaking for all imports\n- [ ] Lighthouse performance score ≥ 90\n\n## Optimization Strategies\n\n1. **Code splitting**\n   - Lazy load route components\n   - Dynamic imports for heavy features\n\n2. **Dependency optimization**\n   - Replace moment.js with date-fns (if used)\n   - Use lodash-es for tree shaking\n   - Analyze bundle with webpack-bundle-analyzer\n\n3. **Build configuration**\n   - Enable minification/compression\n   - Configure chunk splitting\n   - Remove source maps from production\n\n## Validation\n\n- [ ] `npm run build` produces < 230 KB bundle\n- [ ] Lighthouse performance score ≥ 90\n- [ ] Page load time < 2s on 3G connection\n- [ ] No runtime errors from lazy loading",
+      "labels": ["performance", "enhancement"],
+      "assignees": []
+    },
+    {
+      "title": "Add comprehensive error boundaries",
+      "body": "## Goal\n\nImplement React error boundaries to gracefully handle component errors and provide better UX.\n\n## Current State\n\n- No error boundaries (entire app crashes on component error)\n- No error reporting/logging\n- Poor user feedback on errors\n\n## Acceptance Criteria\n\n- [ ] Root error boundary wraps entire app\n- [ ] Route-level error boundaries for major sections\n- [ ] Custom error UI with recovery options\n- [ ] Error logging to console (dev) and service (production)\n- [ ] Error boundary tests verify fallback rendering\n\n## Error UI Requirements\n\n- Display user-friendly error message\n- Show \"Reload page\" button\n- Show \"Report issue\" link (GitHub issues)\n- In dev mode: show error stack trace\n\n## Technical Approach\n\n1. Create `ErrorBoundary` component\n2. Add error logging hook\n3. Design error fallback UI\n4. Integrate with route structure\n5. Add Sentry (or similar) for production error tracking\n\n## Validation\n\n- [ ] Simulate component error, verify fallback UI\n- [ ] Verify error logged correctly\n- [ ] Test recovery actions (reload)\n- [ ] Unit tests for error boundary logic",
+      "labels": ["enhancement", "ui"],
+      "assignees": []
+    }
+  ]
+}

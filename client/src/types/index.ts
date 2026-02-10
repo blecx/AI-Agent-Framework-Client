@@ -5,32 +5,7 @@
 export * from './raid';
 export * from './workflow';
 export * from './template';
-
-// Project types
-export interface Project {
-  key: string;
-  name: string;
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
-  documents?: Document[];
-  gitRepo?: GitRepoInfo;
-}
-
-export interface Document {
-  id: string;
-  name: string;
-  path: string;
-  content: string;
-  lastModified: string;
-}
-
-export interface GitRepoInfo {
-  url: string;
-  branch: string;
-  lastCommit?: string;
-  status?: 'clean' | 'dirty' | 'unknown';
-}
+export * from './project';
 
 // Proposal types
 export interface Proposal {
