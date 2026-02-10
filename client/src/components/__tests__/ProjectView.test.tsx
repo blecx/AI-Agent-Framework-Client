@@ -184,8 +184,10 @@ describe('ProjectView', () => {
       expect(screen.getByText('Test Project')).toBeInTheDocument();
     });
 
-    // Audit badge should be present (mocked component)
-    expect(mockGetAuditResults).toHaveBeenCalledWith('TEST-123');
+    // Wait for audit query to complete and verify API was called
+    await waitFor(() => {
+      expect(mockGetAuditResults).toHaveBeenCalledWith('TEST-123');
+    });
   });
 
   it('switches to propose tab when clicked', async () => {
