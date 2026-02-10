@@ -27,6 +27,7 @@
     "@vitest/ui": "^4.0.17",
     "axios-mock-adapter": "^2.1.0",
     "jsdom": "^27.4.0",
+    "rollup-plugin-visualizer": "^6.0.5",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vitest": "^4.0.17"
