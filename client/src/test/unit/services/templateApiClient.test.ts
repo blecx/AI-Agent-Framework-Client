@@ -163,7 +163,12 @@ describe('TemplateApiClient', () => {
 
       const createdTemplate: Template = {
         id: 'tpl-new',
-        ...templateCreate,
+        name: templateCreate.name,
+        description: templateCreate.description,
+        schema: templateCreate.schema,
+        markdown_template: templateCreate.markdown_template,
+        artifact_type: 'report',
+        version: '1.0.0',
       };
 
       mockAxiosInstance.post.mockResolvedValue({ data: createdTemplate });
