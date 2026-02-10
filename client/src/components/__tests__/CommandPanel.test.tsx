@@ -9,12 +9,17 @@ import { MemoryRouter } from 'react-router-dom';
 import CommandPanel from '../CommandPanel';
 
 // Mock dependencies
+const mockCreateProject = vi.fn();
+const mockListProjects = vi.fn();
+const mockCheckHealth = vi.fn();
+const mockGetInfo = vi.fn();
+
 vi.mock('../../services/apiClient', () => ({
   default: {
-    createProject: vi.fn(),
-    listProjects: vi.fn(),
-    checkHealth: vi.fn(),
-    getInfo: vi.fn(),
+    createProject: mockCreateProject,
+    listProjects: mockListProjects,
+    checkHealth: mockCheckHealth,
+    getInfo: mockGetInfo,
   },
 }));
 
@@ -40,14 +45,10 @@ function renderWithRouter(ui: React.ReactElement) {
 }
 
 describe('CommandPanel', () => {
-  let mockApiClient: any;
-
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
-    
-    const apiModule = await import('../../services/apiClient');
-    mockApiClient = apiModule.default;
+
   });
 
   it('renders command panel with header', () => {
@@ -84,7 +85,7 @@ describe('CommandPanel', () => {
   });
 
   it('progresses through project creation flow', async () => {
-    mockApiClient.createProject.mockResolvedValue({
+    mockCreateProject.mockResolvedValue({
       success: true,
       data: { key: 'test-project', name: 'Test Project' },
     });
@@ -113,12 +114,12 @@ describe('CommandPanel', () => {
     
     // Should call API
     await waitFor(() => {
-      expect(mockApiClient.createProject).toHaveBeenCalledWith('test-project', 'Test Project');
+      expect(mockCreateProject).toHaveBeenCalledWith('test-project', 'Test Project');
     });
   });
 
   it('creates project with auto-generated key when empty', async () => {
-    mockApiClient.createProject.mockResolvedValue({
+    mockCreateProject.mockResolvedValue({
       success: true,
       data: { key: 'my-project', name: 'My Project' },
     });
@@ -139,12 +140,12 @@ describe('CommandPanel', () => {
     
     // Should create with auto-generated key
     await waitFor(() => {
-      expect(mockApiClient.createProject).toHaveBeenCalledWith('my-project', 'My Project');
+      expect(mockCreateProject).toHaveBeenCalledWith('my-project', 'My Project');
     });
   });
 
   it('shows success message and navigates after project creation', async () => {
-    mockApiClient.createProject.mockResolvedValue({
+    mockCreateProject.mockResolvedValue({
       success: true,
       data: { key: 'test-123', name: 'Test Project' },
     });
@@ -178,7 +179,7 @@ describe('CommandPanel', () => {
   });
 
   it('shows error message when project creation fails', async () => {
-    mockApiClient.createProject.mockResolvedValue({
+    mockCreateProject.mockResolvedValue({
       success: false,
       error: 'Project key already exists',
     });
@@ -203,7 +204,7 @@ describe('CommandPanel', () => {
   });
 
   it('lists projects successfully', async () => {
-    mockApiClient.listProjects.mockResolvedValue({
+    mockListProjects.mockResolvedValue({
       success: true,
       data: [{ key: 'test-1' }, { key: 'test-2' }],
     });
@@ -216,7 +217,7 @@ describe('CommandPanel', () => {
     await user.click(listButton);
     
     await waitFor(() => {
-      expect(mockApiClient.listProjects).toHaveBeenCalled();
+      expect(mockListProjects).toHaveBeenCalled();
     });
     
     await waitFor(() => {
@@ -233,7 +234,7 @@ describe('CommandPanel', () => {
   });
 
   it('handles list projects error', async () => {
-    mockApiClient.listProjects.mockRejectedValue(new Error('Network error'));
+    mockListProjects.mockRejectedValue(new Error('Network error'));
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
@@ -246,7 +247,7 @@ describe('CommandPanel', () => {
   });
 
   it('checks API health successfully', async () => {
-    mockApiClient.checkHealth.mockResolvedValue({ status: 'healthy' });
+    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
@@ -254,7 +255,7 @@ describe('CommandPanel', () => {
     await user.click(screen.getByRole('button', { name: /Check API health/i }));
     
     await waitFor(() => {
-      expect(mockApiClient.checkHealth).toHaveBeenCalled();
+      expect(mockCheckHealth).toHaveBeenCalled();
     });
     
     await waitFor(() => {
@@ -263,7 +264,7 @@ describe('CommandPanel', () => {
   });
 
   it('handles health check error', async () => {
-    mockApiClient.checkHealth.mockRejectedValue(new Error('API unreachable'));
+    mockCheckHealth.mockRejectedValue(new Error('API unreachable'));
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
@@ -276,7 +277,7 @@ describe('CommandPanel', () => {
   });
 
   it('gets API info successfully', async () => {
-    mockApiClient.getInfo.mockResolvedValue({
+    mockGetInfo.mockResolvedValue({
       name: 'Test API',
       version: '1.0.0',
     });
@@ -287,7 +288,7 @@ describe('CommandPanel', () => {
     await user.click(screen.getByRole('button', { name: /Get API information/i }));
     
     await waitFor(() => {
-      expect(mockApiClient.getInfo).toHaveBeenCalled();
+      expect(mockGetInfo).toHaveBeenCalled();
     });
     
     await waitFor(() => {
@@ -296,7 +297,7 @@ describe('CommandPanel', () => {
   });
 
   it('handles get info error', async () => {
-    mockApiClient.getInfo.mockRejectedValue(new Error('Failed to get info'));
+    mockGetInfo.mockRejectedValue(new Error('Failed to get info'));
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
@@ -309,7 +310,7 @@ describe('CommandPanel', () => {
   });
 
   it('adds commands to history', async () => {
-    mockApiClient.checkHealth.mockResolvedValue({ status: 'healthy' });
+    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
@@ -330,7 +331,7 @@ describe('CommandPanel', () => {
   });
 
   it('shows clear history button when history exists', async () => {
-    mockApiClient.checkHealth.mockResolvedValue({ status: 'healthy' });
+    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
@@ -347,7 +348,7 @@ describe('CommandPanel', () => {
   });
 
   it('clears history with confirmation', async () => {
-    mockApiClient.checkHealth.mockResolvedValue({ status: 'healthy' });
+    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
@@ -375,7 +376,7 @@ describe('CommandPanel', () => {
   });
 
   it('cancels clear history', async () => {
-    mockApiClient.checkHealth.mockResolvedValue({ status: 'healthy' });
+    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
@@ -396,7 +397,7 @@ describe('CommandPanel', () => {
   });
 
   it('disables buttons while loading', async () => {
-    mockApiClient.checkHealth.mockImplementation(() => new Promise(() => {})); // Never resolves
+    mockCheckHealth.mockImplementation(() => new Promise(() => {})); // Never resolves
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
@@ -430,7 +431,7 @@ describe('CommandPanel', () => {
   });
 
   it('dismisses status message when close button clicked', async () => {
-    mockApiClient.checkHealth.mockResolvedValue({ status: 'healthy' });
+    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
@@ -452,7 +453,7 @@ describe('CommandPanel', () => {
   });
 
   it('displays error status with error styling', async () => {
-    mockApiClient.checkHealth.mockRejectedValue(new Error('Connection failed'));
+    mockCheckHealth.mockRejectedValue(new Error('Connection failed'));
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
@@ -466,7 +467,7 @@ describe('CommandPanel', () => {
   });
 
   it('displays success status with success styling', async () => {
-    mockApiClient.checkHealth.mockResolvedValue({ status: 'healthy' });
+    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
@@ -480,7 +481,7 @@ describe('CommandPanel', () => {
   });
 
   it('shows timestamps for history entries', async () => {
-    mockApiClient.checkHealth.mockResolvedValue({ status: 'healthy' });
+    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);

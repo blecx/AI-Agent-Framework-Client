@@ -93,7 +93,7 @@ describe('ProjectView', () => {
       () =>
         ({
           getAuditResults: mockGetAuditResults,
-        }) as any
+        }) as unknown as InstanceType<typeof auditModule.AuditApiClient>
     );
   });
 
