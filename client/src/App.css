@@ -146,9 +146,42 @@
   border: 1px solid #eee;
   border-radius: 8px;
   padding: 0.75rem;
+  margin-bottom: 1rem;
   color: #b00020;
   overflow: auto;
-  white-space: pre-wrap;
+}
+
+.error-boundary-stack,
+.error-boundary-component-stack {
+  margin-top: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.error-boundary-stack summary,
+.error-boundary-component-stack summary {
+  padding: 0.75rem;
+  background: #f5f5f5;
+  cursor: pointer;
+  font-weight: 500;
+  user-select: none;
+}
+
+.error-boundary-stack summary:hover,
+.error-boundary-component-stack summary:hover {
+  background: #ececec;
+}
+
+.error-boundary-stack pre,
+.error-boundary-component-stack pre {
+  margin: 0;
+  padding: 0.75rem;
+  background: #fafafa;
+  overflow: auto;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: #333;
 }
 
 /* Responsive */

@@ -40,7 +40,7 @@ describe('Accessibility Tests', () => {
       );
 
       const buttons = screen.getAllByRole('button');
-      expect(buttons).toHaveLength(2);
+      expect(buttons).toHaveLength(3); // Try again, Reload page, Report issue
       buttons.forEach(button => {
         expect(button).toHaveAttribute('type', 'button');
       });
