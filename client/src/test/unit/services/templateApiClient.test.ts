@@ -157,7 +157,7 @@ describe('TemplateApiClient', () => {
         description: 'Test template',
         schema: { type: 'object', properties: {} },
         markdown_template: '# {{title}}',
-        artifact_type: 'report',
+        artifact_type: 'report' as const,
         version: '1.0.0',
       };
 
