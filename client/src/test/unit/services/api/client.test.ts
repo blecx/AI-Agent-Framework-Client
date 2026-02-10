@@ -21,11 +21,11 @@ function isValidationError(error: unknown): boolean {
 
 // Mock axios
 vi.mock('axios');
-const mockedAxios = axios as any;
+const mockedAxios = axios as typeof axios & { create: ReturnType<typeof vi.fn> };
 
 describe('ApiClient', () => {
   let client: ApiClient;
-  let mockAxiosInstance: any;
+  let mockAxiosInstance: ReturnType<typeof axios.create>;
 
   beforeEach(() => {
     mockAxiosInstance = {
@@ -63,7 +63,7 @@ describe('ApiClient', () => {
       try {
         await client.get('/test');
         expect.fail('Should have thrown error');
-      } catch (err: any) {
+      } catch (err: unknown) {
         expect(isNetworkError(err)).toBe(true);
         if (isNetworkError(err)) {
           expect(err.code).toBe('ECONNREFUSED');
@@ -87,7 +87,7 @@ describe('ApiClient', () => {
       try {
         await client.get('/test');
         expect.fail('Should have thrown error');
-      } catch (err: any) {
+      } catch (err: unknown) {
         expect(isNetworkError(err)).toBe(true);
         if (isNetworkError(err)) {
           expect(err.isRetryable).toBe(false);
@@ -104,7 +104,7 @@ describe('ApiClient', () => {
           data: { detail: 'Invalid request' },
           statusText: 'Bad Request',
           headers: {},
-          config: {} as any,
+          config: {} as never,
         },
         config: {},
         toJSON: () => ({}),
@@ -116,7 +116,7 @@ describe('ApiClient', () => {
       try {
         await client.get('/test');
         expect.fail('Should have thrown error');
-      } catch (err: any) {
+      } catch (err: unknown) {
         expect(isApiError(err)).toBe(true);
         if (isApiError(err)) {
           expect(err.status).toBe(400);
@@ -134,7 +134,7 @@ describe('ApiClient', () => {
           data: { detail: 'Internal server error' },
           statusText: 'Internal Server Error',
           headers: {},
-          config: {} as any,
+          config: {} as never,
         },
         config: {},
         toJSON: () => ({}),
@@ -146,7 +146,7 @@ describe('ApiClient', () => {
       try {
         await client.get('/test');
         expect.fail('Should have thrown error');
-      } catch (err: any) {
+      } catch (err: unknown) {
         expect(isApiError(err)).toBe(true);
         if (isApiError(err)) {
           expect(err.status).toBe(500);
@@ -177,7 +177,7 @@ describe('ApiClient', () => {
       try {
         await client.getValidated('/test', TestSchema);
         expect.fail('Should have thrown validation error');
-      } catch (err: any) {
+      } catch (err: unknown) {
         expect(isValidationError(err)).toBe(true);
         if (isValidationError(err)) {
           expect(err.message).toContain('validation');

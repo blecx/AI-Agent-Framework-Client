@@ -20,8 +20,8 @@ describe('ProjectApiClient', () => {
 
   beforeEach(() => {
     client = new ProjectApiClient('http://test.local', 'test-key');
-    // @ts-ignore - accessing private property for testing
-    mockAxios = new MockAdapter(client['client']); 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- accessing private property for testing
+    mockAxios = new MockAdapter((client as any).client); 
   });
 
   afterEach(() => {
@@ -86,7 +86,7 @@ describe('ProjectApiClient', () => {
         name: 'Test',
       };
 
-      await expect(client.createProject(invalidRequest as any)).rejects.toThrow(ValidationError);
+      await expect(client.createProject(invalidRequest as never)).rejects.toThrow(ValidationError);
     });
 
     it('should accept valid createProject request', async () => {
@@ -135,8 +135,8 @@ describe('ProjectApiClient', () => {
 
     it('should respect maxRetries config', async () => {
       const clientWithRetries = new ProjectApiClient('http://test.local', undefined, { maxRetries: 2 });
-      // @ts-ignore
-      const mockAxiosWithRetries = new MockAdapter(clientWithRetries['client']);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- accessing private property for testing
+      const mockAxiosWithRetries = new MockAdapter((clientWithRetries as any).client);
       
       // Always return 503 to test retry exhaustion  
       mockAxiosWithRetries.onGet('/projects').reply(() => [503, { message: 'Service unavailable' }]);
