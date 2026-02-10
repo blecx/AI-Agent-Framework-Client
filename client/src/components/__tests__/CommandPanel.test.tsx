@@ -3,23 +3,21 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import CommandPanel from '../CommandPanel';
 
-// Mock dependencies
-const mockCreateProject = vi.fn();
-const mockListProjects = vi.fn();
-const mockCheckHealth = vi.fn();
-const mockGetInfo = vi.fn();
+// Create mock navigate function
+const mockNavigate = vi.fn();
 
+// Mock dependencies
 vi.mock('../../services/apiClient', () => ({
   default: {
-    createProject: mockCreateProject,
-    listProjects: mockListProjects,
-    checkHealth: mockCheckHealth,
-    getInfo: mockGetInfo,
+    createProject: vi.fn(),
+    listProjects: vi.fn(),
+    checkHealth: vi.fn(),
+    getInfo: vi.fn(),
   },
 }));
 
@@ -31,7 +29,6 @@ vi.mock('../../hooks/useToast', () => ({
   }),
 }));
 
-const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
@@ -45,10 +42,21 @@ function renderWithRouter(ui: React.ReactElement) {
 }
 
 describe('CommandPanel', () => {
-  beforeEach(() => {
+  let mockCreateProject: ReturnType<typeof vi.fn>;
+  let mockListProjects: ReturnType<typeof vi.fn>;
+  let mockCheckHealth: ReturnType<typeof vi.fn>;
+  let mockGetInfo: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
     vi.clearAllMocks();
     mockNavigate.mockClear();
 
+    // Import mocked apiClient after mocks are set up
+    const apiClient = await import('../../services/apiClient');
+    mockCreateProject = apiClient.default.createProject as ReturnType<typeof vi.fn>;
+    mockListProjects = apiClient.default.listProjects as ReturnType<typeof vi.fn>;
+    mockCheckHealth = apiClient.default.checkHealth as ReturnType<typeof vi.fn>;
+    mockGetInfo = apiClient.default.getInfo as ReturnType<typeof vi.fn>;
   });
 
   it('renders command panel with header', () => {
@@ -110,7 +118,11 @@ describe('CommandPanel', () => {
     // Enter project key and submit
     const keyInput = screen.getByPlaceholderText(/my-project/i);
     await user.type(keyInput, 'test-project');
-    await user.click(screen.getByRole('button', { name: /Create/i }));
+    
+    // Get submit button within modal dialog
+    const modal = screen.getByRole('dialog');
+    const submitButton = within(modal).getByRole('button', { name: /Create/i });
+    await user.click(submitButton);
     
     // Should call API
     await waitFor(() => {
@@ -136,7 +148,11 @@ describe('CommandPanel', () => {
     await waitFor(() => {
       expect(screen.getByLabelText(/Project Key/i)).toBeInTheDocument();
     });
-    await user.click(screen.getByRole('button', { name: /Create/i }));
+    
+    // Get submit button within modal dialog
+    const modal = screen.getByRole('dialog');
+    const submitButton = within(modal).getByRole('button', { name: /Create/i });
+    await user.click(submitButton);
     
     // Should create with auto-generated key
     await waitFor(() => {
@@ -162,7 +178,11 @@ describe('CommandPanel', () => {
     await waitFor(() => {
       expect(screen.getByLabelText(/Project Key/i)).toBeInTheDocument();
     });
-    await user.click(screen.getByRole('button', { name: /Create/i }));
+    
+    // Get submit button within modal dialog
+    const modal = screen.getByRole('dialog');
+    const submitButton = within(modal).getByRole('button', { name: /Create/i });
+    await user.click(submitButton);
     
     // Should show success message
     await waitFor(() => {
@@ -195,7 +215,11 @@ describe('CommandPanel', () => {
     await waitFor(() => {
       expect(screen.getByLabelText(/Project Key/i)).toBeInTheDocument();
     });
-    await user.click(screen.getByRole('button', { name: /Create/i }));
+    
+    // Get submit button within modal dialog
+    const modal = screen.getByRole('dialog');
+    const submitButton = within(modal).getByRole('button', { name: /Create/i });
+    await user.click(submitButton);
     
     // Should show error message
     await waitFor(() => {
