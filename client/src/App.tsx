@@ -144,8 +144,22 @@ function App() {
                       <Navigation />
                       <main id="main-content" className="app-main">
                         <Routes>
-                          <Route path="/" element={<ProjectList />} />
-                          <Route path="/projects" element={<ProjectList />} />
+                          <Route
+                            path="/"
+                            element={
+                              <ErrorBoundary name="ProjectList">
+                                <ProjectList />
+                              </ErrorBoundary>
+                            }
+                          />
+                          <Route
+                            path="/projects"
+                            element={
+                              <ErrorBoundary name="ProjectList">
+                                <ProjectList />
+                              </ErrorBoundary>
+                            }
+                          />
                           <Route
                             path="/projects/:projectKey"
                             element={

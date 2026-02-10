@@ -56,8 +56,16 @@ export default class ErrorBoundary extends Component<
     const title = encodeURIComponent(
       `Bug: ${error?.message || 'Unexpected error'}`,
     );
+    
+    // Truncate stack traces to avoid URL length limits (browsers typically 2048-8192 chars)
+    const truncate = (text: string | null | undefined, maxLength: number = 1000): string => {
+      if (!text) return 'N/A';
+      if (text.length <= maxLength) return text;
+      return text.substring(0, maxLength) + '\n... (truncated)';
+    };
+    
     const body = encodeURIComponent(
-      `## Error Details\n\n**Message:** ${error?.message}\n\n**Stack:**\n\`\`\`\n${error?.stack || 'N/A'}\n\`\`\`\n\n**Component Stack:**\n\`\`\`\n${errorInfo?.componentStack || 'N/A'}\n\`\`\`\n\n**Environment:** ${isDevelopment ? 'Development' : 'Production'}\n\n## Steps to Reproduce\n\n1. \n2. \n3. \n\n## Expected Behavior\n\n\n## Actual Behavior\n\n`,
+      `## Error Details\n\n**Message:** ${error?.message}\n\n**Stack:**\n\`\`\`\n${truncate(error?.stack)}\n\`\`\`\n\n**Component Stack:**\n\`\`\`\n${truncate(errorInfo?.componentStack)}\n\`\`\`\n\n**Environment:** ${isDevelopment ? 'Development' : 'Production'}\n\n## Steps to Reproduce\n\n1. \n2. \n3. \n\n## Expected Behavior\n\n\n## Actual Behavior\n\n`,
     );
     const issueUrl = `https://github.com/blecx/AI-Agent-Framework-Client/issues/new?title=${title}&body=${body}&labels=bug`;
     window.open(issueUrl, '_blank', 'noopener,noreferrer');
