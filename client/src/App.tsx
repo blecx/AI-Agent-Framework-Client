@@ -148,27 +148,68 @@ function App() {
                           <Route path="/projects" element={<ProjectList />} />
                           <Route
                             path="/projects/:projectKey"
-                            element={<ProjectView />}
+                            element={
+                              <ErrorBoundary name="ProjectView">
+                                <ProjectView />
+                              </ErrorBoundary>
+                            }
                           />
                           <Route
                             path="/projects/:projectKey/propose"
-                            element={<ProposePanel />}
+                            element={
+                              <ErrorBoundary name="ProposePanel">
+                                <ProposePanel />
+                              </ErrorBoundary>
+                            }
                           />
                           <Route
                             path="/projects/:projectKey/apply"
-                            element={<ApplyPanelWrapper />}
+                            element={
+                              <ErrorBoundary name="ApplyPanel">
+                                <ApplyPanelWrapper />
+                              </ErrorBoundary>
+                            }
                           />
                           <Route
                             path="/projects/:projectKey/artifacts"
-                            element={<ProjectView />}
+                            element={
+                              <ErrorBoundary name="ProjectView">
+                                <ProjectView />
+                              </ErrorBoundary>
+                            }
                           />
                           <Route
                             path="/project/:key"
-                            element={<ProjectView />}
+                            element={
+                              <ErrorBoundary name="ProjectView">
+                                <ProjectView />
+                              </ErrorBoundary>
+                            }
                           />
-                          <Route path="/commands" element={<CommandPanel />} />
-                          <Route path="/api-tester" element={<ApiTester />} />
-                          <Route path="/ui" element={<UiLibraryDemo />} />
+                          <Route
+                            path="/commands"
+                            element={
+                              <ErrorBoundary name="CommandPanel">
+                                <CommandPanel />
+                              </ErrorBoundary>
+                            }
+                          />
+                          <Route
+                            path="/api-tester"
+                            element={
+                              <ErrorBoundary name="ApiTester">
+                                <ApiTester />
+                              </ErrorBoundary>
+                            }
+                          />
+                          <Route
+                            path="/ui"
+                            element={
+                              <ErrorBoundary name="UiLibraryDemo">
+                                <UiLibraryDemo />
+                              </ErrorBoundary>
+                            }
+                          />
                         </Routes>
                       </main>
                       <ToastContainer />
