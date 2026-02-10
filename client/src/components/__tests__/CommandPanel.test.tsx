@@ -2,8 +2,8 @@
  * CommandPanel Component Tests
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, waitFor, within, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import CommandPanel from '../CommandPanel';
@@ -49,6 +49,7 @@ describe('CommandPanel', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    vi.clearAllTimers();
     mockNavigate.mockClear();
 
     // Import mocked apiClient after mocks are set up
@@ -57,6 +58,12 @@ describe('CommandPanel', () => {
     mockListProjects = apiClient.default.listProjects as ReturnType<typeof vi.fn>;
     mockCheckHealth = apiClient.default.checkHealth as ReturnType<typeof vi.fn>;
     mockGetInfo = apiClient.default.getInfo as ReturnType<typeof vi.fn>;
+  });
+
+  afterEach(() => {
+    vi.clearAllTimers();
+    vi.useRealTimers();
+    cleanup();
   });
 
   it('renders command panel with header', () => {
