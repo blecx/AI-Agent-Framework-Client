@@ -1,6 +1,7 @@
 /**
  * API Client for AI Agent Framework
  * Provides methods for project management, proposals, commands, and RAID
+ * NOTE: Project methods now delegate to ProjectApiClient for better type safety
  */
 
 import axios, { AxiosError } from 'axios';
@@ -24,6 +25,8 @@ import type {
   AuditEventType,
 } from '../types';
 import { notify } from '../notifications/notificationBus';
+import { ProjectApiClient } from './ProjectApiClient';
+import { isApiError } from './errors';
 
 type ApiClientRequestConfig = AxiosRequestConfig & {
   suppressErrorToast?: boolean;
@@ -71,10 +74,14 @@ class ApiClient {
   private apiKey?: string;
   private maxRetries = 3;
   private retryDelay = 1000;
+  private projectClient: ProjectApiClient;
 
   constructor() {
     this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
     this.apiKey = import.meta.env.VITE_API_KEY || '';
+
+    // Initialize ProjectApiClient for type-safe project operations
+    this.projectClient = new ProjectApiClient(this.baseUrl, this.apiKey);
 
     this.client = axios.create({
       baseURL: this.baseUrl,
@@ -135,6 +142,8 @@ class ApiClient {
   setBaseUrl(url: string): void {
     this.baseUrl = url;
     this.client.defaults.baseURL = url;
+    // Update ProjectApiClient instance with new base URL
+    this.projectClient = new ProjectApiClient(url, this.apiKey);
   }
 
   /**
@@ -143,6 +152,8 @@ class ApiClient {
   setApiKey(key: string): void {
     this.apiKey = key;
     this.client.defaults.headers.common['Authorization'] = `Bearer ${key}`;
+    // Update ProjectApiClient instance with new API key
+    this.projectClient = new ProjectApiClient(this.baseUrl, key);
   }
 
   /**
@@ -153,22 +164,22 @@ class ApiClient {
   }
 
   // ==================== Project Management ====================
+  // NOTE: These methods now delegate to ProjectApiClient for better type safety
 
   /**
    * List all projects
    */
   async listProjects(): Promise<ApiResponse<Project[]>> {
     try {
-      const response = await this.client.get<Project[]>('/projects');
+      const data = await this.projectClient.listProjects();
       return {
         success: true,
-        data: response.data,
+        data,
       };
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'Failed to list projects',
+        error: isApiError(error) ? error.message : (error instanceof Error ? error.message : 'Failed to list projects'),
       };
     }
   }
@@ -178,15 +189,15 @@ class ApiClient {
    */
   async getProject(key: string): Promise<ApiResponse<Project>> {
     try {
-      const response = await this.client.get<Project>(`/projects/${key}`);
+      const data = await this.projectClient.getProject(key);
       return {
         success: true,
-        data: response.data,
+        data,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to get project',
+        error: isApiError(error) ? error.message : (error instanceof Error ? error.message : 'Failed to get project'),
       };
     }
   }
@@ -200,20 +211,15 @@ class ApiClient {
     description?: string,
   ): Promise<ApiResponse<Project>> {
     try {
-      const response = await this.client.post<Project>('/projects', {
-        key,
-        name,
-        description,
-      });
+      const data = await this.projectClient.createProject({ key, name, description });
       return {
         success: true,
-        data: response.data,
+        data,
       };
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'Failed to create project',
+        error: isApiError(error) ? error.message : (error instanceof Error ? error.message : 'Failed to create project'),
       };
     }
   }
@@ -226,19 +232,18 @@ class ApiClient {
     updates: Partial<Project>,
   ): Promise<ApiResponse<Project>> {
     try {
-      const response = await this.client.put<Project>(
-        `/projects/${key}`,
-        updates,
-      );
+      const data = await this.projectClient.updateProject(key, {
+        name: updates.name,
+        description: updates.description,
+      });
       return {
         success: true,
-        data: response.data,
+        data,
       };
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'Failed to update project',
+        error: isApiError(error) ? error.message : (error instanceof Error ? error.message : 'Failed to update project'),
       };
     }
   }
@@ -248,15 +253,14 @@ class ApiClient {
    */
   async deleteProject(key: string): Promise<ApiResponse<void>> {
     try {
-      await this.client.delete(`/projects/${key}`);
+      await this.projectClient.deleteProject(key);
       return {
         success: true,
       };
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'Failed to delete project',
+        error: isApiError(error) ? error.message : (error instanceof Error ? error.message : 'Failed to delete project'),
       };
     }
   }

@@ -3,6 +3,8 @@
  * TypeScript interfaces matching the FastAPI backend models
  */
 
+import { z } from 'zod';
+
 // ==================== Project Types ====================
 
 export interface ProjectCreate {
@@ -34,6 +36,40 @@ export interface ProjectState {
     note?: string;
   }>;
 }
+
+// ==================== Project Zod Schemas ====================
+
+export const ProjectCreateSchema = z.object({
+  key: z.string().min(1, 'Project key is required'),
+  name: z.string().min(1, 'Project name is required'),
+  description: z.string().optional(),
+});
+
+export const ProjectInfoSchema = z.object({
+  key: z.string(),
+  name: z.string(),
+  description: z.string().optional(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  state: z.string().optional(),
+});
+
+export const ProjectUpdateSchema = z.object({
+  name: z.string().optional(),
+  description: z.string().optional(),
+});
+
+const StateHistoryItemSchema = z.object({
+  state: z.string(),
+  timestamp: z.string(),
+  note: z.string().optional(),
+});
+
+export const ProjectStateSchema = z.object({
+  project_key: z.string(),
+  current_state: z.string(),
+  history: z.array(StateHistoryItemSchema),
+});
 
 // ==================== RAID Types ====================
 
