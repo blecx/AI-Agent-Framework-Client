@@ -8,17 +8,23 @@ import {
   ProposalApiClient,
   type Proposal,
   type ProposalCreate,
-  type ProposalStatus,
-  type ChangeType,
 } from '../../../services/ProposalApiClient';
 
 // Mock axios
 vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);
 
+type MockAxiosInstance = {
+  get: ReturnType<typeof vi.fn>;
+  post: ReturnType<typeof vi.fn>;
+  put: ReturnType<typeof vi.fn>;
+  patch: ReturnType<typeof vi.fn>;
+  delete: ReturnType<typeof vi.fn>;
+};
+
 describe('ProposalApiClient', () => {
   let client: ProposalApiClient;
-  let mockAxiosInstance: any;
+  let mockAxiosInstance: MockAxiosInstance;
 
   const mockProposal: Proposal = {
     id: 'prop-001',
@@ -43,7 +49,7 @@ describe('ProposalApiClient', () => {
       delete: vi.fn(),
     };
 
-    mockedAxios.create.mockReturnValue(mockAxiosInstance);
+    mockedAxios.create.mockReturnValue(mockAxiosInstance as unknown as ReturnType<typeof axios.create>);
     client = new ProposalApiClient('http://localhost:8000');
   });
 
@@ -92,7 +98,7 @@ describe('ProposalApiClient', () => {
 
     it('should handle 400 validation error', async () => {
       const error = new Error('Invalid proposal data');
-      (error as any).response = { status: 400, data: { detail: 'Missing required fields' } };
+      (error as unknown as { response: { status: number; data: { detail: string } } }).response = { status: 400, data: { detail: 'Missing required fields' } };
       mockAxiosInstance.post.mockRejectedValue(error);
 
       await expect(
@@ -102,7 +108,7 @@ describe('ProposalApiClient', () => {
 
     it('should handle duplicate proposal ID error', async () => {
       const error = new Error('Proposal ID already exists');
-      (error as any).response = { status: 409 };
+      (error as unknown as { response: { status: number } }).response = { status: 409 };
       mockAxiosInstance.post.mockRejectedValue(error);
 
       await expect(
@@ -198,7 +204,7 @@ describe('ProposalApiClient', () => {
 
     it('should handle 404 proposal not found', async () => {
       const error = new Error('Proposal not found');
-      (error as any).response = { status: 404 };
+      (error as unknown as { response: { status: number } }).response = { status: 404 };
       mockAxiosInstance.get.mockRejectedValue(error);
 
       await expect(client.getProposal('PROJ-001', 'invalid-id')).rejects.toThrow();
@@ -222,7 +228,7 @@ describe('ProposalApiClient', () => {
 
     it('should handle already applied proposal error', async () => {
       const error = new Error('Proposal already applied');
-      (error as any).response = { status: 409 };
+      (error as unknown as { response: { status: number } }).response = { status: 409 };
       mockAxiosInstance.post.mockRejectedValue(error);
 
       await expect(client.applyProposal('PROJ-001', 'prop-001')).rejects.toThrow();
@@ -230,7 +236,7 @@ describe('ProposalApiClient', () => {
 
     it('should handle missing proposal error', async () => {
       const error = new Error('Proposal not found');
-      (error as any).response = { status: 404 };
+      (error as unknown as { response: { status: number } }).response = { status: 404 };
       mockAxiosInstance.post.mockRejectedValue(error);
 
       await expect(client.applyProposal('PROJ-001', 'invalid')).rejects.toThrow();
@@ -266,7 +272,7 @@ describe('ProposalApiClient', () => {
 
     it('should handle already rejected proposal error', async () => {
       const error = new Error('Proposal already rejected');
-      (error as any).response = { status: 409 };
+      (error as unknown as { response: { status: number } }).response = { status: 409 };
       mockAxiosInstance.post.mockRejectedValue(error);
 
       await expect(

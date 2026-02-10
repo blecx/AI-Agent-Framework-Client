@@ -10,9 +10,17 @@ import { ArtifactApiClient, type Artifact } from '../../../services/ArtifactApiC
 vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);
 
+type MockAxiosInstance = {
+  get: ReturnType<typeof vi.fn>;
+  post: ReturnType<typeof vi.fn>;
+  put: ReturnType<typeof vi.fn>;
+  patch: ReturnType<typeof vi.fn>;
+  delete: ReturnType<typeof vi.fn>;
+};
+
 describe('ArtifactApiClient', () => {
   let client: ArtifactApiClient;
-  let mockAxiosInstance: any;
+  let mockAxiosInstance: MockAxiosInstance;
 
   beforeEach(() => {
     // Reset mocks
@@ -28,7 +36,7 @@ describe('ArtifactApiClient', () => {
     };
 
     // Mock axios.create to return our mock instance
-    mockedAxios.create.mockReturnValue(mockAxiosInstance);
+    mockedAxios.create.mockReturnValue(mockAxiosInstance as unknown as ReturnType<typeof axios.create>);
 
     // Create client instance
     client = new ArtifactApiClient('http://localhost:8000');
@@ -80,7 +88,7 @@ describe('ArtifactApiClient', () => {
 
     it('should handle 404 project not found error', async () => {
       const error = new Error('Project not found');
-      (error as any).response = { status: 404 };
+      (error as unknown as { response: { status: number } }).response = { status: 404 };
       mockAxiosInstance.get.mockRejectedValue(error);
 
       await expect(client.listArtifacts('INVALID')).rejects.toThrow(
@@ -90,7 +98,7 @@ describe('ArtifactApiClient', () => {
 
     it('should handle 500 server error', async () => {
       const error = new Error('Internal server error');
-      (error as any).response = { status: 500 };
+      (error as unknown as { response: { status: number } }).response = { status: 500 };
       mockAxiosInstance.get.mockRejectedValue(error);
 
       await expect(client.listArtifacts('PROJ-001')).rejects.toThrow(
@@ -100,7 +108,7 @@ describe('ArtifactApiClient', () => {
 
     it('should handle network error', async () => {
       const error = new Error('Network Error');
-      (error as any).code = 'ECONNREFUSED';
+      (error as unknown as { code: string }).code = 'ECONNREFUSED';
       mockAxiosInstance.get.mockRejectedValue(error);
 
       await expect(client.listArtifacts('PROJ-001')).rejects.toThrow(
@@ -110,7 +118,7 @@ describe('ArtifactApiClient', () => {
 
     it('should handle timeout error', async () => {
       const error = new Error('Timeout');
-      (error as any).code = 'ECONNABORTED';
+      (error as unknown as { code: string }).code = 'ECONNABORTED';
       mockAxiosInstance.get.mockRejectedValue(error);
 
       await expect(client.listArtifacts('PROJ-001')).rejects.toThrow('Timeout');
@@ -146,7 +154,7 @@ describe('ArtifactApiClient', () => {
 
     it('should handle 404 artifact not found', async () => {
       const error = new Error('Artifact not found');
-      (error as any).response = { status: 404 };
+      (error as unknown as { response: { status: number } }).response = { status: 404 };
       mockAxiosInstance.get.mockRejectedValue(error);
 
       await expect(
@@ -182,7 +190,7 @@ describe('ArtifactApiClient', () => {
 
   describe('constructor', () => {
     it('should create client with default base URL', () => {
-      const defaultClient = new ArtifactApiClient();
+      void new ArtifactApiClient();
 
       expect(mockedAxios.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -195,7 +203,7 @@ describe('ArtifactApiClient', () => {
     });
 
     it('should create client with custom base URL', () => {
-      const customClient = new ArtifactApiClient('https://api.example.com');
+      void new ArtifactApiClient('https://api.example.com');
 
       expect(mockedAxios.create).toHaveBeenCalledWith(
         expect.objectContaining({

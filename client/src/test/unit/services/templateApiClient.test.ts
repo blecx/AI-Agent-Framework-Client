@@ -11,9 +11,17 @@ import type { Template, TemplateCreate, TemplateUpdate } from '../../../types/te
 vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);
 
+type MockAxiosInstance = {
+  get: ReturnType<typeof vi.fn>;
+  post: ReturnType<typeof vi.fn>;
+  put: ReturnType<typeof vi.fn>;
+  patch: ReturnType<typeof vi.fn>;
+  delete: ReturnType<typeof vi.fn>;
+};
+
 describe('TemplateApiClient', () => {
   let client: TemplateApiClient;
-  let mockAxiosInstance: any;
+  let mockAxiosInstance: MockAxiosInstance;
 
   const mockTemplate: Template = {
     id: 'tpl-001',
@@ -43,7 +51,7 @@ describe('TemplateApiClient', () => {
       delete: vi.fn(),
     };
 
-    mockedAxios.create.mockReturnValue(mockAxiosInstance);
+    mockedAxios.create.mockReturnValue(mockAxiosInstance as unknown as ReturnType<typeof axios.create>);
     client = new TemplateApiClient('http://localhost:8000');
   });
 
@@ -78,7 +86,7 @@ describe('TemplateApiClient', () => {
 
     it('should handle 500 server error', async () => {
       const error = new Error('Internal server error');
-      (error as any).response = { status: 500 };
+      (error as unknown as { response: { status: number } }).response = { status: 500 };
       mockAxiosInstance.get.mockRejectedValue(error);
 
       await expect(client.listTemplates()).rejects.toThrow();
@@ -86,7 +94,7 @@ describe('TemplateApiClient', () => {
 
     it('should handle network error', async () => {
       const error = new Error('Network Error');
-      (error as any).code = 'ECONNREFUSED';
+      (error as unknown as { code: string }).code = 'ECONNREFUSED';
       mockAxiosInstance.get.mockRejectedValue(error);
 
       await expect(client.listTemplates()).rejects.toThrow('Network Error');
@@ -109,7 +117,7 @@ describe('TemplateApiClient', () => {
 
     it('should handle 404 template not found', async () => {
       const error = new Error('Template not found');
-      (error as any).response = { status: 404 };
+      (error as unknown as { response: { status: number } }).response = { status: 404 };
       mockAxiosInstance.get.mockRejectedValue(error);
 
       await expect(client.getTemplate('invalid-id')).rejects.toThrow();
@@ -172,7 +180,7 @@ describe('TemplateApiClient', () => {
 
     it('should handle 400 validation error', async () => {
       const error = new Error('Invalid template data');
-      (error as any).response = {
+      (error as unknown as { response: { status: number; data: { detail: string } } }).response = {
         status: 400,
         data: { detail: 'Schema validation failed' },
       };
@@ -183,7 +191,7 @@ describe('TemplateApiClient', () => {
 
     it('should handle duplicate template ID error', async () => {
       const error = new Error('Template already exists');
-      (error as any).response = { status: 409 };
+      (error as unknown as { response: { status: number } }).response = { status: 409 };
       mockAxiosInstance.post.mockRejectedValue(error);
 
       await expect(
@@ -253,7 +261,7 @@ describe('TemplateApiClient', () => {
 
     it('should handle 404 template not found', async () => {
       const error = new Error('Template not found');
-      (error as any).response = { status: 404 };
+      (error as unknown as { response: { status: number } }).response = { status: 404 };
       mockAxiosInstance.put.mockRejectedValue(error);
 
       await expect(
@@ -263,7 +271,7 @@ describe('TemplateApiClient', () => {
 
     it('should handle 400 validation error on update', async () => {
       const error = new Error('Invalid update data');
-      (error as any).response = { status: 400 };
+      (error as unknown as { response: { status: number } }).response = { status: 400 };
       mockAxiosInstance.put.mockRejectedValue(error);
 
       await expect(
@@ -287,7 +295,7 @@ describe('TemplateApiClient', () => {
 
     it('should handle 404 template not found on delete', async () => {
       const error = new Error('Template not found');
-      (error as any).response = { status: 404 };
+      (error as unknown as { response: { status: number } }).response = { status: 404 };
       mockAxiosInstance.delete.mockRejectedValue(error);
 
       await expect(client.deleteTemplate('invalid-id')).rejects.toThrow();
@@ -295,7 +303,7 @@ describe('TemplateApiClient', () => {
 
     it('should handle 409 template in use error', async () => {
       const error = new Error('Template is in use by active projects');
-      (error as any).response = { status: 409 };
+      (error as unknown as { response: { status: number } }).response = { status: 409 };
       mockAxiosInstance.delete.mockRejectedValue(error);
 
       await expect(client.deleteTemplate('tpl-001')).rejects.toThrow();
@@ -308,7 +316,7 @@ describe('TemplateApiClient', () => {
 
   describe('constructor', () => {
     it('should create client with default base URL', () => {
-      const defaultClient = new TemplateApiClient();
+      void new TemplateApiClient();
 
       expect(mockedAxios.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -321,7 +329,7 @@ describe('TemplateApiClient', () => {
     });
 
     it('should create client with custom base URL', () => {
-      const customClient = new TemplateApiClient('https://api.example.com');
+      void new TemplateApiClient('https://api.example.com');
 
       expect(mockedAxios.create).toHaveBeenCalledWith(
         expect.objectContaining({

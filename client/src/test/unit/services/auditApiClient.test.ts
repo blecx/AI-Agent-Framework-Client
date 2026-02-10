@@ -7,16 +7,23 @@ import axios from 'axios';
 import {
   AuditApiClient,
   type AuditResult,
-  type AuditIssue,
 } from '../../../services/AuditApiClient';
 
 // Mock axios
 vi.mock('axios');
 const mockedAxios = vi.mocked(axios, true);
 
+type MockAxiosInstance = {
+  get: ReturnType<typeof vi.fn>;
+  post: ReturnType<typeof vi.fn>;
+  put: ReturnType<typeof vi.fn>;
+  patch: ReturnType<typeof vi.fn>;
+  delete: ReturnType<typeof vi.fn>;
+};
+
 describe('AuditApiClient', () => {
   let client: AuditApiClient;
-  let mockAxiosInstance: any;
+  let mockAxiosInstance: MockAxiosInstance;
 
   const mockAuditResult: AuditResult = {
     projectKey: 'PROJ-001',
@@ -57,7 +64,7 @@ describe('AuditApiClient', () => {
       delete: vi.fn(),
     };
 
-    mockedAxios.create.mockReturnValue(mockAxiosInstance);
+    mockedAxios.create.mockReturnValue(mockAxiosInstance as unknown as ReturnType<typeof axios.create>);
     client = new AuditApiClient('http://localhost:8000');
   });
 
@@ -102,7 +109,7 @@ describe('AuditApiClient', () => {
 
     it('should handle 404 project not found', async () => {
       const error = new Error('Project not found');
-      (error as any).response = { status: 404 };
+      (error as unknown as { response: { status: number } }).response = { status: 404 };
       mockAxiosInstance.get.mockRejectedValue(error);
 
       await expect(client.getAuditResults('INVALID')).rejects.toThrow(
@@ -112,7 +119,7 @@ describe('AuditApiClient', () => {
 
     it('should handle 500 server error', async () => {
       const error = new Error('Internal server error');
-      (error as any).response = { status: 500 };
+      (error as unknown as { response: { status: number } }).response = { status: 500 };
       mockAxiosInstance.get.mockRejectedValue(error);
 
       await expect(client.getAuditResults('PROJ-001')).rejects.toThrow();
@@ -120,7 +127,7 @@ describe('AuditApiClient', () => {
 
     it('should handle network error', async () => {
       const error = new Error('Network Error');
-      (error as any).code = 'ECONNREFUSED';
+      (error as unknown as { code: string }).code = 'ECONNREFUSED';
       mockAxiosInstance.get.mockRejectedValue(error);
 
       await expect(client.getAuditResults('PROJ-001')).rejects.toThrow(
@@ -177,7 +184,7 @@ describe('AuditApiClient', () => {
 
     it('should handle 404 project not found when running audit', async () => {
       const error = new Error('Project not found');
-      (error as any).response = { status: 404 };
+      (error as unknown as { response: { status: number } }).response = { status: 404 };
       mockAxiosInstance.post.mockRejectedValue(error);
 
       await expect(client.runAudit('INVALID')).rejects.toThrow('Project not found');
@@ -185,7 +192,7 @@ describe('AuditApiClient', () => {
 
     it('should handle audit execution timeout', async () => {
       const error = new Error('Audit execution timed out');
-      (error as any).code = 'ECONNABORTED';
+      (error as unknown as { code: string }).code = 'ECONNABORTED';
       mockAxiosInstance.post.mockRejectedValue(error);
 
       await expect(client.runAudit('PROJ-001')).rejects.toThrow('timed out');
@@ -193,7 +200,7 @@ describe('AuditApiClient', () => {
 
     it('should handle concurrent audit runs', async () => {
       const error = new Error('Audit already running');
-      (error as any).response = { status: 409 };
+      (error as unknown as { response: { status: number } }).response = { status: 409 };
       mockAxiosInstance.post.mockRejectedValue(error);
 
       await expect(client.runAudit('PROJ-001')).rejects.toThrow(
@@ -208,7 +215,7 @@ describe('AuditApiClient', () => {
 
   describe('constructor', () => {
     it('should create client with default base URL', () => {
-      const defaultClient = new AuditApiClient();
+      void new AuditApiClient();
 
       expect(mockedAxios.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -221,7 +228,7 @@ describe('AuditApiClient', () => {
     });
 
     it('should create client with custom base URL', () => {
-      const customClient = new AuditApiClient('https://api.example.com');
+      void new AuditApiClient('https://api.example.com');
 
       expect(mockedAxios.create).toHaveBeenCalledWith(
         expect.objectContaining({
