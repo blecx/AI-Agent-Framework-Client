@@ -173,8 +173,7 @@ describe('CommandPanel', () => {
       data: { key: 'test-123', name: 'Test Project' },
     });
 
-    vi.useFakeTimers();
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
     
     // Complete create flow
@@ -196,13 +195,10 @@ describe('CommandPanel', () => {
       expect(screen.getByText(/Project "Test Project" created successfully/i)).toBeInTheDocument();
     });
     
-    // Should navigate after timeout
-    vi.advanceTimersByTime(1000);
+    // Should navigate after delay (no fake timers - just wait for it)
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/projects/test-123');
-    });
-    
-    vi.useRealTimers();
+    }, { timeout: 2000 });
   });
 
   it('shows error message when project creation fails', async () => {
@@ -228,9 +224,10 @@ describe('CommandPanel', () => {
     const submitButton = within(modal).getByRole('button', { name: /Create/i });
     await user.click(submitButton);
     
-    // Should show error message
+    // Should show error message (use getAllByText since error appears in status and possibly history)
     await waitFor(() => {
-      expect(screen.getByText(/Project key already exists/i)).toBeInTheDocument();
+      const errorElements = screen.getAllByText(/Project key already exists/i);
+      expect(errorElements.length).toBeGreaterThan(0);
     });
   });
 
@@ -240,8 +237,7 @@ describe('CommandPanel', () => {
       data: [{ key: 'test-1' }, { key: 'test-2' }],
     });
 
-    vi.useFakeTimers();
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
     
     const listButton = screen.getByRole('button', { name: /List all projects/i });
@@ -255,13 +251,10 @@ describe('CommandPanel', () => {
       expect(screen.getByText(/Found 2 project\(s\)/i)).toBeInTheDocument();
     });
     
-    // Should navigate after timeout
-    vi.advanceTimersByTime(500);
+    // Should navigate after delay
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/projects');
-    });
-    
-    vi.useRealTimers();
+    }, { timeout: 2000 });
   });
 
   it('handles list projects error', async () => {
@@ -272,8 +265,10 @@ describe('CommandPanel', () => {
     
     await user.click(screen.getByRole('button', { name: /List all projects/i }));
     
+    // Use getAllByText since error appears in status and history
     await waitFor(() => {
-      expect(screen.getByText(/Network error/i)).toBeInTheDocument();
+      const errorElements = screen.getAllByText(/Network error/i);
+      expect(errorElements.length).toBeGreaterThan(0);
     });
   });
 
@@ -302,8 +297,10 @@ describe('CommandPanel', () => {
     
     await user.click(screen.getByRole('button', { name: /Check API health/i }));
     
+    // Use getAllByText since error appears in status and history
     await waitFor(() => {
-      expect(screen.getByText(/API unreachable/i)).toBeInTheDocument();
+      const errorElements = screen.getAllByText(/API unreachable/i);
+      expect(errorElements.length).toBeGreaterThan(0);
     });
   });
 
@@ -322,8 +319,10 @@ describe('CommandPanel', () => {
       expect(mockGetInfo).toHaveBeenCalled();
     });
     
+    // Use getAllByText since info appears in status and history
     await waitFor(() => {
-      expect(screen.getByText(/Test API v1\.0\.0/i)).toBeInTheDocument();
+      const infoElements = screen.getAllByText(/Test API v1\.0\.0/i);
+      expect(infoElements.length).toBeGreaterThan(0);
     });
   });
 
@@ -335,8 +334,10 @@ describe('CommandPanel', () => {
     
     await user.click(screen.getByRole('button', { name: /Get API information/i }));
     
+    // Use getAllByText since error appears in status and history
     await waitFor(() => {
-      expect(screen.getByText(/Failed to get info/i)).toBeInTheDocument();
+      const errorElements = screen.getAllByText(/Failed to get info/i);
+      expect(errorElements.length).toBeGreaterThan(0);
     });
   });
 
@@ -388,7 +389,8 @@ describe('CommandPanel', () => {
     await user.click(screen.getByRole('button', { name: /Check API health/i }));
     
     await waitFor(() => {
-      expect(screen.getByText('Check API health')).toBeInTheDocument();
+      const healthTexts = screen.getAllByText('Check API health');
+      expect(healthTexts.length).toBeGreaterThan(0);
     });
     
     // Click clear history
@@ -397,8 +399,9 @@ describe('CommandPanel', () => {
     // Should show confirmation dialog
     expect(screen.getByText(/Are you sure you want to clear all command history/i)).toBeInTheDocument();
     
-    // Confirm
-    await user.click(screen.getByRole('button', { name: /Clear/i }));
+    // Confirm - use exact text to distinguish from "Clear History" button
+    const confirmButton = screen.getByRole('button', { name: 'Clear' });
+    await user.click(confirmButton);
     
     // History should be cleared
     await waitFor(() => {
@@ -491,8 +494,11 @@ describe('CommandPanel', () => {
     
     await user.click(screen.getByRole('button', { name: /Check API health/i }));
     
+    // Use getAllByText since error appears in status and history
     await waitFor(() => {
-      const statusMessage = screen.getByText(/Connection failed/i).closest('.status-message');
+      const errorElements = screen.getAllByText(/Connection failed/i);
+      expect(errorElements.length).toBeGreaterThan(0);
+      const statusMessage = errorElements[0].closest('.status-message');
       expect(statusMessage).toHaveClass('error');
     });
   });
