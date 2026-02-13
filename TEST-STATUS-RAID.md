@@ -3,32 +3,41 @@
 ## Summary
 RAIDList.test.tsx and RAIDDetail.test.tsx are **Work In Progress** and require significant updates to match the actual component implementations.
 
-## Current Status (as of 2026-02-13)
+## Current Status (as of 2026-02-13 21:51 UTC)
 
 ### ✅ ApplyPanel.test.tsx
 - **Status:** ✅ PASSING (29/29 tests)
 - **Committed:** Yes (commit e60b8b3)
 
 ### ⚠️ RAIDDetail.test.tsx  
-- **Status:** ⚠️ PARTIALLY FIXED (5/48 tests passing, 89.6% failure rate)
-- **Committed:** Yes (with TODOs)
-- **Fixed:** Import statements (default→named export), mock paths
-- **Remaining Issues:**
-  1. Mock data uses wrong field names (camelCase vs snake_case)
-  2. Mock data uses wrong enum values (UPPERCASE vs lowercase)
-  3. Component doesn't have `isOpen` prop (removed from tests needed)
-  4. Test selectors don't match actual DOM structure
-  5. Missing required fields in mock data
+- **Status:** ⚠️ IMPROVED (5/48 tests passing, 89.6% failure rate)
+- **Committed:** No (in progress)
+- **Fixed:**
+  - ✅ Import statements (default→named export)
+  - ✅ Mock paths (./RAIDBadge→./raid/RAIDBadge)
+  - ✅ Toast mock (useToast→showToast)
+  - ✅ isOpen props removed (all 48 occurrences)
+  - ✅ Mock data field names (camelCase→snake_case)
+  - ✅ Mock data enum values (UPPERCASE→lowercase)
+  - ✅ Added all required fields (mitigation_plan, linked_*, created_by, updated_by)
+- **Remaining Issues (~40 failing tests):**
+  - Test selectors don't match DOM (looking for data-testid that don't exist)
+  - Need to use className-based selectors or add data-testid to component
 
 ### ⚠️ RAIDList.test.tsx
-- **Status:** ⚠️ NEEDS MAJOR UPDATES (4/28 tests passing, 85.7% failure rate)
-- **Committed:** Yes (with TODOs)
-- **Remaining Issues:**
-  1. Loading state: expects text but component shows skeleton loaders
-  2. Empty state: expects different text than EmptyState component renders
-  3. Mock data structure doesn't match type definitions
-  4. Field names don't match (camelCase vs snake_case)
-  5. Enum values don't match (UPPERCASE vs lowercase)
+- **Status:** ⚠️ IMPROVED (6/28 tests passing, 78.6% failure rate - was 85.7%)
+- **Committed:** No (in progress)
+- **Fixed:**
+  - ✅ Mock data field names (camelCase→snake_case)
+  - ✅ Mock data enum values (UPPERCASE→lowercase)
+  - ✅ Added all required fields
+  - ✅ API response structure (array→{items, total})
+  - ✅ Loading state assertion (text→skeleton check)
+  - ✅ Empty state text (updated to match EmptyState component)
+  - ✅ Fixed undefined→null for target_resolution_date
+- **Remaining Issues (~22 failing tests):**
+  - Test selectors looking for data-testid that don't exist
+  - Need className-based selectors or add data-testid to  component
 
 ## Required Fixes
 

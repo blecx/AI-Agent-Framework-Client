@@ -66,42 +66,65 @@ vi.mock('./RAIDCreateModal', () => ({
 describe('RAIDList', () => {
   const mockRiskItem: RAIDItem = {
     id: 'raid-1',
-    type: 'RISK',
-    status: 'OPEN',
-    priority: 'HIGH',
+    type: 'risk',
+    status: 'open',
+    priority: 'high',
     title: 'Security Risk',
     description: 'Potential security vulnerability',
     owner: 'john@example.com',
-    createdAt: '2026-02-01T10:00:00Z',
-    updatedAt: '2026-02-01T10:00:00Z',
-    impact: 'CRITICAL',
-    likelihood: 'HIGH',
-    targetResolutionDate: '2026-03-01',
+    created_at: '2026-02-01T10:00:00Z',
+    updated_at: '2026-02-01T10:00:00Z',
+    created_by: 'admin',
+    updated_by: 'admin',
+    impact: 'high',
+    likelihood: 'likely',
+    target_resolution_date: '2026-03-01',
+    mitigation_plan: 'Apply security patches',
+    next_actions: ['Review code', 'Apply patch'],
+    linked_decisions: [],
+    linked_change_requests: [],
   };
 
   const mockAssumptionItem: RAIDItem = {
     id: 'raid-2',
-    type: 'ASSUMPTION',
-    status: 'VALIDATED',
-    priority: 'MEDIUM',
+    type: 'assumption',
+    status: 'open',
+    priority: 'medium',
     title: 'Resource Assumption',
     description: 'Assuming team availability',
     owner: 'jane@example.com',
-    createdAt: '2026-01-28T10:00:00Z',
-    updatedAt: '2026-01-28T10:00:00Z',
-    targetResolutionDate: '2026-02-15',
+    created_at: '2026-01-28T10:00:00Z',
+    updated_at: '2026-01-28T10:00:00Z',
+    created_by: 'admin',
+    updated_by: 'admin',
+    target_resolution_date: '2026-02-15',
+    impact: null,
+    likelihood: null,
+    mitigation_plan: '',
+    next_actions: [],
+    linked_decisions: [],
+    linked_change_requests: [],
   };
 
   const mockIssueItem: RAIDItem = {
     id: 'raid-3',
-    type: 'ISSUE',
-    status: 'RESOLVED',
-    priority: 'LOW',
+    type: 'issue',
+    status: 'closed',
+    priority: 'low',
     title: 'Minor Bug',
     description: 'Low priority issue',
     owner: 'john@example.com',
-    createdAt: '2026-01-25T10:00:00Z',
-    updatedAt: '2026-02-01T10:00:00Z',
+    created_at: '2026-01-25T10:00:00Z',
+    updated_at: '2026-02-01T10:00:00Z',
+    created_by: 'admin',
+    updated_by: 'admin',
+    target_resolution_date: null,
+    impact: null,
+    likelihood: null,
+    mitigation_plan: '',
+    next_actions: [],
+    linked_decisions: [],
+    linked_change_requests: [],
   };
 
   const renderWithProviders = (
@@ -134,14 +157,18 @@ describe('RAIDList', () => {
   // =========================================================================
 
   describe('Loading State', () => {
-    it('should display loading message while fetching items', () => {
+    it('should display loading skeleton while fetching items', () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockImplementation(
         () => new Promise(() => {}) // Never resolves
       );
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
 
-      expect(screen.getByText('Loading RAID items...')).toBeInTheDocument();
+      // Component shows skeleton loaders, not loading text
+      const skeletonRows = screen.getAllByRole('row').filter(
+        row => row.getAttribute('aria-busy') === 'true'
+      );
+      expect(skeletonRows.length).toBeGreaterThan(0);
     });
   });
 
@@ -153,7 +180,7 @@ describe('RAIDList', () => {
     it('should display empty state when no items exist', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [],
+        data: { items: [], total: 0 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -161,7 +188,10 @@ describe('RAIDList', () => {
       await waitFor(() => {
         expect(screen.getByTestId('empty-state')).toBeInTheDocument();
         expect(
-          screen.getByText(/No RAID items yet. Create your first/i)
+          screen.getByText(/No RAID items yet/i)
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText(/Track Risks, Assumptions, Issues, and Dependencies/i)
         ).toBeInTheDocument();
       });
     });
@@ -170,7 +200,7 @@ describe('RAIDList', () => {
       const user = userEvent.setup();
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -198,7 +228,7 @@ describe('RAIDList', () => {
     it('should render RAID items list', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem, mockAssumptionItem, mockIssueItem],
+        data: { items: [mockRiskItem, mockAssumptionItem, mockIssueItem], total: 3 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -213,7 +243,7 @@ describe('RAIDList', () => {
     it('should display item count', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem, mockAssumptionItem, mockIssueItem],
+        data: { items: [mockRiskItem, mockAssumptionItem, mockIssueItem], total: 3 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -226,7 +256,7 @@ describe('RAIDList', () => {
     it('should render type badge for each item', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -241,7 +271,7 @@ describe('RAIDList', () => {
     it('should render status badge for each item', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -256,7 +286,7 @@ describe('RAIDList', () => {
     it('should render priority badge for each item', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -271,7 +301,7 @@ describe('RAIDList', () => {
     it('should format item creation date', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -284,7 +314,7 @@ describe('RAIDList', () => {
     it('should display owner information', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -298,7 +328,7 @@ describe('RAIDList', () => {
     it('should display target resolution date when available', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -318,7 +348,7 @@ describe('RAIDList', () => {
     it('should render filters component', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -332,7 +362,7 @@ describe('RAIDList', () => {
       const user = userEvent.setup();
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem, mockAssumptionItem, mockIssueItem],
+        data: { items: [mockRiskItem, mockAssumptionItem, mockIssueItem], total: 3 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -359,7 +389,7 @@ describe('RAIDList', () => {
       const user = userEvent.setup();
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem, mockAssumptionItem, mockIssueItem],
+        data: { items: [mockRiskItem, mockAssumptionItem, mockIssueItem], total: 3 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -382,7 +412,7 @@ describe('RAIDList', () => {
       const user = userEvent.setup();
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem, mockAssumptionItem, mockIssueItem],
+        data: { items: [mockRiskItem, mockAssumptionItem, mockIssueItem], total: 3 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -405,7 +435,7 @@ describe('RAIDList', () => {
       const user = userEvent.setup();
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem, mockAssumptionItem, mockIssueItem],
+        data: { items: [mockRiskItem, mockAssumptionItem, mockIssueItem], total: 3 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -427,7 +457,7 @@ describe('RAIDList', () => {
     it('should extract unique owners from items', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem, mockAssumptionItem, mockIssueItem],
+        data: { items: [mockRiskItem, mockAssumptionItem, mockIssueItem], total: 3 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -449,7 +479,7 @@ describe('RAIDList', () => {
     it('should read filters from URL params on mount', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(
@@ -469,7 +499,7 @@ describe('RAIDList', () => {
       const user = userEvent.setup();
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       const { container } = renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -494,7 +524,7 @@ describe('RAIDList', () => {
     it('should handle multiple filter params from URL', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(
@@ -515,7 +545,7 @@ describe('RAIDList', () => {
     it('should handle date range filter params from URL', async () => {
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(
@@ -541,7 +571,7 @@ describe('RAIDList', () => {
       const user = userEvent.setup();
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -562,7 +592,7 @@ describe('RAIDList', () => {
       const user = userEvent.setup();
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -590,7 +620,7 @@ describe('RAIDList', () => {
       const user = userEvent.setup();
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);
@@ -625,12 +655,12 @@ describe('RAIDList', () => {
     it('should filter items by date range client-side', async () => {
       const itemInRange: RAIDItem = {
         ...mockRiskItem,
-        targetResolutionDate: '2026-02-15',
+        target_resolution_date: '2026-02-15',
       };
 
       const itemOutOfRange: RAIDItem = {
         ...mockAssumptionItem,
-        targetResolutionDate: '2026-04-15',
+        target_resolution_date: '2026-04-15',
       };
 
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
@@ -655,7 +685,7 @@ describe('RAIDList', () => {
     it('should handle items without target dates in filtering', async () => {
       const itemWithoutDate: RAIDItem = {
         ...mockIssueItem,
-        targetResolutionDate: undefined,
+        target_resolution_date: null,
       };
 
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
@@ -686,7 +716,7 @@ describe('RAIDList', () => {
       const user = userEvent.setup();
       (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
         success: true,
-        data: [mockRiskItem],
+        data: { items: [mockRiskItem], total: 1 },
       });
 
       renderWithProviders(<RAIDList projectKey="TEST-123" />);

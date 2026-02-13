@@ -34,35 +34,44 @@ vi.mock('../raid/RAIDBadge', () => ({
 describe('RAIDDetail', () => {
   const mockRiskItem: RAIDItem = {
     id: 'raid-1',
-    type: 'RISK',
-    status: 'OPEN',
-    priority: 'HIGH',
+    type: 'risk',
+    status: 'open',
+    priority: 'high',
     title: 'Security Risk',
     description: 'Potential security vulnerability',
     owner: 'john@example.com',
-    createdAt: '2026-02-01T10:00:00Z',
-    updatedAt: '2026-02-01T10:00:00Z',
-    impact: 'CRITICAL',
-    likelihood: 'HIGH',
-    targetResolutionDate: '2026-03-01',
-    nextActions: [
-      { action: 'Review code', owner: 'john', dueDate: '2026-02-10' },
-      { action: 'Apply patch', owner: 'jane', dueDate: '2026-02-15' },
-    ],
+    created_at: '2026-02-01T10:00:00Z',
+    updated_at: '2026-02-01T10:00:00Z',
+    created_by: 'admin',
+    updated_by: 'admin',
+    impact: 'high',
+    likelihood: 'likely',
+    target_resolution_date: '2026-03-01',
+    mitigation_plan: 'Apply security patches and review code',
+    next_actions: ['Review code', 'Apply patch'],
+    linked_decisions: [],
+    linked_change_requests: [],
   };
 
   const mockAssumptionItem: RAIDItem = {
     id: 'raid-2',
-    type: 'ASSUMPTION',
-    status: 'VALIDATED',
-    priority: 'MEDIUM',
+    type: 'assumption',
+    status: 'open',
+    priority: 'medium',
     title: 'Resource Assumption',
     description: 'Assuming team availability',
     owner: 'jane@example.com',
-    createdAt: '2026-01-28T10:00:00Z',
-    updatedAt: '2026-01-28T10:00:00Z',
-    targetResolutionDate: '2026-02-15',
-    nextActions: [],
+    created_at: '2026-01-28T10:00:00Z',
+    updated_at: '2026-01-28T10:00:00Z',
+    created_by: 'admin',
+    updated_by: 'admin',
+    target_resolution_date: '2026-02-15',
+    impact: null,
+    likelihood: null,
+    mitigation_plan: '',
+    next_actions: [],
+    linked_decisions: [],
+    linked_change_requests: [],
   };
 
   const renderWithProviders = (component: React.ReactElement) => {
@@ -96,7 +105,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -109,7 +118,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -122,7 +131,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -137,7 +146,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -152,7 +161,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -167,7 +176,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -180,7 +189,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -194,7 +203,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -208,7 +217,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -221,7 +230,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -234,7 +243,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -248,7 +257,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -262,7 +271,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockAssumptionItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -276,7 +285,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -291,7 +300,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockAssumptionItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -305,7 +314,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={false}
+
           onClose={vi.fn()}
         />
       );
@@ -324,7 +333,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -338,7 +347,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -358,7 +367,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -382,7 +391,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -402,7 +411,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockAssumptionItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -422,7 +431,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -454,7 +463,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -480,7 +489,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -506,7 +515,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -531,7 +540,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -556,7 +565,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -582,7 +591,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -608,7 +617,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -633,7 +642,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -664,7 +673,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -684,7 +693,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockAssumptionItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -710,7 +719,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -736,7 +745,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -770,7 +779,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -794,7 +803,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -836,7 +845,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -873,7 +882,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -906,7 +915,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -941,7 +950,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -977,7 +986,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -1016,7 +1025,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -1054,7 +1063,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -1073,7 +1082,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -1105,7 +1114,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={vi.fn()}
         />
       );
@@ -1139,7 +1148,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={onClose}
         />
       );
@@ -1157,7 +1166,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={onClose}
         />
       );
@@ -1175,7 +1184,7 @@ describe('RAIDDetail', () => {
         <RAIDDetail
           projectKey="TEST-123"
           item={mockRiskItem}
-          isOpen={true}
+
           onClose={onClose}
         />
       );
