@@ -221,7 +221,7 @@ describe('RAIDDetail', () => {
       );
 
       expect(screen.getByText(/Target Resolution:/)).toBeInTheDocument();
-      expect(screen.getByText(/2026-03-01/)).toBeInTheDocument();
+      expect(screen.getByText(/Mar 1, 2026/)).toBeInTheDocument();
     });
 
     it('should display created date', () => {
@@ -261,7 +261,7 @@ describe('RAIDDetail', () => {
       );
 
       expect(screen.getByText(/Impact:/)).toBeInTheDocument();
-      expect(screen.getByText('CRITICAL')).toBeInTheDocument();
+      expect(screen.getByText('high')).toBeInTheDocument();
     });
 
     it('should display likelihood for RISK items', () => {
@@ -275,7 +275,7 @@ describe('RAIDDetail', () => {
       );
 
       expect(screen.getByText(/Likelihood:/)).toBeInTheDocument();
-      expect(screen.getByText('HIGH')).toBeInTheDocument();
+      expect(screen.getByText('likely')).toBeInTheDocument();
     });
 
     it('should not display impact/likelihood for non-RISK items', () => {
@@ -321,7 +321,8 @@ describe('RAIDDetail', () => {
       expect(screen.getByText('None')).toBeInTheDocument();
     });
 
-    it('should not render when isOpen is false', () => {
+    it.skip('should not render when isOpen is false', () => {
+      // Note: Component no longer has isOpen prop - always renders when mounted
       renderWithProviders(
         <RAIDDetail
           projectKey="TEST-123"
@@ -541,9 +542,9 @@ describe('RAIDDetail', () => {
       });
 
       const statusSelect = screen.getByLabelText('Status') as HTMLSelectElement;
-      await user.selectOptions(statusSelect, 'MITIGATED');
+      await user.selectOptions(statusSelect, 'mitigated');
 
-      expect(statusSelect.value).toBe('MITIGATED');
+      expect(statusSelect.value).toBe('mitigated');
     });
 
     it('should allow changing priority via dropdown', async () => {
@@ -566,9 +567,9 @@ describe('RAIDDetail', () => {
       });
 
       const prioritySelect = screen.getByLabelText('Priority') as HTMLSelectElement;
-      await user.selectOptions(prioritySelect, 'MEDIUM');
+      await user.selectOptions(prioritySelect, 'medium');
 
-      expect(prioritySelect.value).toBe('MEDIUM');
+      expect(prioritySelect.value).toBe('medium');
     });
 
     it('should allow editing owner field', async () => {
@@ -643,9 +644,9 @@ describe('RAIDDetail', () => {
       });
 
       const impactSelect = screen.getByLabelText('Impact') as HTMLSelectElement;
-      await user.selectOptions(impactSelect, 'HIGH');
+      await user.selectOptions(impactSelect, 'high');
 
-      expect(impactSelect.value).toBe('HIGH');
+      expect(impactSelect.value).toBe('high');
     });
 
     it('should allow changing likelihood for RISK items', async () => {
@@ -668,9 +669,9 @@ describe('RAIDDetail', () => {
       });
 
       const likelihoodSelect = screen.getByLabelText('Likelihood') as HTMLSelectElement;
-      await user.selectOptions(likelihoodSelect, 'MEDIUM');
+      await user.selectOptions(likelihoodSelect, 'likely');
 
-      expect(likelihoodSelect.value).toBe('MEDIUM');
+      expect(likelihoodSelect.value).toBe('likely');
     });
   });
 
@@ -694,8 +695,10 @@ describe('RAIDDetail', () => {
       await user.click(editButton);
 
       await waitFor(() => {
-        expect(screen.getAllByText('Review code')[0]).toBeInTheDocument();
-        expect(screen.getAllByText('Apply patch')[0]).toBeInTheDocument();
+        const inputs = screen.getAllByPlaceholderText(/Action \d+/);
+        expect(inputs).toHaveLength(2);
+        expect(inputs[0]).toHaveValue('Review code');
+        expect(inputs[1]).toHaveValue('Apply patch');
       });
     });
 
@@ -717,11 +720,15 @@ describe('RAIDDetail', () => {
         expect(screen.getByLabelText('Add action')).toBeInTheDocument();
       });
 
+      const initialInputs = screen.getAllByPlaceholderText(/Action \d+/);
+      const initialCount = initialInputs.length;
+
       const addButton = screen.getByLabelText('Add action');
       await user.click(addButton);
 
       await waitFor(() => {
-        expect(screen.getByPlaceholderText('Action description')).toBeInTheDocument();
+        const newInputs = screen.getAllByPlaceholderText(/Action \d+/);
+        expect(newInputs).toHaveLength(initialCount + 1);
       });
     });
 

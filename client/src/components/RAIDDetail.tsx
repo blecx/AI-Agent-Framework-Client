@@ -335,6 +335,7 @@ export function RAIDDetail({ item, projectKey, onClose }: RAIDDetailProps) {
                   type="button"
                   onClick={addNextAction}
                   className="add-action-btn"
+                  aria-label="Add action"
                 >
                   + Add Action
                 </button>
@@ -349,33 +350,33 @@ export function RAIDDetail({ item, projectKey, onClose }: RAIDDetailProps) {
 
               <div className="detail-grid">
                 <div className="detail-field">
-                  <span className="detail-label">Status</span>
+                  <span className="detail-label">Status:</span>
                   <StatusBadge value={item.status} />
                 </div>
 
                 <div className="detail-field">
-                  <span className="detail-label">Priority</span>
+                  <span className="detail-label">Priority:</span>
                   <PriorityBadge value={item.priority} />
                 </div>
 
                 <div className="detail-field">
-                  <span className="detail-label">Owner</span>
+                  <span className="detail-label">Owner:</span>
                   <span>{item.owner}</span>
                 </div>
 
                 <div className="detail-field">
-                  <span className="detail-label">Created</span>
+                  <span className="detail-label">Created:</span>
                   <span>{formatDate(item.created_at)}</span>
                 </div>
 
                 <div className="detail-field">
-                  <span className="detail-label">Updated</span>
+                  <span className="detail-label">Updated:</span>
                   <span>{formatDate(item.updated_at)}</span>
                 </div>
 
                 {item.target_resolution_date && (
                   <div className="detail-field">
-                    <span className="detail-label">Target Date</span>
+                    <span className="detail-label">Target Resolution:</span>
                     <span>{formatDate(item.target_resolution_date)}</span>
                   </div>
                 )}
@@ -384,13 +385,13 @@ export function RAIDDetail({ item, projectKey, onClose }: RAIDDetailProps) {
                   <>
                     {item.impact && (
                       <div className="detail-field">
-                        <span className="detail-label">Impact</span>
+                        <span className="detail-label">Impact:</span>
                         <span>{item.impact.replace('_', ' ')}</span>
                       </div>
                     )}
                     {item.likelihood && (
                       <div className="detail-field">
-                        <span className="detail-label">Likelihood</span>
+                        <span className="detail-label">Likelihood:</span>
                         <span>{item.likelihood.replace('_', ' ')}</span>
                       </div>
                     )}
@@ -405,14 +406,19 @@ export function RAIDDetail({ item, projectKey, onClose }: RAIDDetailProps) {
                 </div>
               )}
 
-              {item.next_actions && item.next_actions.length > 0 && (
+              {item.next_actions && item.next_actions.length > 0 ? (
                 <div className="detail-section">
-                  <h4>Next Actions</h4>
+                  <h4>Next Actions:</h4>
                   <ul className="next-actions-list">
                     {item.next_actions.map((action, index) => (
                       <li key={index}>{action}</li>
                     ))}
                   </ul>
+                </div>
+              ) : (
+                <div className="detail-section">
+                  <h4>Next Actions:</h4>
+                  <p>None</p>
                 </div>
               )}
 
@@ -431,6 +437,7 @@ export function RAIDDetail({ item, projectKey, onClose }: RAIDDetailProps) {
                 onClick={handleCancel}
                 className="btn btn-secondary"
                 disabled={updateMutation.isPending}
+                aria-label="Cancel changes"
               >
                 Cancel
               </button>
@@ -438,6 +445,7 @@ export function RAIDDetail({ item, projectKey, onClose }: RAIDDetailProps) {
                 onClick={handleSave}
                 className="btn btn-primary"
                 disabled={updateMutation.isPending}
+                aria-label="Save changes"
               >
                 {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
               </button>
@@ -450,6 +458,7 @@ export function RAIDDetail({ item, projectKey, onClose }: RAIDDetailProps) {
               <button
                 onClick={() => setIsEditing(true)}
                 className="btn btn-primary"
+                aria-label="Edit item"
               >
                 Edit
               </button>
