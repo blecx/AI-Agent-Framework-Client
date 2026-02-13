@@ -18,7 +18,7 @@ vi.mock('../../services/apiClient', () => ({
   },
 }));
 
-vi.mock('../EmptyState', () => ({
+vi.mock('../ui/EmptyState', () => ({
   default: ({ title, description }: any) => (
     <div data-testid="empty-state">
       <h3>{title}</h3>
@@ -27,8 +27,8 @@ vi.mock('../EmptyState', () => ({
   ),
 }));
 
-vi.mock('../Button', () => ({
-  default: ({ onClick, children, variant, icon }: any) => (
+vi.mock('../ui/Button', () => ({
+  Button: ({ onClick, children, variant, icon }: any) => (
     <button onClick={onClick} data-variant={variant} data-icon={icon}>
       {children}
     </button>
@@ -53,19 +53,19 @@ vi.mock('../raid/RAIDBadge', () => ({
   ),
 }));
 
-vi.mock('./RAIDFilters', () => ({
-  default: ({ filters, onFilterChange }: any) => (
+vi.mock('../raid/RAIDFilters', () => ({
+  RAIDFilters: ({ onFiltersChange }: any) => (
     <div data-testid="raid-filters">
-      <button onClick={() => onFilterChange({ type: 'RISK' })}>Filter RISK</button>
-      <button onClick={() => onFilterChange({ status: 'OPEN' })}>Filter OPEN</button>
-      <button onClick={() => onFilterChange({ priority: 'HIGH' })}>Filter HIGH</button>
-      <button onClick={() => onFilterChange({ owner: 'john' })}>Filter Owner</button>
+      <button onClick={() => onFiltersChange({ type: 'risk' })}>Filter RISK</button>
+      <button onClick={() => onFiltersChange({ status: 'open' })}>Filter OPEN</button>
+      <button onClick={() => onFiltersChange({ priority: 'high' })}>Filter HIGH</button>
+      <button onClick={() => onFiltersChange({ owner: 'john' })}>Filter Owner</button>
     </div>
   ),
 }));
 
-vi.mock('./RAIDCreateModal', () => ({
-  default: ({ isOpen, onClose, onCreate, type }: any) =>
+vi.mock('../raid/RAIDCreateModal', () => ({
+  RAIDCreateModal: ({ isOpen, onClose, onCreate, type }: any) =>
     isOpen ? (
       <div data-testid="create-modal">
         <h3>Create {type} Item</h3>

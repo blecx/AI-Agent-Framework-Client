@@ -225,7 +225,12 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
 
   const items = filteredItems;
 
-  if (items.length === 0 && Object.keys(selectedFilters).length === 0) {
+  // Check if any filters are actually set
+  const hasActiveFilters = Object.values(selectedFilters).some(
+    (value) => value !== undefined && value !== null && value !== '',
+  );
+
+  if (items.length === 0 && !hasActiveFilters) {
     return (
       <div className="raid-list-container">
         <header className="raid-list-header">
