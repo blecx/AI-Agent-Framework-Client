@@ -720,7 +720,7 @@ describe('RAIDDetail', () => {
         expect(screen.getByLabelText('Add action')).toBeInTheDocument();
       });
 
-      const initialInputs = screen.getAllByPlaceholderText(/Action \d+/);
+      const initialInputs = screen.queryAllByPlaceholderText(/Action \d+/);
       const initialCount = initialInputs.length;
 
       const addButton = screen.getByLabelText('Add action');

@@ -437,7 +437,7 @@ export function RAIDDetail({ item, projectKey, onClose }: RAIDDetailProps) {
                 onClick={handleCancel}
                 className="btn btn-secondary"
                 disabled={updateMutation.isPending}
-                aria-label="Cancel changes"
+                aria-label="Cancel editing"
               >
                 Cancel
               </button>
