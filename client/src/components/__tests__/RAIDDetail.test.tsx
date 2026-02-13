@@ -747,11 +747,11 @@ describe('RAIDDetail', () => {
       await user.click(editButton);
 
       await waitFor(() => {
-        const actionInputs = screen.getAllByPlaceholderText('Action description');
+        const actionInputs = screen.getAllByPlaceholderText(/Action \d+/);
         expect(actionInputs.length).toBe(2);
       });
 
-      const actionInput = screen.getAllByPlaceholderText('Action description')[0];
+      const actionInput = screen.getAllByPlaceholderText(/Action \d+/)[0];
       await user.clear(actionInput);
       await user.type(actionInput, 'Updated action');
 
@@ -839,6 +839,14 @@ describe('RAIDDetail', () => {
       await user.clear(titleInput);
       await user.type(titleInput, 'Updated Title');
 
+      // Wait for React state to update
+      await waitFor(() => {
+        expect(titleInput.value).toBe('Updated Title');
+      });
+
+      // Give React one more tick  to ensure formData state has updated
+      await new Promise(resolve => setTimeout(resolve, 0));
+
       const saveButton = screen.getByLabelText('Save changes');
       await user.click(saveButton);
 
@@ -880,6 +888,11 @@ describe('RAIDDetail', () => {
       const titleInput = screen.getByLabelText('Title') as HTMLInputElement;
       await user.clear(titleInput);
       await user.type(titleInput, 'Updated Title');
+
+      // Wait for the value to be actually set
+      await waitFor(() => {
+        expect(titleInput.value).toBe('Updated Title');
+      });
 
       const saveButton = screen.getByLabelText('Save changes');
       await user.click(saveButton);
@@ -951,6 +964,11 @@ describe('RAIDDetail', () => {
       await user.clear(titleInput);
       await user.type(titleInput, 'Updated Title');
 
+      // Wait for the value to be actually set
+      await waitFor(() => {
+        expect(titleInput.value).toBe('Updated Title');
+      });
+
       const saveButton = screen.getByLabelText('Save changes');
       await user.click(saveButton);
 
@@ -985,6 +1003,11 @@ describe('RAIDDetail', () => {
       const titleInput = screen.getByLabelText('Title') as HTMLInputElement;
       await user.clear(titleInput);
       await user.type(titleInput, 'Updated Title');
+
+      // Wait for the value to be actually set
+      await waitFor(() => {
+        expect(titleInput.value).toBe('Updated Title');
+      });
 
       const saveButton = screen.getByLabelText('Save changes');
       await user.click(saveButton);
@@ -1021,6 +1044,11 @@ describe('RAIDDetail', () => {
       const titleInput = screen.getByLabelText('Title') as HTMLInputElement;
       await user.clear(titleInput);
       await user.type(titleInput, 'Updated Title');
+
+      // Wait for the value to be actually set
+      await waitFor(() => {
+        expect(titleInput.value).toBe('Updated Title');
+      });
 
       const saveButton = screen.getByLabelText('Save changes');
       await user.click(saveButton);
@@ -1060,6 +1088,11 @@ describe('RAIDDetail', () => {
       const titleInput = screen.getByLabelText('Title') as HTMLInputElement;
       await user.clear(titleInput);
       await user.type(titleInput, 'Updated Title');
+
+      // Wait for the value to be actually set
+      await waitFor(() => {
+        expect(titleInput.value).toBe('Updated Title');
+      });
 
       const saveButton = screen.getByLabelText('Save changes');
       await user.click(saveButton);
