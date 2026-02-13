@@ -88,7 +88,15 @@ export function RAIDDetail({ item, projectKey, onClose }: RAIDDetailProps) {
       return;
     }
 
-    updateMutation.mutate(updates);
+    // Filter out undefined values before sending
+    const filteredUpdates: RAIDItemUpdate = {};
+    for (const [key, value] of Object.entries(updates)) {
+      if (value !== undefined) {
+        filteredUpdates[key as keyof RAIDItemUpdate] = value;
+      }
+    }
+
+    updateMutation.mutate(filteredUpdates);
   };
 
   const handleCancel = () => {

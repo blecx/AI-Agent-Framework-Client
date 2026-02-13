@@ -12,11 +12,17 @@ import apiClient from '../../services/apiClient';
 import type { RAIDItem, RAIDItemUpdate } from '../../types';
 
 // Mock dependencies
-vi.mock('../../services/apiClient', () => ({
-  default: {
-    updateRAIDItem: vi.fn(),
-  },
-}));
+vi.mock('../../services/apiClient', () => {
+  const mockFn = vi.fn();
+  return {
+    default: {
+      updateRAIDItem: mockFn,
+    },
+    apiClient: {
+      updateRAIDItem: mockFn,
+    },
+  };
+});
 
 let mockShowToast: ReturnType<typeof vi.fn>;
 vi.mock('../../utils/toast', () => ({
@@ -897,15 +903,19 @@ describe('RAIDDetail', () => {
       const saveButton = screen.getByLabelText('Save changes');
       await user.click(saveButton);
 
+      // Wait for the call to be made
       await waitFor(() => {
-        const updateCall = (apiClient.updateRAIDItem as ReturnType<typeof vi.fn>).mock.calls[0];
-        const updateData = updateCall[2] as RAIDItemUpdate;
-
-        // Should only include changed field
-        expect(updateData).toHaveProperty('title');
-        // Should not include unchanged fields like description
-        expect(updateData).not.toHaveProperty('description');
+        expect(apiClient.updateRAIDItem).toHaveBeenCalled();
       });
+
+      // Now check the call details
+      const updateCall = (apiClient.updateRAIDItem as ReturnType<typeof vi.fn>).mock.calls[0];
+      const updateData = updateCall[2] as RAIDItemUpdate;
+
+      // Should only include changed field
+      expect(updateData).toHaveProperty('title');
+      // Should not include unchanged fields like description  
+      expect(updateData).not.toHaveProperty('description');
     });
 
     it('should show info toast when no changes made', async () => {
