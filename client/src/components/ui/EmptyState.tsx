@@ -20,7 +20,7 @@ export default function EmptyState({
   children,
 }: EmptyStateProps) {
   return (
-    <div className="empty-state" role="status" aria-live="polite">
+    <div className="empty-state" data-testid="empty-state" role="status" aria-live="polite">
       <div className="empty-state-icon">{icon}</div>
       <h3 className="empty-state-title">{title}</h3>
       {description && <p className="empty-state-description">{description}</p>}

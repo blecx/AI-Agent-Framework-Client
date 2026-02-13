@@ -124,8 +124,8 @@ export function RAIDDetail({ item, projectKey, onClose }: RAIDDetailProps) {
   };
 
   return (
-    <div className="raid-detail-overlay" onClick={onClose}>
-      <div className="raid-detail-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="raid-detail-overlay" data-testid="modal-overlay" onClick={onClose}>
+      <div className="raid-detail-modal" data-testid="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="raid-detail-header">
           <div className="raid-detail-title-row">
             <TypeBadge value={item.type} />

@@ -26,9 +26,21 @@ vi.mock('../../utils/toast', () => ({
 }));
 
 vi.mock('../raid/RAIDBadge', () => ({
-  TypeBadge: ({ type }: any) => <span data-testid="type-badge">{type}</span>,
-  StatusBadge: ({ status }: any) => <span data-testid="status-badge">{status}</span>,
-  PriorityBadge: ({ priority }: any) => <span data-testid="priority-badge">{priority}</span>,
+  TypeBadge: ({ value }: any) => (
+    <span data-testid="type-badge">
+      {value.charAt(0).toUpperCase() + value.slice(1)}
+    </span>
+  ),
+  StatusBadge: ({ value }: any) => (
+    <span data-testid="status-badge">
+      {value.split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+    </span>
+  ),
+  PriorityBadge: ({ value }: any) => (
+    <span data-testid="priority-badge">
+      {value.toUpperCase()}
+    </span>
+  ),
 }));
 
 describe('RAIDDetail', () => {
@@ -138,7 +150,7 @@ describe('RAIDDetail', () => {
 
       const typeBadges = screen.getAllByTestId('type-badge');
       expect(typeBadges.length).toBeGreaterThan(0);
-      expect(screen.getByText('RISK')).toBeInTheDocument();
+      expect(screen.getByText('Risk')).toBeInTheDocument();
     });
 
     it('should render status badge', () => {
@@ -153,7 +165,7 @@ describe('RAIDDetail', () => {
 
       const statusBadges = screen.getAllByTestId('status-badge');
       expect(statusBadges.length).toBeGreaterThan(0);
-      expect(screen.getByText('OPEN')).toBeInTheDocument();
+      expect(screen.getByText('Open')).toBeInTheDocument();
     });
 
     it('should render priority badge', () => {
