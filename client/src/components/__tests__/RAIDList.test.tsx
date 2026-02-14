@@ -19,7 +19,7 @@ vi.mock('../../services/apiClient', () => ({
 }));
 
 vi.mock('../ui/EmptyState', () => ({
-  default: ({ title, description }: any) => (
+  default: ({ title, description }: { title: string; description: string }) => (
     <div data-testid="empty-state">
       <h3>{title}</h3>
       <p>{description}</p>
@@ -28,7 +28,7 @@ vi.mock('../ui/EmptyState', () => ({
 }));
 
 vi.mock('../ui/Button', () => ({
-  Button: ({ onClick, children, variant, icon }: any) => (
+  Button: ({ onClick, children, variant, icon }: { onClick?: () => void; children: React.ReactNode; variant?: string; icon?: string }) => (
     <button onClick={onClick} data-variant={variant} data-icon={icon}>
       {children}
     </button>
@@ -36,17 +36,17 @@ vi.mock('../ui/Button', () => ({
 }));
 
 vi.mock('../raid/RAIDBadge', () => ({
-  TypeBadge: ({ value }: any) => (
+  TypeBadge: ({ value }: { value: string }) => (
     <span data-testid="type-badge">
       {value.charAt(0).toUpperCase() + value.slice(1)}
     </span>
   ),
-  StatusBadge: ({ value }: any) => (
+  StatusBadge: ({ value }: { value: string }) => (
     <span data-testid="status-badge">
       {value.split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
     </span>
   ),
-  PriorityBadge: ({ value }: any) => (
+  PriorityBadge: ({ value }: { value: string }) => (
     <span data-testid="priority-badge">
       {value.toUpperCase()}
     </span>
@@ -54,7 +54,7 @@ vi.mock('../raid/RAIDBadge', () => ({
 }));
 
 vi.mock('../raid/RAIDFilters', () => ({
-  RAIDFilters: ({ onFiltersChange }: any) => (
+  RAIDFilters: ({ onFiltersChange }: { onFiltersChange: (filters: Record<string, string>) => void }) => (
     <div data-testid="raid-filters">
       <button onClick={() => onFiltersChange({ type: 'risk' })}>Filter RISK</button>
       <button onClick={() => onFiltersChange({ status: 'open' })}>Filter OPEN</button>
@@ -65,7 +65,7 @@ vi.mock('../raid/RAIDFilters', () => ({
 }));
 
 vi.mock('../raid/RAIDCreateModal', () => ({
-  RAIDCreateModal: ({ projectKey, onClose }: any) => (
+  RAIDCreateModal: ({ projectKey, onClose }: { projectKey: string; onClose: () => void }) => (
     <div data-testid="create-modal">
       <h3>Create RAID Item for {projectKey}</h3>
       <button onClick={onClose}>Close</button>
