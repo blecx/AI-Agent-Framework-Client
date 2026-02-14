@@ -1,0 +1,113 @@
+.guided-builder-page {
+  max-width: 980px;
+  margin: 1.2rem auto;
+  padding: 0 1rem 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.guided-builder-header,
+.guided-builder-footer,
+.guided-builder-content {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.guided-builder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.guided-builder-exit {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 999px;
+  width: 2rem;
+  height: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.guided-builder-content {
+  padding: 1rem;
+}
+
+.guided-builder-footer {
+  padding: 0.75rem 1rem;
+}
+
+.guided-step h2 {
+  margin: 0;
+}
+
+.guided-step p {
+  color: #4b5563;
+}
+
+.guided-feature-list {
+  margin: 0 0 1rem;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.guided-form-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.guided-form-grid label {
+  display: grid;
+  gap: 0.3rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.guided-form-grid input,
+.guided-form-grid textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  font: inherit;
+}
+
+.guided-form-full {
+  grid-column: 1 / -1;
+}
+
+.guided-checkbox-grid {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.guided-checkbox-grid label {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.guided-review-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin: 0 0 1rem;
+}
+
+.guided-review-card p {
+  margin: 0.2rem 0;
+}
+
+@media (max-width: 768px) {
+  .guided-builder-header {
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .guided-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

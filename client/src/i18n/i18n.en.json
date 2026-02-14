@@ -186,7 +186,57 @@
     }
   },
   "gb": {
-    "title": "Guided Builder"
+    "title": "Guided Builder",
+    "exit": "Exit guided builder",
+    "progress": "Step {{current}} of {{total}}",
+    "step": {
+      "welcome": "Welcome",
+      "projectSetup": "Project Setup",
+      "artifacts": "Artifacts",
+      "review": "Review"
+    },
+    "nav": {
+      "next": "Next",
+      "back": "Back",
+      "skip": "Skip"
+    },
+    "welcome": {
+      "title": "Welcome to Guided Builder",
+      "description": "Create a project step-by-step with AI assistance and best-practice defaults.",
+      "feature1": "Set up project essentials quickly",
+      "feature2": "Select artifacts to generate",
+      "feature3": "Review before finalizing",
+      "cta": "Get Started"
+    },
+    "projectSetup": {
+      "description": "Define your project basics before artifact generation.",
+      "fields": {
+        "name": "Project name",
+        "key": "Project key",
+        "description": "Description",
+        "standard": "Standard"
+      },
+      "placeholders": {
+        "name": "e.g. Apollo Modernization",
+        "key": "e.g. APOLLO-01",
+        "description": "Describe project goals and context"
+      }
+    },
+    "artifacts": {
+      "description": "Choose which artifacts to initialize.",
+      "options": {
+        "charter": "Project Charter",
+        "wbs": "Work Breakdown Structure",
+        "raid": "RAID Register",
+        "schedule": "Milestone Schedule"
+      }
+    },
+    "review": {
+      "description": "Review your setup and continue to project workspace.",
+      "artifacts": "Selected artifacts",
+      "none": "None selected",
+      "openProject": "Open Project"
+    }
   },
   "ac": {
     "title": "Assisted Creation",

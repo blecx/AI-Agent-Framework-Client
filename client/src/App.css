@@ -66,6 +66,22 @@
   background: #f0f0ff;
 }
 
+.nav-links .nav-link-cta {
+  background: #4f46e5;
+  color: #fff;
+  font-weight: 700;
+}
+
+.nav-links .nav-link-cta:hover {
+  background: #4338ca;
+  color: #fff;
+}
+
+.nav-links .nav-link-cta.active {
+  background: #3730a3;
+  color: #fff;
+}
+
 .nav-status {
   display: flex;
   align-items: center;

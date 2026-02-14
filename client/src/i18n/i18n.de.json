@@ -186,7 +186,57 @@
     }
   },
   "gb": {
-    "title": "Guided Builder"
+    "title": "Guided Builder",
+    "exit": "Guided Builder verlassen",
+    "progress": "Schritt {{current}} von {{total}}",
+    "step": {
+      "welcome": "Willkommen",
+      "projectSetup": "Projekt-Setup",
+      "artifacts": "Artefakte",
+      "review": "Überprüfung"
+    },
+    "nav": {
+      "next": "Weiter",
+      "back": "Zurück",
+      "skip": "Überspringen"
+    },
+    "welcome": {
+      "title": "Willkommen im Guided Builder",
+      "description": "Erstellen Sie ein Projekt Schritt für Schritt mit KI-Unterstützung und bewährten Standardwerten.",
+      "feature1": "Projektgrundlagen schnell einrichten",
+      "feature2": "Zu generierende Artefakte auswählen",
+      "feature3": "Vor dem Abschluss alles überprüfen",
+      "cta": "Jetzt starten"
+    },
+    "projectSetup": {
+      "description": "Definieren Sie die wichtigsten Projektdaten vor der Artefakterstellung.",
+      "fields": {
+        "name": "Projektname",
+        "key": "Projektschlüssel",
+        "description": "Beschreibung",
+        "standard": "Standard"
+      },
+      "placeholders": {
+        "name": "z. B. Apollo-Modernisierung",
+        "key": "z. B. APOLLO-01",
+        "description": "Projektziele und Kontext beschreiben"
+      }
+    },
+    "artifacts": {
+      "description": "Wählen Sie aus, welche Artefakte initial erstellt werden sollen.",
+      "options": {
+        "charter": "Projektauftrag",
+        "wbs": "Projektstrukturplan",
+        "raid": "RAID-Register",
+        "schedule": "Meilensteinplan"
+      }
+    },
+    "review": {
+      "description": "Überprüfen Sie Ihr Setup und wechseln Sie in den Projekt-Workspace.",
+      "artifacts": "Ausgewählte Artefakte",
+      "none": "Keine ausgewählt",
+      "openProject": "Projekt öffnen"
+    }
   },
   "ac": {
     "title": "Assisted Creation",
