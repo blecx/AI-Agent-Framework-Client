@@ -36,8 +36,8 @@ describe('Artifact Navigation Integration', () => {
       <QueryClientProvider client={queryClient}>
         <MemoryRouter initialEntries={['/projects/TEST']}>
           <Routes>
-            <Route path="/projects/:key" element={<ProjectView />} />
-            <Route path="/projects/:key/artifacts" element={<ProjectView />} />
+            <Route path="/projects/:projectKey" element={<ProjectView />} />
+            <Route path="/projects/:projectKey/artifacts" element={<ProjectView />} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
