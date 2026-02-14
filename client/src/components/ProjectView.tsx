@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import apiClient from '../services/apiClient';
 import ProposePanel from './ProposePanel';
 import ApplyPanel from './ApplyPanel';
@@ -15,6 +16,7 @@ import './ProjectView.css';
 type TabType = 'overview' | 'propose' | 'apply' | 'commands' | 'artifacts' | 'audit';
 
 export default function ProjectView() {
+  const { t } = useTranslation();
   const { key } = useParams<{ key: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -151,7 +153,7 @@ export default function ProjectView() {
           className={`tab ${activeTab === 'artifacts' ? 'active' : ''}`}
           onClick={() => setActiveTab('artifacts')}
         >
-          Artifacts
+          {t('art.list.title')}
         </button>
         <button
           className={`tab ${activeTab === 'audit' ? 'active' : ''}`}

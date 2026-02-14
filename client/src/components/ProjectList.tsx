@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import apiClient from '../services/apiClient';
 import type { Project } from '../types';
 import { useToast } from '../hooks/useToast';
@@ -10,6 +11,7 @@ import { Button } from './ui/Button';
 import './ProjectList.css';
 
 export default function ProjectList() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const toast = useToast();
@@ -85,7 +87,7 @@ export default function ProjectList() {
     return (
       <div className="project-list-container">
         <header className="project-list-header">
-          <h1>Projects</h1>
+          <h1>{t('projects.list.title')}</h1>
         </header>
         <div className="projects-grid">
           <SkeletonProjectCard />
@@ -111,13 +113,13 @@ export default function ProjectList() {
   return (
     <div className="project-list-container">
       <header className="project-list-header">
-        <h1>Projects</h1>
+        <h1>{t('projects.list.title')}</h1>
         <Button
           variant="primary"
           data-testid="create-project-button"
           onClick={() => setShowCreateForm(!showCreateForm)}
         >
-          {showCreateForm ? 'Cancel' : '+ Create Project'}
+          {showCreateForm ? t('projects.create.cta.cancel') : `+ ${t('projects.list.cta.new')}`}
         </Button>
       </header>
 
@@ -125,7 +127,7 @@ export default function ProjectList() {
 
       {showCreateForm && (
         <div className="create-project-form" data-testid="create-project-form">
-          <h2>Create New Project</h2>
+          <h2>{t('projects.create.title')}</h2>
           <form onSubmit={handleCreateProject}>
             <div className="form-group">
               <label htmlFor="projectKey">Project Key *</label>
@@ -173,7 +175,7 @@ export default function ProjectList() {
                 isLoading={createProjectMutation.isPending}
                 disabled={createProjectMutation.isPending}
               >
-                Create Project
+                {t('projects.create.cta.create')}
               </Button>
               <Button
                 type="button"
@@ -183,7 +185,7 @@ export default function ProjectList() {
                   setError(null);
                 }}
               >
-                Cancel
+                {t('projects.create.cta.cancel')}
               </Button>
             </div>
           </form>
@@ -193,10 +195,10 @@ export default function ProjectList() {
       {projects.length === 0 ? (
         <EmptyState
           icon="📁"
-          title="No projects yet"
-          description="Create your first project to start managing your work with AI-powered assistance."
+          title={t('projects.list.empty.title')}
+          description={t('projects.list.empty.text')}
           action={{
-            label: '+ Create Project',
+            label: `+ ${t('projects.list.cta.new')}`,
             onClick: () => setShowCreateForm(true),
           }}
         />
