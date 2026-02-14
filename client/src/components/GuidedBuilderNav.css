@@ -1,0 +1,23 @@
+.guided-builder-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.guided-builder-nav-right {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .guided-builder-nav {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .guided-builder-nav-right {
+    display: grid;
+    gap: 0.5rem;
+  }
+}

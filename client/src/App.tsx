@@ -7,6 +7,7 @@ import {
   useParams,
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import ProjectList from './components/ProjectList';
 import ProjectView from './components/ProjectView';
 import ProposePanel from './components/ProposePanel';
@@ -14,6 +15,7 @@ import ApplyPanel from './components/ApplyPanel';
 import CommandPanel from './components/CommandPanel';
 import ApiTester from './components/ApiTester';
 import UiLibraryDemo from './components/UiLibraryDemo';
+import GuidedBuilder from './components/GuidedBuilder';
 import { ToastProvider } from './components/ToastContext';
 import ToastContainer from './components/ToastContainer';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -49,6 +51,7 @@ interface NavigationProps {
 }
 
 function Navigation({ connectionState }: NavigationProps) {
+  const { t } = useTranslation();
   const location = useLocation();
 
   return (
@@ -57,6 +60,12 @@ function Navigation({ connectionState }: NavigationProps) {
         <h1>AI Agent Framework</h1>
       </div>
       <div className="nav-links">
+        <Link
+          to="/guided-builder"
+          className={location.pathname.startsWith('/guided-builder') ? 'active nav-link-cta' : 'nav-link-cta'}
+        >
+          → {t('nav.guidedBuilder')}
+        </Link>
         <Link
           to="/projects"
           className={location.pathname.startsWith('/projects') ? 'active' : ''}
@@ -163,6 +172,22 @@ function App() {
                             element={
                               <ErrorBoundary name="SyncPanel">
                                 <SyncPanel />
+                              </ErrorBoundary>
+                            }
+                          />
+                          <Route
+                            path="/guided-builder"
+                            element={
+                              <ErrorBoundary name="GuidedBuilder">
+                                <GuidedBuilder />
+                              </ErrorBoundary>
+                            }
+                          />
+                          <Route
+                            path="/guided-builder/:step"
+                            element={
+                              <ErrorBoundary name="GuidedBuilder">
+                                <GuidedBuilder />
                               </ErrorBoundary>
                             }
                           />

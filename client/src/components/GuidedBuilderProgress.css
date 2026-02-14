@@ -1,0 +1,23 @@
+.guided-builder-progress {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.guided-builder-progress p {
+  margin: 0;
+  color: #374151;
+  font-weight: 600;
+}
+
+.guided-builder-progress-bar {
+  width: min(360px, 100%);
+  height: 8px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.guided-builder-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+}
