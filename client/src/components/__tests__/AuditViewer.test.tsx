@@ -10,9 +10,6 @@ import {
   type AuditResult,
 } from '../../services/AuditApiClient';
 
-// Mock the API client
-vi.mock('../../services/AuditApiClient');
-
 const mockAuditResult: AuditResult = {
   projectKey: 'TEST-001',
   timestamp: '2026-02-01T10:00:00Z',
@@ -51,21 +48,30 @@ const mockAuditResult: AuditResult = {
 
 describe('AuditViewer', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
+  const mockApiMethods = (options: {
+    getAuditResults?: ReturnType<typeof vi.fn>;
+    runAudit?: ReturnType<typeof vi.fn>;
+  }) => {
+    const getAuditResults = options.getAuditResults ?? vi.fn().mockResolvedValue(mockAuditResult);
+    const runAudit = options.runAudit ?? vi.fn().mockResolvedValue(mockAuditResult);
+
+    vi.spyOn(AuditApiClient.prototype, 'getAuditResults').mockImplementation(getAuditResults);
+    vi.spyOn(AuditApiClient.prototype, 'runAudit').mockImplementation(runAudit);
+
+    return { getAuditResults, runAudit };
+  };
+
   it('renders loading state initially', () => {
-    const mockGetAuditResults = vi
+    const pendingGetAuditResults = vi
       .fn()
       .mockImplementation(() => new Promise(() => {}));
 
-    vi.mocked(AuditApiClient).mockImplementation(
-      () =>
-        ({
-          getAuditResults: mockGetAuditResults,
-          runAudit: vi.fn(),
-        }) as unknown as InstanceType<typeof AuditApiClient>,
-    );
+    mockApiMethods({
+      getAuditResults: pendingGetAuditResults,
+    });
 
     render(<AuditViewer projectKey="TEST-001" />);
 
@@ -73,20 +79,12 @@ describe('AuditViewer', () => {
   });
 
   it('fetches and displays audit results on mount', async () => {
-    const mockGetAuditResults = vi.fn().mockResolvedValue(mockAuditResult);
-
-    vi.mocked(AuditApiClient).mockImplementation(
-      () =>
-        ({
-          getAuditResults: mockGetAuditResults,
-          runAudit: vi.fn(),
-        }) as unknown as InstanceType<typeof AuditApiClient>,
-    );
+    const { getAuditResults } = mockApiMethods({});
 
     render(<AuditViewer projectKey="TEST-001" />);
 
     await waitFor(() => {
-      expect(mockGetAuditResults).toHaveBeenCalledWith('TEST-001');
+      expect(getAuditResults).toHaveBeenCalledWith('TEST-001');
     });
 
     const counts = screen.getAllByText('1');
@@ -97,15 +95,7 @@ describe('AuditViewer', () => {
   });
 
   it('displays severity summary correctly', async () => {
-    const mockGetAuditResults = vi.fn().mockResolvedValue(mockAuditResult);
-
-    vi.mocked(AuditApiClient).mockImplementation(
-      () =>
-        ({
-          getAuditResults: mockGetAuditResults,
-          runAudit: vi.fn(),
-        }) as unknown as InstanceType<typeof AuditApiClient>,
-    );
+    mockApiMethods({});
 
     render(<AuditViewer projectKey="TEST-001" />);
 
@@ -119,15 +109,7 @@ describe('AuditViewer', () => {
   });
 
   it('filters issues by severity', async () => {
-    const mockGetAuditResults = vi.fn().mockResolvedValue(mockAuditResult);
-
-    vi.mocked(AuditApiClient).mockImplementation(
-      () =>
-        ({
-          getAuditResults: mockGetAuditResults,
-          runAudit: vi.fn(),
-        }) as unknown as InstanceType<typeof AuditApiClient>,
-    );
+    mockApiMethods({});
 
     render(<AuditViewer projectKey="TEST-001" />);
 
@@ -152,16 +134,9 @@ describe('AuditViewer', () => {
   });
 
   it('triggers audit run when button clicked', async () => {
-    const mockGetAuditResults = vi.fn().mockResolvedValue(mockAuditResult);
     const mockRunAudit = vi.fn().mockResolvedValue(mockAuditResult);
 
-    vi.mocked(AuditApiClient).mockImplementation(
-      () =>
-        ({
-          getAuditResults: mockGetAuditResults,
-          runAudit: mockRunAudit,
-        }) as unknown as InstanceType<typeof AuditApiClient>,
-    );
+    mockApiMethods({ runAudit: mockRunAudit });
 
     render(<AuditViewer projectKey="TEST-001" />);
 
@@ -184,14 +159,7 @@ describe('AuditViewer', () => {
       summary: { errors: 0, warnings: 0, info: 0 },
     };
     const mockGetAuditResults = vi.fn().mockResolvedValue(emptyResult);
-
-    vi.mocked(AuditApiClient).mockImplementation(
-      () =>
-        ({
-          getAuditResults: mockGetAuditResults,
-          runAudit: vi.fn(),
-        }) as unknown as InstanceType<typeof AuditApiClient>,
-    );
+    mockApiMethods({ getAuditResults: mockGetAuditResults });
 
     render(<AuditViewer projectKey="TEST-001" />);
 
@@ -206,14 +174,7 @@ describe('AuditViewer', () => {
     const mockGetAuditResults = vi
       .fn()
       .mockRejectedValue(new Error('API Error'));
-
-    vi.mocked(AuditApiClient).mockImplementation(
-      () =>
-        ({
-          getAuditResults: mockGetAuditResults,
-          runAudit: vi.fn(),
-        }) as unknown as InstanceType<typeof AuditApiClient>,
-    );
+    mockApiMethods({ getAuditResults: mockGetAuditResults });
 
     render(<AuditViewer projectKey="TEST-001" />);
 
@@ -223,15 +184,7 @@ describe('AuditViewer', () => {
   });
 
   it('creates correct fix links for issues', async () => {
-    const mockGetAuditResults = vi.fn().mockResolvedValue(mockAuditResult);
-
-    vi.mocked(AuditApiClient).mockImplementation(
-      () =>
-        ({
-          getAuditResults: mockGetAuditResults,
-          runAudit: vi.fn(),
-        }) as unknown as InstanceType<typeof AuditApiClient>,
-    );
+    mockApiMethods({});
 
     render(<AuditViewer projectKey="TEST-001" />);
 
@@ -250,14 +203,7 @@ describe('AuditViewer', () => {
     const recentTime = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(); // 2 hours ago
     const recentResult = { ...mockAuditResult, timestamp: recentTime };
     const mockGetAuditResults = vi.fn().mockResolvedValue(recentResult);
-
-    vi.mocked(AuditApiClient).mockImplementation(
-      () =>
-        ({
-          getAuditResults: mockGetAuditResults,
-          runAudit: vi.fn(),
-        }) as unknown as InstanceType<typeof AuditApiClient>,
-    );
+    mockApiMethods({ getAuditResults: mockGetAuditResults });
 
     render(<AuditViewer projectKey="TEST-001" />);
 
@@ -269,18 +215,11 @@ describe('AuditViewer', () => {
   });
 
   it('disables run button while loading', async () => {
-    const mockGetAuditResults = vi.fn().mockResolvedValue(mockAuditResult);
     const mockRunAudit = vi
       .fn()
       .mockImplementation(() => new Promise(() => {}));
 
-    vi.mocked(AuditApiClient).mockImplementation(
-      () =>
-        ({
-          getAuditResults: mockGetAuditResults,
-          runAudit: mockRunAudit,
-        }) as unknown as InstanceType<typeof AuditApiClient>,
-    );
+    mockApiMethods({ runAudit: mockRunAudit });
 
     render(<AuditViewer projectKey="TEST-001" />);
 
