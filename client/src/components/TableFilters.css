@@ -1,0 +1,26 @@
+.table-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.table-filter-item {
+  min-width: 200px;
+}
+
+.table-filter-input,
+.table-filter-select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.table-filter-input:focus,
+.table-filter-select:focus {
+  outline: none;
+  border-color: #2f81f7;
+  box-shadow: 0 0 0 2px rgba(47, 129, 247, 0.15);
+}

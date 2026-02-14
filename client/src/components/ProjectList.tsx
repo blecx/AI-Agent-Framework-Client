@@ -6,8 +6,9 @@ import apiClient from '../services/apiClient';
 import type { Project } from '../types';
 import { useToast } from '../hooks/useToast';
 import { SkeletonProjectCard } from './ui/Skeleton';
-import EmptyState from './ui/EmptyState';
 import { Button } from './ui/Button';
+import DataTable from './DataTable';
+import type { TableColumn, TableFilter } from '../types/table';
 import './ProjectList.css';
 
 export default function ProjectList() {
@@ -110,6 +111,53 @@ export default function ProjectList() {
 
   const projects = projectsResponse || [];
 
+  const projectColumns: Array<TableColumn<Project>> = [
+    {
+      key: 'key',
+      label: t('projects.list.meta.key'),
+      sortable: true,
+      render: (project) => <span className="project-key">{project.key}</span>,
+      sortValue: (project) => project.key,
+    },
+    {
+      key: 'name',
+      label: t('projects.list.table.name'),
+      sortable: true,
+      sortValue: (project) => project.name,
+    },
+    {
+      key: 'description',
+      label: t('projects.list.table.description'),
+      render: (project) => project.description || '-',
+      sortValue: (project) => project.description || '',
+    },
+    {
+      key: 'createdAt',
+      label: t('projects.list.meta.created'),
+      sortable: true,
+      render: (project) => new Date(project.createdAt).toLocaleDateString(),
+      sortValue: (project) => new Date(project.createdAt).getTime(),
+    },
+    {
+      key: 'gitRepo',
+      label: t('projects.list.table.branch'),
+      render: (project) => (
+        project.gitRepo ? <span className="git-status">{project.gitRepo.branch}</span> : '-'
+      ),
+      sortValue: (project) => project.gitRepo?.branch || '',
+    },
+  ];
+
+  const projectFilters: Array<TableFilter<Project>> = [
+    {
+      key: 'search',
+      label: t('table.search'),
+      type: 'search',
+      placeholder: t('projects.list.table.searchPlaceholder'),
+      accessor: (project) => `${project.key} ${project.name} ${project.description || ''}`.toLowerCase(),
+    },
+  ];
+
   return (
     <div className="project-list-container">
       <header className="project-list-header">
@@ -192,42 +240,19 @@ export default function ProjectList() {
         </div>
       )}
 
-      {projects.length === 0 ? (
-        <EmptyState
-          icon="📁"
-          title={t('projects.list.empty.title')}
-          description={t('projects.list.empty.text')}
-          ctaLabel={t('projects.list.cta.new')}
-          ctaAction={() => setShowCreateForm(true)}
-        />
-      ) : (
-        <div className="projects-grid">
-          {projects.map((project: Project) => (
-            <div
-              key={project.key}
-              className="project-card"
-              data-testid={`project-card-${project.key}`}
-              onClick={() => handleViewProject(project.key)}
-            >
-              <h3>{project.name}</h3>
-              <p className="project-key">{t('projects.list.meta.key')}: {project.key}</p>
-              {project.description && (
-                <p className="project-description">{project.description}</p>
-              )}
-              <div className="project-meta">
-                <span>
-                  {t('projects.list.meta.created')}: {new Date(project.createdAt).toLocaleDateString()}
-                </span>
-                {project.gitRepo && (
-                  <span className="git-status">
-                    📁 {project.gitRepo.branch}
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <DataTable
+        columns={projectColumns}
+        data={projects}
+        filters={projectFilters}
+        getRowId={(project) => project.key}
+        onRowClick={(project) => handleViewProject(project.key)}
+        queryKeyPrefix="projects"
+        defaultPageSize={10}
+        emptyTitle={t('projects.list.empty.title')}
+        emptyDescription={t('projects.list.empty.text')}
+        emptyCta={t('projects.list.cta.new')}
+        onEmptyCta={() => setShowCreateForm(true)}
+      />
     </div>
   );
 }
