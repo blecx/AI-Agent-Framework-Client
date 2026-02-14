@@ -1,5 +1,5 @@
 export type ConnectionState =
-  | 'online'
-  | 'offline'
-  | 'reconnecting'
-  | 'degraded';
+  | "online"
+  | "offline"
+  | "reconnecting"
+  | "degraded";

@@ -1,35 +1,35 @@
-import { useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
-import apiClient from '../services/apiClient';
-import ProposePanel from './ProposePanel';
-import ApplyPanel from './ApplyPanel';
-import CommandPanel from './ProjectCommandPanel';
-import { ArtifactList } from './ArtifactList';
-import { AuditViewer } from './AuditViewer';
-import ReadinessBuilder from './ReadinessBuilder';
-import { AuditBadge } from './AuditBadge';
-import { AuditApiClient } from '../services/AuditApiClient';
-import Skeleton from './ui/Skeleton';
-import './ProjectView.css';
+import { useState } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+import apiClient from "../services/apiClient";
+import ProposePanel from "./ProposePanel";
+import ApplyPanel from "./ApplyPanel";
+import CommandPanel from "./ProjectCommandPanel";
+import { ArtifactList } from "./ArtifactList";
+import { AuditViewer } from "./AuditViewer";
+import ReadinessBuilder from "./ReadinessBuilder";
+import { AuditBadge } from "./AuditBadge";
+import { AuditApiClient } from "../services/AuditApiClient";
+import Skeleton from "./ui/Skeleton";
+import "./ProjectView.css";
 
 type TabType =
-  | 'overview'
-  | 'propose'
-  | 'apply'
-  | 'commands'
-  | 'artifacts'
-  | 'readiness'
-  | 'audit';
+  | "overview"
+  | "propose"
+  | "apply"
+  | "commands"
+  | "artifacts"
+  | "readiness"
+  | "audit";
 
 function tabFromPath(pathname: string): TabType {
-  if (pathname.endsWith('/propose')) return 'propose';
-  if (pathname.endsWith('/apply')) return 'apply';
-  if (pathname.endsWith('/artifacts')) return 'artifacts';
-  if (pathname.endsWith('/readiness')) return 'readiness';
-  if (pathname.endsWith('/audit')) return 'audit';
-  return 'overview';
+  if (pathname.endsWith("/propose")) return "propose";
+  if (pathname.endsWith("/apply")) return "apply";
+  if (pathname.endsWith("/artifacts")) return "artifacts";
+  if (pathname.endsWith("/readiness")) return "readiness";
+  if (pathname.endsWith("/audit")) return "audit";
+  return "overview";
 }
 
 export default function ProjectView() {
@@ -37,7 +37,9 @@ export default function ProjectView() {
   const { projectKey } = useParams<{ projectKey: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<TabType>(() => tabFromPath(location.pathname));
+  const [activeTab, setActiveTab] = useState<TabType>(() =>
+    tabFromPath(location.pathname),
+  );
 
   // Fetch project data
   const {
@@ -45,12 +47,15 @@ export default function ProjectView() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['project', projectKey],
+    queryKey: ["project", projectKey],
     queryFn: async () => {
-      if (!projectKey) throw new Error(t('projectView.errors.projectKeyRequired'));
+      if (!projectKey)
+        throw new Error(t("projectView.errors.projectKeyRequired"));
       const response = await apiClient.getProject(projectKey);
       if (!response.success) {
-        throw new Error(response.error || t('projectView.errors.failedToLoadProject'));
+        throw new Error(
+          response.error || t("projectView.errors.failedToLoadProject"),
+        );
       }
       return response.data;
     },
@@ -59,9 +64,10 @@ export default function ProjectView() {
 
   // Fetch audit data for badge
   const { data: auditData } = useQuery({
-    queryKey: ['audit', projectKey],
+    queryKey: ["audit", projectKey],
     queryFn: async () => {
-      if (!projectKey) throw new Error(t('projectView.errors.projectKeyRequired'));
+      if (!projectKey)
+        throw new Error(t("projectView.errors.projectKeyRequired"));
       const client = new AuditApiClient();
       return await client.getAuditResults(projectKey);
     },
@@ -76,8 +82,8 @@ export default function ProjectView() {
       <div className="project-view-container">
         <header className="project-header">
           <div className="header-left">
-            <button className="btn-back" onClick={() => navigate('/')}>
-              {t('projectView.actions.backToProjects')}
+            <button className="btn-back" onClick={() => navigate("/")}>
+              {t("projectView.actions.backToProjects")}
             </button>
             <div>
               <Skeleton width="200px" height="32px" />
@@ -107,12 +113,13 @@ export default function ProjectView() {
     return (
       <div className="project-view-container">
         <div className="error">
-          {t('projectView.errors.loadingWithMessage', {
-            message: (error as Error)?.message || t('projectView.errors.unknownError'),
+          {t("projectView.errors.loadingWithMessage", {
+            message:
+              (error as Error)?.message || t("projectView.errors.unknownError"),
           })}
         </div>
-        <button className="btn-secondary" onClick={() => navigate('/')}>
-          {t('projectView.actions.backToProjectsText')}
+        <button className="btn-secondary" onClick={() => navigate("/")}>
+          {t("projectView.actions.backToProjectsText")}
         </button>
       </div>
     );
@@ -124,12 +131,14 @@ export default function ProjectView() {
     <div className="project-view-container">
       <header className="project-header">
         <div className="header-left">
-          <button className="btn-back" onClick={() => navigate('/')}>
-            {t('projectView.actions.backToProjects')}
+          <button className="btn-back" onClick={() => navigate("/")}>
+            {t("projectView.actions.backToProjects")}
           </button>
           <div>
             <h1>{project.name}</h1>
-            <p className="project-key">{t('projectView.labels.key')}: {project.key}</p>
+            <p className="project-key">
+              {t("projectView.labels.key")}: {project.key}
+            </p>
           </div>
         </div>
         <div className="header-right">
@@ -138,7 +147,7 @@ export default function ProjectView() {
               errorCount={auditData.summary.errors}
               warningCount={auditData.summary.warnings}
               infoCount={auditData.summary.info}
-              onClick={() => setActiveTab('audit')}
+              onClick={() => setActiveTab("audit")}
             />
           )}
         </div>
@@ -146,79 +155,87 @@ export default function ProjectView() {
 
       <nav className="project-tabs">
         <button
-          className={`tab ${activeTab === 'overview' ? 'active' : ''}`}
-          onClick={() => setActiveTab('overview')}
+          className={`tab ${activeTab === "overview" ? "active" : ""}`}
+          onClick={() => setActiveTab("overview")}
         >
-          {t('projectView.tabs.overview')}
+          {t("projectView.tabs.overview")}
         </button>
         <button
-          className={`tab ${activeTab === 'propose' ? 'active' : ''}`}
-          onClick={() => setActiveTab('propose')}
+          className={`tab ${activeTab === "propose" ? "active" : ""}`}
+          onClick={() => setActiveTab("propose")}
         >
-          {t('projectView.tabs.proposeChanges')}
+          {t("projectView.tabs.proposeChanges")}
         </button>
         <button
-          className={`tab ${activeTab === 'apply' ? 'active' : ''}`}
-          onClick={() => setActiveTab('apply')}
+          className={`tab ${activeTab === "apply" ? "active" : ""}`}
+          onClick={() => setActiveTab("apply")}
         >
-          {t('projectView.tabs.applyProposals')}
+          {t("projectView.tabs.applyProposals")}
         </button>
         <button
-          className={`tab ${activeTab === 'commands' ? 'active' : ''}`}
-          onClick={() => setActiveTab('commands')}
+          className={`tab ${activeTab === "commands" ? "active" : ""}`}
+          onClick={() => setActiveTab("commands")}
         >
-          {t('projectView.tabs.commands')}
+          {t("projectView.tabs.commands")}
         </button>
         <button
-          className={`tab ${activeTab === 'artifacts' ? 'active' : ''}`}
-          onClick={() => setActiveTab('artifacts')}
+          className={`tab ${activeTab === "artifacts" ? "active" : ""}`}
+          onClick={() => setActiveTab("artifacts")}
         >
-          {t('projectView.tabs.artifacts')}
+          {t("projectView.tabs.artifacts")}
         </button>
         <button
-          className={`tab ${activeTab === 'readiness' ? 'active' : ''}`}
-          onClick={() => setActiveTab('readiness')}
+          className={`tab ${activeTab === "readiness" ? "active" : ""}`}
+          onClick={() => setActiveTab("readiness")}
         >
-          {t('nav.readinessBuilder')}
+          {t("nav.readinessBuilder")}
         </button>
         <button
-          className={`tab ${activeTab === 'audit' ? 'active' : ''}`}
-          onClick={() => setActiveTab('audit')}
+          className={`tab ${activeTab === "audit" ? "active" : ""}`}
+          onClick={() => setActiveTab("audit")}
         >
-          {t('projectView.tabs.audit')}
+          {t("projectView.tabs.audit")}
         </button>
       </nav>
 
       <div className="project-content">
-        {activeTab === 'overview' && (
+        {activeTab === "overview" && (
           <div className="overview-tab">
             <section className="project-section">
-              <h2>{t('projectView.sections.projectDetails')}</h2>
+              <h2>{t("projectView.sections.projectDetails")}</h2>
               {project.description && <p>{project.description}</p>}
               <div className="detail-row">
-                <span className="label">{t('projectView.labels.created')}:</span>
+                <span className="label">
+                  {t("projectView.labels.created")}:
+                </span>
                 <span>{new Date(project.createdAt).toLocaleString()}</span>
               </div>
               <div className="detail-row">
-                <span className="label">{t('projectView.labels.lastUpdated')}:</span>
+                <span className="label">
+                  {t("projectView.labels.lastUpdated")}:
+                </span>
                 <span>{new Date(project.updatedAt).toLocaleString()}</span>
               </div>
             </section>
 
             {project.gitRepo && (
               <section className="project-section">
-                <h2>{t('projectView.sections.gitRepository')}</h2>
+                <h2>{t("projectView.sections.gitRepository")}</h2>
                 <div className="detail-row">
-                  <span className="label">{t('projectView.labels.url')}:</span>
+                  <span className="label">{t("projectView.labels.url")}:</span>
                   <span className="monospace">{project.gitRepo.url}</span>
                 </div>
                 <div className="detail-row">
-                  <span className="label">{t('projectView.labels.branch')}:</span>
+                  <span className="label">
+                    {t("projectView.labels.branch")}:
+                  </span>
                   <span className="monospace">{project.gitRepo.branch}</span>
                 </div>
                 {project.gitRepo.lastCommit && (
                   <div className="detail-row">
-                    <span className="label">{t('projectView.labels.lastCommit')}:</span>
+                    <span className="label">
+                      {t("projectView.labels.lastCommit")}:
+                    </span>
                     <span className="monospace">
                       {project.gitRepo.lastCommit}
                     </span>
@@ -226,7 +243,9 @@ export default function ProjectView() {
                 )}
                 {project.gitRepo.status && (
                   <div className="detail-row">
-                    <span className="label">{t('projectView.labels.status')}:</span>
+                    <span className="label">
+                      {t("projectView.labels.status")}:
+                    </span>
                     <span
                       className={`status-badge status-${project.gitRepo.status}`}
                     >
@@ -239,14 +258,18 @@ export default function ProjectView() {
 
             {project.documents && project.documents.length > 0 && (
               <section className="project-section">
-                <h2>{t('projectView.sections.documents', { count: project.documents.length })}</h2>
+                <h2>
+                  {t("projectView.sections.documents", {
+                    count: project.documents.length,
+                  })}
+                </h2>
                 <div className="documents-list">
                   {project.documents.map((doc) => (
                     <div key={doc.id} className="document-item">
                       <div className="document-name">{doc.name}</div>
                       <div className="document-path">{doc.path}</div>
                       <div className="document-meta">
-                        {t('projectView.labels.lastModified')}{' '}
+                        {t("projectView.labels.lastModified")}{" "}
                         {new Date(doc.lastModified).toLocaleString()}
                       </div>
                     </div>
@@ -257,24 +280,34 @@ export default function ProjectView() {
           </div>
         )}
 
-        {activeTab === 'propose' && projectKey && <ProposePanel projectKey={projectKey} />}
-        {activeTab === 'apply' && projectKey && <ApplyPanel projectKey={projectKey} />}
-        {activeTab === 'commands' && projectKey && <CommandPanel projectKey={projectKey} />}
-        {activeTab === 'artifacts' && projectKey && (
+        {activeTab === "propose" && projectKey && (
+          <ProposePanel projectKey={projectKey} />
+        )}
+        {activeTab === "apply" && projectKey && (
+          <ApplyPanel projectKey={projectKey} />
+        )}
+        {activeTab === "commands" && projectKey && (
+          <CommandPanel projectKey={projectKey} />
+        )}
+        {activeTab === "artifacts" && projectKey && (
           <ArtifactList
             projectKey={projectKey}
             onCreateNew={() => {
               // TODO: Open template selector modal
-              console.log('Create new artifact');
+              console.log("Create new artifact");
             }}
             onSelectArtifact={(artifact) => {
               // TODO: Open ArtifactEditor modal/view
-              console.log('Selected artifact:', artifact);
+              console.log("Selected artifact:", artifact);
             }}
           />
         )}
-        {activeTab === 'readiness' && projectKey && <ReadinessBuilder projectKey={projectKey} />}
-        {activeTab === 'audit' && projectKey && <AuditViewer projectKey={projectKey} />}
+        {activeTab === "readiness" && projectKey && (
+          <ReadinessBuilder projectKey={projectKey} />
+        )}
+        {activeTab === "audit" && projectKey && (
+          <AuditViewer projectKey={projectKey} />
+        )}
       </div>
     </div>
   );

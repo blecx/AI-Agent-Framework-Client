@@ -34,7 +34,7 @@ describe('LoadingSpinner', () => {
 
     it('renders with custom message', () => {
       render(<LoadingSpinner message="Loading projects..." />);
-      expect(screen.getByText('Loading projects...')).toBeInTheDocument();
+      expect(screen.getByText('Loading projects...', { selector: 'p.loading-message' })).toBeInTheDocument();
     });
 
     it('renders as inline by default', () => {

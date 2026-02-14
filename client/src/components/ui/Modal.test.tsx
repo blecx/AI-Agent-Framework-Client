@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Modal } from './Modal';
 
 describe('Modal', () => {
@@ -30,5 +31,38 @@ describe('Modal', () => {
 
     if (overlay) fireEvent.click(overlay);
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('traps focus inside modal with Tab and Shift+Tab', async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <button type="button">Outside</button>
+        <Modal isOpen onClose={vi.fn()} title="Focusable modal">
+          <button type="button">First</button>
+          <button type="button">Last</button>
+        </Modal>
+      </>,
+    );
+
+    const closeButton = screen.getByRole('button', { name: /close dialog/i });
+    const firstButton = screen.getByRole('button', { name: 'First' });
+    const lastButton = screen.getByRole('button', { name: 'Last' });
+
+    await waitFor(() => {
+      expect(closeButton).toHaveFocus();
+    });
+
+    await user.tab();
+    expect(firstButton).toHaveFocus();
+
+    await user.tab();
+    expect(lastButton).toHaveFocus();
+
+    await user.tab();
+    expect(closeButton).toHaveFocus();
+
+    await user.tab({ shift: true });
+    expect(lastButton).toHaveFocus();
   });
 });

@@ -1,4 +1,4 @@
-import type { ProjectReadiness } from '../types/readiness';
+import type { ProjectReadiness } from "../types/readiness";
 
 // TODO: Replace with backend readiness API
 export const mockReadinessService = {
@@ -6,34 +6,34 @@ export const mockReadinessService = {
     await new Promise((resolve) => setTimeout(resolve, 250));
 
     return {
-      overallStatus: 'warn',
+      overallStatus: "warn",
       checks: [
         {
-          id: 'projectBasics',
-          status: 'pass',
+          id: "projectBasics",
+          status: "pass",
         },
         {
-          id: 'projectCharter',
-          status: 'warn',
-          actionKey: 'reviewCharter',
+          id: "projectCharter",
+          status: "warn",
+          actionKey: "reviewCharter",
           actionUrl: `/projects/${projectKey}/artifacts`,
         },
         {
-          id: 'raidRegister',
-          status: 'fail',
-          actionKey: 'createRaid',
+          id: "raidRegister",
+          status: "fail",
+          actionKey: "createRaid",
           actionUrl: `/projects/${projectKey}`,
         },
         {
-          id: 'workflowDefinition',
-          status: 'notAssessed',
-          actionKey: 'defineWorkflow',
+          id: "workflowDefinition",
+          status: "notAssessed",
+          actionKey: "defineWorkflow",
           actionUrl: `/projects/${projectKey}`,
         },
         {
-          id: 'proposalGovernance',
-          status: 'inProgress',
-          actionKey: 'continueGovernance',
+          id: "proposalGovernance",
+          status: "inProgress",
+          actionKey: "continueGovernance",
           actionUrl: `/projects/${projectKey}/apply`,
         },
       ],

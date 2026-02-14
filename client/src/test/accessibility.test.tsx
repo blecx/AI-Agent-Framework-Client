@@ -9,6 +9,20 @@ import userEvent from '@testing-library/user-event';
 import ErrorBoundary from '../components/ErrorBoundary';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { LoadingSkeleton, FormSkeleton } from '../components/LoadingSkeleton';
+import SkipToContent from '../components/SkipToContent';
+import Toast from '../components/Toast';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const map: Record<string, string> = {
+        'a11y.skipToContent': 'Skip to main content',
+      };
+      return map[key] ?? key;
+    },
+  }),
+}));
 
 describe('Accessibility Tests', () => {
   describe('ErrorBoundary', () => {
@@ -218,6 +232,45 @@ describe('Accessibility Tests', () => {
       await userEvent.keyboard('{Enter}');
       
       expect(onSubmit).toHaveBeenCalled();
+    });
+  });
+
+  describe('Skip Link', () => {
+    it('renders skip link and focuses main content on activation', async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <SkipToContent />
+          <main id="main-content" tabIndex={-1}>Main section</main>
+        </>,
+      );
+
+      const link = screen.getByRole('link', { name: /skip to main content/i });
+      await user.click(link);
+
+      expect(screen.getByText('Main section')).toHaveFocus();
+    });
+  });
+
+  describe('Live Regions', () => {
+    it('announces error toasts assertively', () => {
+      render(
+        <Toast
+          id="toast-1"
+          type="error"
+          message="Something failed"
+          onClose={() => {}}
+        />,
+      );
+
+      const alert = screen.getByRole('alert');
+      expect(alert).toHaveAttribute('aria-live', 'assertive');
+    });
+
+    it('loading spinner exposes status label', () => {
+      render(<LoadingSpinner message="Loading projects" />);
+      const status = screen.getByRole('status');
+      expect(status).toHaveAttribute('aria-label', 'Loading projects');
     });
   });
 });

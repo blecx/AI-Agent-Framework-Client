@@ -1,9 +1,9 @@
 export type ReadinessState =
-  | 'notAssessed'
-  | 'inProgress'
-  | 'pass'
-  | 'warn'
-  | 'fail';
+  | "notAssessed"
+  | "inProgress"
+  | "pass"
+  | "warn"
+  | "fail";
 
 export interface ReadinessCheck {
   id: string;

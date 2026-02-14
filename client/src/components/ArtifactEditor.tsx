@@ -3,16 +3,16 @@
  * Template-driven form for creating/editing artifacts
  */
 
-import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import type { Template, JSONSchemaProperty } from '../types/template';
-import type { ArtifactState } from '../types/artifact';
-import { templateApiClient } from '../services/TemplateApiClient';
-import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
-import { FormSkeleton } from './LoadingSkeleton';
-import { useToast } from '../hooks/useToast';
-import ArtifactStateBadge from './ArtifactStateBadge';
-import './ArtifactEditor.css';
+import React, { useEffect, useState, useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import type { Template, JSONSchemaProperty } from "../types/template";
+import type { ArtifactState } from "../types/artifact";
+import { templateApiClient } from "../services/TemplateApiClient";
+import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
+import { FormSkeleton } from "./LoadingSkeleton";
+import { useToast } from "../hooks/useToast";
+import ArtifactStateBadge from "./ArtifactStateBadge";
+import "./ArtifactEditor.css";
 
 export interface ArtifactEditorProps {
   templateId: string;
@@ -29,7 +29,7 @@ export interface ArtifactEditorProps {
 export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
   templateId,
   projectKey: _projectKey, // Reserved for future use (artifact generation API)
-  artifactState = 'draft',
+  artifactState = "draft",
   initialData = {},
   onSave,
   onProposeForReview,
@@ -39,8 +39,10 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
 }) => {
   const { t } = useTranslation();
   const [template, setTemplate] = useState<Template | null>(null);
-  const [formData, setFormData] = useState<Record<string, unknown>>(initialData);
-  const [currentState, setCurrentState] = useState<ArtifactState>(artifactState);
+  const [formData, setFormData] =
+    useState<Record<string, unknown>>(initialData);
+  const [currentState, setCurrentState] =
+    useState<ArtifactState>(artifactState);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,9 +56,10 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
     when: hasChanges,
   });
 
-  const canEdit = currentState === 'draft' || currentState === 'needsAttention';
-  const canProposeForReview = currentState === 'draft';
-  const canProposeChange = currentState === 'applied' || currentState === 'complete';
+  const canEdit = currentState === "draft" || currentState === "needsAttention";
+  const canProposeForReview = currentState === "draft";
+  const canProposeChange =
+    currentState === "applied" || currentState === "complete";
 
   useEffect(() => {
     setCurrentState(artifactState);
@@ -64,21 +67,21 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
 
   const isFormValid = useMemo(() => {
     if (!template) return false;
-    
+
     const schema = template.schema;
     for (const [fieldName, fieldSchema] of Object.entries(schema.properties)) {
       const isRequired = schema.required?.includes(fieldName);
       const value = formData[fieldName];
-      
+
       if (isRequired && !value) {
         return false;
       }
-      
+
       if (value) {
-        if (fieldSchema.type === 'string' && typeof value !== 'string') {
+        if (fieldSchema.type === "string" && typeof value !== "string") {
           return false;
         }
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
           if (fieldSchema.minLength && value.length < fieldSchema.minLength) {
             return false;
           }
@@ -103,7 +106,11 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
       const tmpl = await templateApiClient.getTemplate(templateId);
       setTemplate(tmpl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('artifactEditor.errors.failedToLoadTemplate'));
+      setError(
+        err instanceof Error
+          ? err.message
+          : t("artifactEditor.errors.failedToLoadTemplate"),
+      );
     } finally {
       setLoading(false);
     }
@@ -112,32 +119,38 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
   const validateField = (
     fieldName: string,
     value: unknown,
-    schema: JSONSchemaProperty
+    schema: JSONSchemaProperty,
   ): string | null => {
     // Required validation
     if (template?.schema.required?.includes(fieldName) && !value) {
-      return t('artifactEditor.validation.required', { field: schema.title || fieldName });
+      return t("artifactEditor.validation.required", {
+        field: schema.title || fieldName,
+      });
     }
 
     // Type validation
     if (value) {
-      if (schema.type === 'string' && typeof value !== 'string') {
-        return t('artifactEditor.validation.mustBeString');
+      if (schema.type === "string" && typeof value !== "string") {
+        return t("artifactEditor.validation.mustBeString");
       }
-      if (schema.type === 'number' && typeof value !== 'number') {
-        return t('artifactEditor.validation.mustBeNumber');
+      if (schema.type === "number" && typeof value !== "number") {
+        return t("artifactEditor.validation.mustBeNumber");
       }
 
       // String length validation
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         if (schema.minLength && value.length < schema.minLength) {
-          return t('artifactEditor.validation.minLength', { min: schema.minLength });
+          return t("artifactEditor.validation.minLength", {
+            min: schema.minLength,
+          });
         }
         if (schema.maxLength && value.length > schema.maxLength) {
-          return t('artifactEditor.validation.maxLength', { max: schema.maxLength });
+          return t("artifactEditor.validation.maxLength", {
+            max: schema.maxLength,
+          });
         }
         if (schema.pattern && !new RegExp(schema.pattern).test(value)) {
-          return t('artifactEditor.validation.invalidFormat');
+          return t("artifactEditor.validation.invalidFormat");
         }
       }
     }
@@ -175,12 +188,12 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
 
   const handleSave = async () => {
     if (!canEdit) {
-      toast.showError(t('art.messages.readOnly'));
+      toast.showError(t("art.messages.readOnly"));
       return;
     }
 
     if (!validateForm()) {
-      toast.showError(t('artifactEditor.messages.fixValidationErrors'));
+      toast.showError(t("artifactEditor.messages.fixValidationErrors"));
       return;
     }
 
@@ -191,13 +204,16 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
       // Optimistic update - call onSave immediately
       await onSave?.(formData);
       setHasChanges(false);
-      toast.showSuccess(t('artifactEditor.messages.savedSuccessfully'));
+      toast.showSuccess(t("artifactEditor.messages.savedSuccessfully"));
     } catch (err) {
       // Rollback on error
       setFormData(previousData);
-      const errorMsg = err instanceof Error ? err.message : t('artifactEditor.errors.failedToSaveArtifact');
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : t("artifactEditor.errors.failedToSaveArtifact");
       toast.showError(errorMsg);
-      console.error('Save error:', err);
+      console.error("Save error:", err);
     } finally {
       setIsSaving(false);
     }
@@ -205,45 +221,53 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
 
   const handleProposeForReview = async () => {
     if (!validateForm()) {
-      toast.showError(t('artifactEditor.messages.fixValidationErrors'));
+      toast.showError(t("artifactEditor.messages.fixValidationErrors"));
       return;
     }
 
     await onProposeForReview?.(formData);
-    setCurrentState('inReview');
-    toast.showInfo(t('art.messages.sentForReview'));
+    setCurrentState("inReview");
+    toast.showInfo(t("art.messages.sentForReview"));
   };
 
   const handleProposeChange = async () => {
     await onProposeChange?.(formData);
-    setCurrentState('inReview');
-    toast.showInfo(t('art.messages.changeProposed'));
+    setCurrentState("inReview");
+    toast.showInfo(t("art.messages.changeProposed"));
   };
 
   const handleExport = () => {
     onExport?.(formData);
-    toast.showInfo(t('art.messages.exportTriggered'));
+    toast.showInfo(t("art.messages.exportTriggered"));
   };
 
   // Keyboard navigation handlers
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // Escape to cancel
-    if (e.key === 'Escape' && onCancel) {
+    if (e.key === "Escape" && onCancel) {
       e.preventDefault();
       onCancel();
     }
   };
 
-  const renderField = (fieldName: string, fieldSchema: JSONSchemaProperty, fieldId: string) => {
+  const renderField = (
+    fieldName: string,
+    fieldSchema: JSONSchemaProperty,
+    fieldId: string,
+  ) => {
     const value = formData[fieldName];
     const label = fieldSchema.title || fieldName;
     const isRequired = template?.schema.required?.includes(fieldName);
     const commonProps = {
       id: fieldId,
       disabled: !canEdit,
-      'aria-required': isRequired,
-      'aria-invalid': !!errors[fieldName],
-      'aria-describedby': errors[fieldName] ? `${fieldId}-error` : fieldSchema.description ? `${fieldId}-desc` : undefined,
+      "aria-required": isRequired,
+      "aria-invalid": !!errors[fieldName],
+      "aria-describedby": errors[fieldName]
+        ? `${fieldId}-error`
+        : fieldSchema.description
+          ? `${fieldId}-desc`
+          : undefined,
     };
 
     // Render based on field type and format
@@ -251,11 +275,13 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
       return (
         <select
           {...commonProps}
-          value={value as string || ''}
+          value={(value as string) || ""}
           onChange={(e) => handleFieldChange(fieldName, e.target.value)}
-          className={errors[fieldName] ? 'error' : ''}
+          className={errors[fieldName] ? "error" : ""}
         >
-          <option value="">{t('artifactEditor.form.selectField', { field: label })}</option>
+          <option value="">
+            {t("artifactEditor.form.selectField", { field: label })}
+          </option>
           {fieldSchema.enum.map((option) => (
             <option key={option} value={option}>
               {option}
@@ -265,38 +291,43 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
       );
     }
 
-    if (fieldSchema.format === 'date') {
+    if (fieldSchema.format === "date") {
       return (
         <input
           {...commonProps}
           type="date"
-          value={value as string || ''}
+          value={(value as string) || ""}
           onChange={(e) => handleFieldChange(fieldName, e.target.value)}
-          className={errors[fieldName] ? 'error' : ''}
+          className={errors[fieldName] ? "error" : ""}
         />
       );
     }
 
-    if (fieldSchema.format === 'textarea' || fieldSchema.maxLength && fieldSchema.maxLength > 200) {
+    if (
+      fieldSchema.format === "textarea" ||
+      (fieldSchema.maxLength && fieldSchema.maxLength > 200)
+    ) {
       return (
         <textarea
           {...commonProps}
-          value={value as string || ''}
+          value={(value as string) || ""}
           onChange={(e) => handleFieldChange(fieldName, e.target.value)}
           rows={6}
-          className={errors[fieldName] ? 'error' : ''}
+          className={errors[fieldName] ? "error" : ""}
         />
       );
     }
 
-    if (fieldSchema.type === 'number') {
+    if (fieldSchema.type === "number") {
       return (
         <input
           {...commonProps}
           type="number"
-          value={value as number || ''}
-          onChange={(e) => handleFieldChange(fieldName, parseFloat(e.target.value))}
-          className={errors[fieldName] ? 'error' : ''}
+          value={(value as number) || ""}
+          onChange={(e) =>
+            handleFieldChange(fieldName, parseFloat(e.target.value))
+          }
+          className={errors[fieldName] ? "error" : ""}
         />
       );
     }
@@ -306,16 +337,20 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
       <input
         {...commonProps}
         type="text"
-        value={value as string || ''}
+        value={(value as string) || ""}
         onChange={(e) => handleFieldChange(fieldName, e.target.value)}
-        className={errors[fieldName] ? 'error' : ''}
+        className={errors[fieldName] ? "error" : ""}
       />
     );
   };
 
   if (loading) {
     return (
-      <div className="artifact-editor" aria-busy="true" aria-label={t('artifactEditor.aria.loadingTemplate')}>
+      <div
+        className="artifact-editor"
+        aria-busy="true"
+        aria-label={t("artifactEditor.aria.loadingTemplate")}
+      >
         <FormSkeleton fields={5} />
       </div>
     );
@@ -332,7 +367,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
   if (!template) {
     return (
       <div className="artifact-editor error" role="alert">
-        {t('artifactEditor.errors.templateNotFound')}
+        {t("artifactEditor.errors.templateNotFound")}
       </div>
     );
   }
@@ -341,16 +376,23 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
     <div className="artifact-editor" onKeyDown={handleKeyDown}>
       {/* Unsaved changes warning dialog */}
       {isBlocked && (
-        <div className="unsaved-changes-dialog" role="dialog" aria-modal="true" aria-labelledby="unsaved-dialog-title">
+        <div
+          className="unsaved-changes-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="unsaved-dialog-title"
+        >
           <div className="dialog-content">
-            <h3 id="unsaved-dialog-title">{t('artifactEditor.unsaved.title')}</h3>
-            <p>{t('artifactEditor.unsaved.message')}</p>
+            <h3 id="unsaved-dialog-title">
+              {t("artifactEditor.unsaved.title")}
+            </h3>
+            <p>{t("artifactEditor.unsaved.message")}</p>
             <div className="dialog-actions">
               <button onClick={cancelNavigation} className="btn-primary">
-                {t('artifactEditor.unsaved.stay')}
+                {t("artifactEditor.unsaved.stay")}
               </button>
               <button onClick={confirmNavigation} className="btn-secondary">
-                {t('artifactEditor.unsaved.leave')}
+                {t("artifactEditor.unsaved.leave")}
               </button>
             </div>
           </div>
@@ -359,35 +401,62 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
 
       <h2>
         {template.name}
-        <span className="template-type">{t('artifactEditor.labels.templateType', { type: template.artifact_type })}</span>
+        <span className="template-type">
+          {t("artifactEditor.labels.templateType", {
+            type: template.artifact_type,
+          })}
+        </span>
         <ArtifactStateBadge state={currentState} />
       </h2>
       <p className="template-description">{template.description}</p>
 
-      <form ref={formRef} onSubmit={(e) => { e.preventDefault(); handleSave(); }} aria-label={t('artifactEditor.aria.editorForm')}>
-        {Object.entries(template.schema.properties).map(([fieldName, fieldSchema]) => {
-          const isRequired = template.schema.required?.includes(fieldName);
-          const label = fieldSchema.title || fieldName;
-          const fieldId = `field-${fieldName}`;
+      <form
+        ref={formRef}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSave();
+        }}
+        aria-label={t("artifactEditor.aria.editorForm")}
+      >
+        {Object.entries(template.schema.properties).map(
+          ([fieldName, fieldSchema]) => {
+            const isRequired = template.schema.required?.includes(fieldName);
+            const label = fieldSchema.title || fieldName;
+            const fieldId = `field-${fieldName}`;
 
-          return (
-            <div key={fieldName} className="form-field">
-              <label htmlFor={fieldId}>
-                {label}
-                {isRequired && <span className="required" aria-label={t('artifactEditor.aria.required')}>*</span>}
-              </label>
-              {fieldSchema.description && (
-                <p id={`${fieldId}-desc`} className="field-description">{fieldSchema.description}</p>
-              )}
-              {renderField(fieldName, fieldSchema, fieldId)}
-              {errors[fieldName] && (
-                <span id={`${fieldId}-error`} className="field-error" role="alert" aria-live="polite">
-                  {errors[fieldName]}
-                </span>
-              )}
-            </div>
-          );
-        })}
+            return (
+              <div key={fieldName} className="form-field">
+                <label htmlFor={fieldId}>
+                  {label}
+                  {isRequired && (
+                    <span
+                      className="required"
+                      aria-label={t("artifactEditor.aria.required")}
+                    >
+                      *
+                    </span>
+                  )}
+                </label>
+                {fieldSchema.description && (
+                  <p id={`${fieldId}-desc`} className="field-description">
+                    {fieldSchema.description}
+                  </p>
+                )}
+                {renderField(fieldName, fieldSchema, fieldId)}
+                {errors[fieldName] && (
+                  <span
+                    id={`${fieldId}-error`}
+                    className="field-error"
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    {errors[fieldName]}
+                  </span>
+                )}
+              </div>
+            );
+          },
+        )}
 
         <div className="form-actions">
           {canEdit && (
@@ -395,13 +464,13 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
               type="button"
               className="btn-secondary"
               onClick={() => {
-                const artifactType = template.artifact_type || 'charter';
+                const artifactType = template.artifact_type || "charter";
                 window.location.assign(
                   `/projects/${_projectKey}/assisted-creation?artifactType=${artifactType}`,
                 );
               }}
             >
-              {t('art.action.improveWithAI')}
+              {t("art.action.improveWithAI")}
             </button>
           )}
           {canEdit && (
@@ -411,25 +480,39 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
               disabled={!isFormValid || isSaving || !canEdit}
               aria-busy={isSaving}
             >
-              {isSaving ? t('artifactEditor.actions.saving') : t('artifactEditor.actions.save')}
+              {isSaving
+                ? t("artifactEditor.actions.saving")
+                : t("artifactEditor.actions.save")}
             </button>
           )}
           {canProposeForReview && (
-            <button type="button" className="btn-primary" onClick={handleProposeForReview}>
-              {t('art.action.propose')}
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={handleProposeForReview}
+            >
+              {t("art.action.propose")}
             </button>
           )}
           {canProposeChange && (
-            <button type="button" className="btn-primary" onClick={handleProposeChange}>
-              {t('art.action.proposeChange')}
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={handleProposeChange}
+            >
+              {t("art.action.proposeChange")}
             </button>
           )}
-          <button type="button" className="btn-secondary" onClick={handleExport}>
-            {t('art.action.export')}
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={handleExport}
+          >
+            {t("art.action.export")}
           </button>
           {onCancel && (
             <button type="button" className="btn-secondary" onClick={onCancel}>
-              {t('artifactEditor.actions.cancel')}
+              {t("artifactEditor.actions.cancel")}
             </button>
           )}
         </div>
