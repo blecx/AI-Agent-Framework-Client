@@ -11,6 +11,50 @@ import {
   type Proposal,
 } from '../../services/ProposalApiClient';
 
+const mockShowSuccess = vi.fn();
+const mockShowError = vi.fn();
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: { status?: string }) => {
+      if (key === 'reviewGate.meta.alreadyProcessed') {
+        return `This proposal has already been ${options?.status}.`;
+      }
+
+      const map: Record<string, string> = {
+        'proposal.review.title': 'Proposal Review',
+        'reviewGate.meta.target': 'Target',
+        'reviewGate.meta.changeType': 'Change Type',
+        'reviewGate.meta.status': 'Status',
+        'reviewGate.meta.author': 'Author',
+        'reviewGate.meta.rationale': 'Rationale',
+        'reviewGate.diff.title': 'Changes',
+        'reviewGate.actions.approve': 'Apply Changes',
+        'reviewGate.actions.reject': 'Reject',
+        'reviewGate.actions.applying': 'Processing...',
+        'reviewGate.reject.title': 'Reject Changes',
+        'reviewGate.reject.reasonLabel': 'Reason (optional)',
+        'reviewGate.reject.reasonPlaceholder': 'Explain why',
+        'reviewGate.reject.cancel': 'Cancel',
+        'reviewGate.reject.confirm': 'Reject',
+        'reviewGate.toasts.approveSuccess': 'Changes applied successfully',
+        'reviewGate.toasts.approveFailed': 'Failed to apply changes',
+        'reviewGate.toasts.rejectSuccess': 'Changes rejected',
+        'reviewGate.toasts.rejectFailed': 'Failed to reject changes',
+      };
+
+      return map[key] ?? key;
+    },
+  }),
+}));
+
+vi.mock('../../hooks/useToast', () => ({
+  useToast: () => ({
+    showSuccess: mockShowSuccess,
+    showError: mockShowError,
+  }),
+}));
+
 // Mock the ProposalApiClient
 vi.mock('../../services/ProposalApiClient', () => ({
   proposalApiClient: {
@@ -41,10 +85,6 @@ const mockProposal: Proposal = {
 describe('ProposalReview', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset window methods
-    vi.spyOn(window, 'confirm').mockImplementation(() => true);
-    vi.spyOn(window, 'prompt').mockImplementation(() => 'Test reason');
-    vi.spyOn(window, 'alert').mockImplementation(() => {});
   });
 
   it('renders loading state initially', () => {
@@ -80,13 +120,13 @@ describe('ProposalReview', () => {
     render(<ProposalReview proposalId="prop-001" projectKey="TEST-123" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Apply')).toBeInTheDocument();
+      expect(screen.getByText('Apply Changes')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Reject')).toBeInTheDocument();
+    expect(screen.getAllByText('Reject').length).toBeGreaterThan(0);
   });
 
-  it('handles apply action with confirmation', async () => {
+  it('handles apply action', async () => {
     const user = userEvent.setup();
     const onComplete = vi.fn();
     vi.mocked(proposalApiClient.getProposal).mockResolvedValue(mockProposal);
@@ -101,14 +141,10 @@ describe('ProposalReview', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Apply')).toBeInTheDocument();
+      expect(screen.getByText('Apply Changes')).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText('Apply'));
-
-    expect(window.confirm).toHaveBeenCalledWith(
-      'Are you sure you want to apply these changes?',
-    );
+    await user.click(screen.getByText('Apply Changes'));
 
     await waitFor(() => {
       expect(proposalApiClient.applyProposal).toHaveBeenCalledWith(
@@ -117,28 +153,11 @@ describe('ProposalReview', () => {
       );
     });
 
-    expect(window.alert).toHaveBeenCalledWith('Proposal applied successfully');
+    expect(mockShowSuccess).toHaveBeenCalledWith('Changes applied successfully');
     expect(onComplete).toHaveBeenCalled();
   });
 
-  it('cancels apply when user declines confirmation', async () => {
-    const user = userEvent.setup();
-    vi.mocked(proposalApiClient.getProposal).mockResolvedValue(mockProposal);
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
-
-    render(<ProposalReview proposalId="prop-001" projectKey="TEST-123" />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Apply')).toBeInTheDocument();
-    });
-
-    await user.click(screen.getByText('Apply'));
-
-    expect(window.confirm).toHaveBeenCalled();
-    expect(proposalApiClient.applyProposal).not.toHaveBeenCalled();
-  });
-
-  it('handles reject action with reason prompt', async () => {
+  it('handles reject action with reason', async () => {
     const user = userEvent.setup();
     const onComplete = vi.fn();
     vi.mocked(proposalApiClient.getProposal).mockResolvedValue(mockProposal);
@@ -153,40 +172,23 @@ describe('ProposalReview', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Reject')).toBeInTheDocument();
+      expect(screen.getByText('Apply Changes')).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText('Reject'));
-
-    expect(window.prompt).toHaveBeenCalledWith('Reason for rejection:');
+    await user.click(screen.getAllByText('Reject')[0]);
+    await user.type(screen.getByLabelText('Reason (optional)'), 'Needs revision');
+    await user.click(screen.getAllByText('Reject')[1]);
 
     await waitFor(() => {
       expect(proposalApiClient.rejectProposal).toHaveBeenCalledWith(
         'TEST-123',
         'prop-001',
-        'Test reason',
+        'Needs revision',
       );
     });
 
-    expect(window.alert).toHaveBeenCalledWith('Proposal rejected');
+    expect(mockShowSuccess).toHaveBeenCalledWith('Changes rejected');
     expect(onComplete).toHaveBeenCalled();
-  });
-
-  it('cancels reject when user cancels reason prompt', async () => {
-    const user = userEvent.setup();
-    vi.mocked(proposalApiClient.getProposal).mockResolvedValue(mockProposal);
-    vi.spyOn(window, 'prompt').mockReturnValue(null);
-
-    render(<ProposalReview proposalId="prop-001" projectKey="TEST-123" />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Reject')).toBeInTheDocument();
-    });
-
-    await user.click(screen.getByText('Reject'));
-
-    expect(window.prompt).toHaveBeenCalled();
-    expect(proposalApiClient.rejectProposal).not.toHaveBeenCalled();
   });
 
   it('displays error message on load failure', async () => {
@@ -211,10 +213,10 @@ describe('ProposalReview', () => {
     render(<ProposalReview proposalId="prop-001" projectKey="TEST-123" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Apply')).toBeInTheDocument();
+      expect(screen.getByText('Apply Changes')).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText('Apply'));
+    await user.click(screen.getByText('Apply Changes'));
 
     await waitFor(() => {
       expect(
@@ -223,6 +225,8 @@ describe('ProposalReview', () => {
         })[0],
       ).toBeInTheDocument();
     });
+
+    expect(mockShowError).toHaveBeenCalledWith('Failed to apply changes');
   });
 
   it('displays error message on reject failure', async () => {
@@ -235,10 +239,11 @@ describe('ProposalReview', () => {
     render(<ProposalReview proposalId="prop-001" projectKey="TEST-123" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Reject')).toBeInTheDocument();
+      expect(screen.getByText('Apply Changes')).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText('Reject'));
+    await user.click(screen.getAllByText('Reject')[0]);
+    await user.click(screen.getAllByText('Reject')[1]);
 
     await waitFor(() => {
       expect(
@@ -247,6 +252,8 @@ describe('ProposalReview', () => {
         })[0],
       ).toBeInTheDocument();
     });
+
+    expect(mockShowError).toHaveBeenCalledWith('Failed to reject changes');
   });
 
   it('disables buttons during action', async () => {
@@ -259,11 +266,11 @@ describe('ProposalReview', () => {
     render(<ProposalReview proposalId="prop-001" projectKey="TEST-123" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Apply')).toBeInTheDocument();
+      expect(screen.getByText('Apply Changes')).toBeInTheDocument();
     });
 
-    const applyButton = screen.getByText('Apply');
-    const rejectButton = screen.getByText('Reject');
+    const applyButton = screen.getByText('Apply Changes');
+    const rejectButton = screen.getAllByText('Reject')[0];
 
     await user.click(applyButton);
 
@@ -283,7 +290,7 @@ describe('ProposalReview', () => {
       expect(screen.getByText(/already been accepted/)).toBeInTheDocument();
     });
 
-    expect(screen.queryByText('Apply')).not.toBeInTheDocument();
+    expect(screen.queryByText('Apply Changes')).not.toBeInTheDocument();
     expect(screen.queryByText('Reject')).not.toBeInTheDocument();
   });
 
@@ -299,7 +306,7 @@ describe('ProposalReview', () => {
       expect(screen.getByText(/already been rejected/)).toBeInTheDocument();
     });
 
-    expect(screen.queryByText('Apply')).not.toBeInTheDocument();
+    expect(screen.queryByText('Apply Changes')).not.toBeInTheDocument();
     expect(screen.queryByText('Reject')).not.toBeInTheDocument();
   });
 });

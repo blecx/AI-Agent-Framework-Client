@@ -343,6 +343,54 @@
       "reject": "Reject"
     }
   },
+  "reviewGate": {
+    "diff": {
+      "title": "Changes",
+      "modeLabel": "View",
+      "sideBySide": "Side-by-Side",
+      "unified": "Unified",
+      "inline": "Inline",
+      "before": "Current",
+      "after": "Proposed"
+    },
+    "checks": {
+      "title": "Validation Checks"
+    },
+    "actions": {
+      "approve": "Apply Changes",
+      "reject": "Reject",
+      "edit": "Edit",
+      "applying": "Processing...",
+      "approveBlocked": "Fix blocking checks before applying"
+    },
+    "reject": {
+      "title": "Reject Changes",
+      "reasonLabel": "Reason (optional)",
+      "reasonPlaceholder": "Explain why these changes are rejected...",
+      "cancel": "Cancel",
+      "confirm": "Reject"
+    },
+    "meta": {
+      "target": "Target",
+      "changeType": "Change Type",
+      "status": "Status",
+      "author": "Author",
+      "rationale": "Rationale",
+      "alreadyProcessed": "This proposal has already been {{status}}."
+    },
+    "defaultChecks": {
+      "syntaxValid": "Syntax valid",
+      "noConflicts": "No conflicts",
+      "changeSize": "Change size",
+      "changeSizeWarning": "Large change set. Please review carefully."
+    },
+    "toasts": {
+      "approveSuccess": "Changes applied successfully",
+      "approveFailed": "Failed to apply changes",
+      "rejectSuccess": "Changes rejected",
+      "rejectFailed": "Failed to reject changes"
+    }
+  },
   "rd": {
     "title": "Readiness Builder",
     "loading": "Loading readiness...",

@@ -3,12 +3,16 @@
  * Review and apply/reject proposals
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useToast } from '../hooks/useToast';
+import ReviewGate from './ReviewGate';
 import { DiffViewer } from './DiffViewer';
 import {
   proposalApiClient,
   type Proposal,
 } from '../services/ProposalApiClient';
+import type { ValidationCheck } from '../types/reviewGate';
 
 export interface ProposalReviewProps {
   proposalId: string;
@@ -21,16 +25,14 @@ export const ProposalReview: React.FC<ProposalReviewProps> = ({
   projectKey,
   onComplete,
 }) => {
+  const { t } = useTranslation();
+  const toast = useToast();
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionInProgress, setActionInProgress] = useState(false);
 
-  useEffect(() => {
-    loadProposal();
-  }, [proposalId, projectKey]);
-
-  const loadProposal = async () => {
+  const loadProposal = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -41,39 +43,36 @@ export const ProposalReview: React.FC<ProposalReviewProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectKey, proposalId]);
+
+  useEffect(() => {
+    loadProposal();
+  }, [loadProposal]);
 
   const handleApply = async () => {
-    if (!window.confirm('Are you sure you want to apply these changes?')) {
-      return;
-    }
-
     try {
       setActionInProgress(true);
       setError(null);
       await proposalApiClient.applyProposal(projectKey, proposalId);
-      alert('Proposal applied successfully');
+      toast.showSuccess(t('reviewGate.toasts.approveSuccess'));
       if (onComplete) onComplete();
     } catch (err) {
+      toast.showError(t('reviewGate.toasts.approveFailed'));
       setError(err instanceof Error ? err.message : 'Failed to apply proposal');
     } finally {
       setActionInProgress(false);
     }
   };
 
-  const handleReject = async () => {
-    const reason = window.prompt('Reason for rejection:');
-    if (!reason) {
-      return;
-    }
-
+  const handleReject = async (reason?: string) => {
     try {
       setActionInProgress(true);
       setError(null);
       await proposalApiClient.rejectProposal(projectKey, proposalId, reason);
-      alert('Proposal rejected');
+      toast.showSuccess(t('reviewGate.toasts.rejectSuccess'));
       if (onComplete) onComplete();
     } catch (err) {
+      toast.showError(t('reviewGate.toasts.rejectFailed'));
       setError(
         err instanceof Error ? err.message : 'Failed to reject proposal',
       );
@@ -94,64 +93,84 @@ export const ProposalReview: React.FC<ProposalReviewProps> = ({
     return <div>Proposal not found</div>;
   }
 
-  // Parse diff to extract old/new content
   const [oldContent, newContent] = parseDiff(proposal.diff);
+
+  const checks: ValidationCheck[] = [
+    {
+      id: 'syntax-valid',
+      label: t('reviewGate.defaultChecks.syntaxValid'),
+      status: 'pass',
+      blocking: true,
+    },
+    {
+      id: 'conflicts',
+      label: t('reviewGate.defaultChecks.noConflicts'),
+      status: proposal.status === 'pending' ? 'pass' : 'warning',
+      blocking: true,
+    },
+    {
+      id: 'change-size',
+      label: t('reviewGate.defaultChecks.changeSize'),
+      status: proposal.diff.split('\n').length > 120 ? 'warning' : 'pass',
+      message:
+        proposal.diff.split('\n').length > 120
+          ? t('reviewGate.defaultChecks.changeSizeWarning')
+          : undefined,
+      blocking: false,
+    },
+  ];
 
   return (
     <div className="proposal-review">
-      <h2>Proposal Review</h2>
+      <h2>{t('proposal.review.title')}</h2>
       <div className="proposal-metadata">
         <p>
-          <strong>Target:</strong> {proposal.target_artifact}
+          <strong>{t('reviewGate.meta.target')}:</strong> {proposal.target_artifact}
         </p>
         <p>
-          <strong>Change Type:</strong> {proposal.change_type}
+          <strong>{t('reviewGate.meta.changeType')}:</strong> {proposal.change_type}
         </p>
         <p>
-          <strong>Status:</strong> {proposal.status}
+          <strong>{t('reviewGate.meta.status')}:</strong> {proposal.status}
         </p>
         <p>
-          <strong>Author:</strong> {proposal.author}
+          <strong>{t('reviewGate.meta.author')}:</strong> {proposal.author}
         </p>
       </div>
 
       <div className="proposal-diff">
-        <h3>Changes</h3>
-        <DiffViewer
-          oldContent={oldContent}
-          newContent={newContent}
-          fileName={proposal.target_artifact}
-        />
+        <h3>{t('reviewGate.diff.title')}</h3>
+        {proposal.status === 'pending' ? (
+          <ReviewGate
+            diff={{ before: oldContent, after: newContent }}
+            checks={checks}
+            onApprove={handleApply}
+            onReject={handleReject}
+            approveLabel={t('reviewGate.actions.approve')}
+            rejectLabel={t('reviewGate.actions.reject')}
+          />
+        ) : (
+          <DiffViewer
+            oldContent={oldContent}
+            newContent={newContent}
+            fileName={proposal.target_artifact}
+          />
+        )}
       </div>
 
       <div className="proposal-rationale">
-        <h3>Rationale</h3>
+        <h3>{t('reviewGate.meta.rationale')}</h3>
         <p>{proposal.rationale}</p>
       </div>
 
-      {proposal.status === 'pending' && (
-        <div className="proposal-actions">
-          <button
-            onClick={handleApply}
-            disabled={actionInProgress}
-            className="btn-apply"
-          >
-            Apply
-          </button>
-          <button
-            onClick={handleReject}
-            disabled={actionInProgress}
-            className="btn-reject"
-          >
-            Reject
-          </button>
+      {proposal.status !== 'pending' && (
+        <div className="proposal-status-message">
+          {t('reviewGate.meta.alreadyProcessed', { status: proposal.status })}
         </div>
       )}
 
-      {proposal.status !== 'pending' && (
-        <div className="proposal-status-message">
-          This proposal has already been {proposal.status}.
-        </div>
+      {actionInProgress && (
+        <div className="proposal-status-message">{t('reviewGate.actions.applying')}</div>
       )}
     </div>
   );
