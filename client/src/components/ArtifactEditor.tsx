@@ -6,30 +6,41 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Template, JSONSchemaProperty } from '../types/template';
+import type { ArtifactState } from '../types/artifact';
 import { templateApiClient } from '../services/TemplateApiClient';
 import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
 import { FormSkeleton } from './LoadingSkeleton';
 import { useToast } from '../hooks/useToast';
+import ArtifactStateBadge from './ArtifactStateBadge';
 import './ArtifactEditor.css';
 
 export interface ArtifactEditorProps {
   templateId: string;
   projectKey: string;
+  artifactState?: ArtifactState;
   initialData?: Record<string, unknown>;
   onSave?: (data: Record<string, unknown>) => void;
+  onProposeForReview?: (data: Record<string, unknown>) => void;
+  onProposeChange?: (data: Record<string, unknown>) => void;
+  onExport?: (data: Record<string, unknown>) => void;
   onCancel?: () => void;
 }
 
 export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
   templateId,
   projectKey: _projectKey, // Reserved for future use (artifact generation API)
+  artifactState = 'draft',
   initialData = {},
   onSave,
+  onProposeForReview,
+  onProposeChange,
+  onExport,
   onCancel,
 }) => {
   const { t } = useTranslation();
   const [template, setTemplate] = useState<Template | null>(null);
   const [formData, setFormData] = useState<Record<string, unknown>>(initialData);
+  const [currentState, setCurrentState] = useState<ArtifactState>(artifactState);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +53,14 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
   const { isBlocked, confirmNavigation, cancelNavigation } = useUnsavedChanges({
     when: hasChanges,
   });
+
+  const canEdit = currentState === 'draft' || currentState === 'needsAttention';
+  const canProposeForReview = currentState === 'draft';
+  const canProposeChange = currentState === 'applied' || currentState === 'complete';
+
+  useEffect(() => {
+    setCurrentState(artifactState);
+  }, [artifactState]);
 
   const isFormValid = useMemo(() => {
     if (!template) return false;
@@ -155,6 +174,11 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
   };
 
   const handleSave = async () => {
+    if (!canEdit) {
+      toast.showError(t('art.messages.readOnly'));
+      return;
+    }
+
     if (!validateForm()) {
       toast.showError(t('artifactEditor.messages.fixValidationErrors'));
       return;
@@ -179,6 +203,28 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
     }
   };
 
+  const handleProposeForReview = async () => {
+    if (!validateForm()) {
+      toast.showError(t('artifactEditor.messages.fixValidationErrors'));
+      return;
+    }
+
+    await onProposeForReview?.(formData);
+    setCurrentState('inReview');
+    toast.showInfo(t('art.messages.sentForReview'));
+  };
+
+  const handleProposeChange = async () => {
+    await onProposeChange?.(formData);
+    setCurrentState('inReview');
+    toast.showInfo(t('art.messages.changeProposed'));
+  };
+
+  const handleExport = () => {
+    onExport?.(formData);
+    toast.showInfo(t('art.messages.exportTriggered'));
+  };
+
   // Keyboard navigation handlers
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // Escape to cancel
@@ -194,6 +240,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
     const isRequired = template?.schema.required?.includes(fieldName);
     const commonProps = {
       id: fieldId,
+      disabled: !canEdit,
       'aria-required': isRequired,
       'aria-invalid': !!errors[fieldName],
       'aria-describedby': errors[fieldName] ? `${fieldId}-error` : fieldSchema.description ? `${fieldId}-desc` : undefined,
@@ -313,6 +360,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
       <h2>
         {template.name}
         <span className="template-type">{t('artifactEditor.labels.templateType', { type: template.artifact_type })}</span>
+        <ArtifactStateBadge state={currentState} />
       </h2>
       <p className="template-description">{template.description}</p>
 
@@ -342,25 +390,42 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
         })}
 
         <div className="form-actions">
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={() => {
-              const artifactType = template.artifact_type || 'charter';
-              window.location.assign(
-                `/projects/${_projectKey}/assisted-creation?artifactType=${artifactType}`,
-              );
-            }}
-          >
-            {t('art.action.improveAi')}
-          </button>
-          <button
-            type="submit"
-            className="btn-primary"
-            disabled={!isFormValid || isSaving}
-            aria-busy={isSaving}
-          >
-            {isSaving ? t('artifactEditor.actions.saving') : t('artifactEditor.actions.save')}
+          {canEdit && (
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => {
+                const artifactType = template.artifact_type || 'charter';
+                window.location.assign(
+                  `/projects/${_projectKey}/assisted-creation?artifactType=${artifactType}`,
+                );
+              }}
+            >
+              {t('art.action.improveWithAI')}
+            </button>
+          )}
+          {canEdit && (
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={!isFormValid || isSaving || !canEdit}
+              aria-busy={isSaving}
+            >
+              {isSaving ? t('artifactEditor.actions.saving') : t('artifactEditor.actions.save')}
+            </button>
+          )}
+          {canProposeForReview && (
+            <button type="button" className="btn-primary" onClick={handleProposeForReview}>
+              {t('art.action.propose')}
+            </button>
+          )}
+          {canProposeChange && (
+            <button type="button" className="btn-primary" onClick={handleProposeChange}>
+              {t('art.action.proposeChange')}
+            </button>
+          )}
+          <button type="button" className="btn-secondary" onClick={handleExport}>
+            {t('art.action.export')}
           </button>
           {onCancel && (
             <button type="button" className="btn-secondary" onClick={onCancel}>

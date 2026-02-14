@@ -371,4 +371,52 @@ describe('ArtifactEditor', () => {
     // Initially disabled (required fields empty)
     expect(saveButton).toBeDisabled();
   });
+
+  it('shows draft state badge by default', async () => {
+    vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
+
+    renderWithI18n(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Draft')).toBeInTheDocument();
+    });
+  });
+
+  it('disables editing in applied state and shows propose change action', async () => {
+    vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
+
+    renderWithI18n(
+      <ArtifactEditor templateId="pmp-01" projectKey="TEST" artifactState="applied" />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Applied')).toBeInTheDocument();
+    });
+
+    const titleInput = screen.getByLabelText(/Project Title/) as HTMLInputElement;
+    expect(titleInput).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /save/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /propose change/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /improve with ai/i })).not.toBeInTheDocument();
+  });
+
+  it('transitions from draft to in-review when proposing for review', async () => {
+    vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
+
+    renderWithI18n(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Project Management Plan')).toBeInTheDocument();
+    });
+
+    await userEvent.type(screen.getByLabelText(/Project Title/), 'Refactor App');
+    await userEvent.type(screen.getByLabelText(/Purpose/), 'Improve reliability');
+
+    const proposeButton = screen.getByRole('button', { name: /propose for review/i });
+    await userEvent.click(proposeButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('In Review')).toBeInTheDocument();
+    });
+  });
 });
