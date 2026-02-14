@@ -24,6 +24,7 @@ import ConnectionStatus from './components/ConnectionStatus';
 import ConnectionBanner from './components/ConnectionBanner';
 import SyncPanel from './components/SyncPanel';
 import { useConnection } from './hooks/useConnection';
+import AssistedCreation from './components/AssistedCreation';
 import { ProjectsStateProvider } from './state/projectsState';
 import { RaidStateProvider } from './state/raidState';
 import { UiPreferencesProvider } from './state/uiPreferences';
@@ -44,6 +45,11 @@ const queryClient = new QueryClient({
 function ApplyPanelWrapper() {
   const { projectKey } = useParams<{ projectKey: string }>();
   return <ApplyPanel projectKey={projectKey || ''} />;
+}
+
+function AssistedCreationWrapper() {
+  const { projectKey } = useParams<{ projectKey: string }>();
+  return <AssistedCreation projectKey={projectKey || ''} />;
 }
 
 interface NavigationProps {
@@ -172,6 +178,14 @@ function App() {
                             element={
                               <ErrorBoundary name="SyncPanel">
                                 <SyncPanel />
+                              </ErrorBoundary>
+                            }
+                          />
+                          <Route
+                            path="/projects/:projectKey/assisted-creation"
+                            element={
+                              <ErrorBoundary name="AssistedCreation">
+                                <AssistedCreationWrapper />
                               </ErrorBoundary>
                             }
                           />

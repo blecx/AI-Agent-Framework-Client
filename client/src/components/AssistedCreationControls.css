@@ -1,0 +1,13 @@
+.assisted-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .assisted-controls {
+    display: grid;
+    justify-content: stretch;
+  }
+}

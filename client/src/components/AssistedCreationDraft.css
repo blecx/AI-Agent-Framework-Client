@@ -1,0 +1,30 @@
+.assisted-draft {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0.75rem;
+  min-height: 340px;
+}
+
+.assisted-draft h3,
+.assisted-draft-state {
+  margin: 0;
+}
+
+.assisted-draft-state {
+  margin-top: 0.2rem;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.assisted-draft pre {
+  margin: 0.6rem 0 0;
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+  font-size: 0.9rem;
+  color: #111827;
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 0.65rem;
+}

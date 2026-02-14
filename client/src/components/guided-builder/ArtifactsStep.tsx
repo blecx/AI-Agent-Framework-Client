@@ -1,14 +1,17 @@
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 interface ArtifactsStepProps {
+  projectKey: string;
   selectedArtifacts: string[];
   onChange: (artifacts: string[]) => void;
 }
 
 const ALL_ARTIFACTS = ['charter', 'wbs', 'raid', 'schedule'];
 
-export default function ArtifactsStep({ selectedArtifacts, onChange }: ArtifactsStepProps) {
+export default function ArtifactsStep({ projectKey, selectedArtifacts, onChange }: ArtifactsStepProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const toggleArtifact = (artifact: string) => {
     if (selectedArtifacts.includes(artifact)) {
@@ -36,6 +39,20 @@ export default function ArtifactsStep({ selectedArtifacts, onChange }: Artifacts
           </label>
         ))}
       </div>
+
+      <button
+        type="button"
+        className="btn-primary"
+        onClick={() =>
+          navigate(
+            `/projects/${projectKey || 'guided-builder'}/assisted-creation?artifactType=${
+              selectedArtifacts[0] || 'charter'
+            }`,
+          )
+        }
+      >
+        {t('ac.entry.cta.start')}
+      </button>
     </section>
   );
 }
