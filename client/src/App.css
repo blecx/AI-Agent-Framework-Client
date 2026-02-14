@@ -76,27 +76,6 @@
   margin-left: 0.5rem;
 }
 
-.status-indicator {
-  font-size: 1rem;
-}
-
-.status-indicator.status-checking {
-  color: #ffc107;
-}
-
-.status-indicator.status-connected {
-  color: #28a745;
-}
-
-.status-indicator.status-disconnected {
-  color: #dc3545;
-}
-
-.status-text {
-  font-size: 0.875rem;
-  color: #4a4a4a;
-}
-
 .app-main {
   padding: 0;
 }

@@ -7,7 +7,6 @@ import {
   useParams,
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
 import ProjectList from './components/ProjectList';
 import ProjectView from './components/ProjectView';
 import ProposePanel from './components/ProposePanel';
@@ -19,11 +18,14 @@ import { ToastProvider } from './components/ToastContext';
 import ToastContainer from './components/ToastContainer';
 import ErrorBoundary from './components/ErrorBoundary';
 import LanguageSwitcher from './components/LanguageSwitcher';
-import apiClient from './services/apiClient';
+import ConnectionStatus from './components/ConnectionStatus';
+import ConnectionBanner from './components/ConnectionBanner';
+import { useConnection } from './hooks/useConnection';
 import { ProjectsStateProvider } from './state/projectsState';
 import { RaidStateProvider } from './state/raidState';
 import { UiPreferencesProvider } from './state/uiPreferences';
 import { WorkflowStateProvider } from './state/workflowState';
+import type { ConnectionState } from './types/connection';
 import './App.css';
 
 // Create a QueryClient instance
@@ -41,43 +43,12 @@ function ApplyPanelWrapper() {
   return <ApplyPanel projectKey={projectKey || ''} />;
 }
 
-function Navigation() {
+interface NavigationProps {
+  connectionState: ConnectionState;
+}
+
+function Navigation({ connectionState }: NavigationProps) {
   const location = useLocation();
-  const [connectionStatus, setConnectionStatus] = useState<
-    'checking' | 'connected' | 'disconnected'
-  >('checking');
-
-  useEffect(() => {
-    let mounted = true;
-
-    const checkConnection = async () => {
-      try {
-        await apiClient.checkHealth();
-        if (mounted) {
-          setConnectionStatus('connected');
-        }
-      } catch {
-        if (mounted) {
-          setConnectionStatus('disconnected');
-        }
-      }
-    };
-
-    // Initial check
-    checkConnection();
-
-    // Periodic health checks every 30 seconds
-    const healthCheckInterval = parseInt(
-      import.meta.env.VITE_HEALTH_CHECK_INTERVAL || '30000',
-      10,
-    );
-    const intervalId = setInterval(checkConnection, healthCheckInterval);
-
-    return () => {
-      mounted = false;
-      clearInterval(intervalId);
-    };
-  }, []);
 
   return (
     <nav className="app-nav">
@@ -107,20 +78,8 @@ function Navigation() {
           UI Library
         </Link>
       </div>
-      <div className="nav-status" role="status" aria-live="polite">
-        <span
-          className={`status-indicator status-${connectionStatus}`}
-          aria-label={`Connection status: ${connectionStatus}`}
-        >
-          {connectionStatus === 'checking' && '⏳'}
-          {connectionStatus === 'connected' && '✓'}
-          {connectionStatus === 'disconnected' && '✗'}
-        </span>
-        <span className="status-text">
-          {connectionStatus === 'checking' && 'Checking...'}
-          {connectionStatus === 'connected' && 'Connected'}
-          {connectionStatus === 'disconnected' && 'Disconnected'}
-        </span>
+      <div className="nav-status">
+        <ConnectionStatus state={connectionState} />
         <LanguageSwitcher />
       </div>
     </nav>
@@ -128,6 +87,8 @@ function Navigation() {
 }
 
 function App() {
+  const { state: connectionState, retryConnection } = useConnection();
+
   return (
     <QueryClientProvider client={queryClient}>
       <UiPreferencesProvider>
@@ -141,7 +102,11 @@ function App() {
                       <a href="#main-content" className="skip-to-content">
                         Skip to main content
                       </a>
-                      <Navigation />
+                      <Navigation connectionState={connectionState} />
+                      <ConnectionBanner
+                        state={connectionState}
+                        onRetry={retryConnection}
+                      />
                       <main id="main-content" className="app-main">
                         <Routes>
                           <Route
