@@ -33,7 +33,7 @@ export default function ProjectList() {
     queryFn: async () => {
       const response = await apiClient.listProjects();
       if (!response.success) {
-        throw new Error(response.error || 'Failed to load projects');
+        throw new Error(response.error || t('projects.list.errors.load'));
       }
       return response.data || [];
     },
@@ -52,7 +52,7 @@ export default function ProjectList() {
         project.description,
       );
       if (!response.success) {
-        throw new Error(response.error || 'Failed to create project');
+        throw new Error(response.error || t('projects.list.errors.create'));
       }
       return response.data;
     },
@@ -61,26 +61,26 @@ export default function ProjectList() {
       setShowCreateForm(false);
       setNewProject({ key: '', name: '', description: '' });
       setError(null);
-      toast.showSuccess('Project created successfully!');
+      toast.showSuccess(t('projects.list.toast.created'));
     },
     onError: (error: Error) => {
       console.error('Error creating project:', error);
       setError(error.message);
-      toast.showError(`Failed to create project: ${error.message}`);
+      toast.showError(t('projects.list.toast.createFailed', { message: error.message }));
     },
   });
 
   const handleCreateProject = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newProject.key || !newProject.name) {
-      setError('Project key and name are required');
+      setError(t('projects.create.errors.requiredKeyAndName'));
       return;
     }
     createProjectMutation.mutate(newProject);
   };
 
   const handleViewProject = (projectKey: string) => {
-    navigate(`/project/${projectKey}`);
+    navigate(`/projects/${projectKey}`);
   };
 
   if (isLoading) {
@@ -102,7 +102,7 @@ export default function ProjectList() {
     return (
       <div className="project-list-container">
         <div className="error">
-          Error loading projects: {(queryError as Error).message}
+          {t('projects.list.errors.loadingWithMessage', { message: (queryError as Error).message })}
         </div>
       </div>
     );
@@ -119,7 +119,7 @@ export default function ProjectList() {
           data-testid="create-project-button"
           onClick={() => setShowCreateForm(!showCreateForm)}
         >
-          {showCreateForm ? t('projects.create.cta.cancel') : `+ ${t('projects.list.cta.new')}`}
+          {showCreateForm ? t('projects.create.cta.cancel') : t('projects.list.cta.new')}
         </Button>
       </header>
 
@@ -130,7 +130,7 @@ export default function ProjectList() {
           <h2>{t('projects.create.title')}</h2>
           <form onSubmit={handleCreateProject}>
             <div className="form-group">
-              <label htmlFor="projectKey">Project Key *</label>
+              <label htmlFor="projectKey">{t('projects.create.form.keyLabel')}</label>
               <input
                 id="projectKey"
                 type="text"
@@ -138,13 +138,13 @@ export default function ProjectList() {
                 onChange={(e) =>
                   setNewProject({ ...newProject, key: e.target.value })
                 }
-                placeholder="e.g., my-project"
+                placeholder={t('projects.create.form.keyPlaceholder')}
                 required
               />
-              <small>Unique identifier (lowercase, hyphens allowed)</small>
+              <small>{t('projects.create.form.keyHelp')}</small>
             </div>
             <div className="form-group">
-              <label htmlFor="projectName">Project Name *</label>
+              <label htmlFor="projectName">{t('projects.create.form.nameLabel')}</label>
               <input
                 id="projectName"
                 type="text"
@@ -152,19 +152,19 @@ export default function ProjectList() {
                 onChange={(e) =>
                   setNewProject({ ...newProject, name: e.target.value })
                 }
-                placeholder="e.g., My Awesome Project"
+                placeholder={t('projects.create.form.namePlaceholder')}
                 required
               />
             </div>
             <div className="form-group">
-              <label htmlFor="projectDescription">Description</label>
+              <label htmlFor="projectDescription">{t('projects.create.form.descriptionLabel')}</label>
               <textarea
                 id="projectDescription"
                 value={newProject.description}
                 onChange={(e) =>
                   setNewProject({ ...newProject, description: e.target.value })
                 }
-                placeholder="Optional project description"
+                placeholder={t('projects.create.form.descriptionPlaceholder')}
                 rows={3}
               />
             </div>
@@ -198,7 +198,7 @@ export default function ProjectList() {
           title={t('projects.list.empty.title')}
           description={t('projects.list.empty.text')}
           action={{
-            label: `+ ${t('projects.list.cta.new')}`,
+            label: t('projects.list.cta.new'),
             onClick: () => setShowCreateForm(true),
           }}
         />
@@ -212,13 +212,13 @@ export default function ProjectList() {
               onClick={() => handleViewProject(project.key)}
             >
               <h3>{project.name}</h3>
-              <p className="project-key">Key: {project.key}</p>
+              <p className="project-key">{t('projects.list.meta.key')}: {project.key}</p>
               {project.description && (
                 <p className="project-description">{project.description}</p>
               )}
               <div className="project-meta">
                 <span>
-                  Created: {new Date(project.createdAt).toLocaleDateString()}
+                  {t('projects.list.meta.created')}: {new Date(project.createdAt).toLocaleDateString()}
                 </span>
                 {project.gitRepo && (
                   <span className="git-status">

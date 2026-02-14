@@ -2,8 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
+import { I18nextProvider } from 'react-i18next';
 import RAIDList from '../../../components/RAIDList';
 import * as apiClientModule from '../../../services/apiClient';
+import i18n from '../../../i18n/config';
 import type { RAIDItemList, RAIDItem } from '../../../types';
 
 // Mock apiClient
@@ -45,14 +47,17 @@ function renderWithQuery(component: React.ReactElement) {
 
   return render(
     <BrowserRouter>
-      <QueryClientProvider client={queryClient}>{component}</QueryClientProvider>
+      <I18nextProvider i18n={i18n}>
+        <QueryClientProvider client={queryClient}>{component}</QueryClientProvider>
+      </I18nextProvider>
     </BrowserRouter>,
   );
 }
 
 describe('RAIDList', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    await i18n.changeLanguage('en');
   });
 
   it('should display loading skeleton while fetching RAID items', () => {

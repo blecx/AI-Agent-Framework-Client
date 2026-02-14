@@ -5,8 +5,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { I18nextProvider } from 'react-i18next';
 import { ArtifactEditor } from '../ArtifactEditor';
 import { templateApiClient } from '../../services/TemplateApiClient';
+import i18n from '../../i18n/config';
 import type { Template } from '../../types/template';
 
 // Mock the templateApiClient
@@ -36,6 +38,9 @@ vi.mock('../../hooks/useUnsavedChanges', () => ({
 }));
 
 describe('ArtifactEditor', () => {
+  const renderWithI18n = (component: React.ReactElement) =>
+    render(<I18nextProvider i18n={i18n}>{component}</I18nextProvider>);
+
   const mockTemplate: Template = {
     id: 'pmp-01',
     name: 'Project Management Plan',
@@ -74,8 +79,9 @@ describe('ArtifactEditor', () => {
     },
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    await i18n.changeLanguage('en');
   });
 
   it('renders loading state initially', () => {
@@ -83,7 +89,7 @@ describe('ArtifactEditor', () => {
       () => new Promise(() => {}) // Never resolves
     );
 
-    render(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
+    renderWithI18n(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
 
     // PR #122 changed loading state to use LoadingSkeleton with aria attributes
     const loadingElement = screen.getByLabelText('Loading template');
@@ -96,7 +102,7 @@ describe('ArtifactEditor', () => {
       new Error('Template not found')
     );
 
-    render(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
+    renderWithI18n(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
 
     await waitFor(() => {
       expect(screen.getByText('Template not found')).toBeInTheDocument();
@@ -106,7 +112,7 @@ describe('ArtifactEditor', () => {
   it('renders form from template schema', async () => {
     vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
 
-    render(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
+    renderWithI18n(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
 
     await waitFor(() => {
       expect(screen.getByText('Project Management Plan')).toBeInTheDocument();
@@ -125,7 +131,7 @@ describe('ArtifactEditor', () => {
   it('marks required fields with asterisk', async () => {
     vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
 
-    render(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
+    renderWithI18n(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
 
     await waitFor(() => {
       expect(screen.getByText('Project Management Plan')).toBeInTheDocument();
@@ -141,7 +147,7 @@ describe('ArtifactEditor', () => {
   it('renders text input for string fields', async () => {
     vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
 
-    render(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
+    renderWithI18n(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
 
     await waitFor(() => {
       const titleInput = screen.getByLabelText(/Project Title/);
@@ -152,7 +158,7 @@ describe('ArtifactEditor', () => {
   it('renders textarea for long text fields', async () => {
     vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
 
-    render(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
+    renderWithI18n(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
 
     await waitFor(() => {
       const purposeInput = screen.getByLabelText(/Purpose/);
@@ -163,7 +169,7 @@ describe('ArtifactEditor', () => {
   it('renders date input for date fields', async () => {
     vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
 
-    render(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
+    renderWithI18n(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
 
     await waitFor(() => {
       const dateInput = screen.getByLabelText(/Start Date/);
@@ -192,7 +198,7 @@ describe('ArtifactEditor', () => {
     vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
     const onSave = vi.fn();
 
-    render(
+    renderWithI18n(
       <ArtifactEditor templateId="pmp-01" projectKey="TEST" onSave={onSave} />
     );
 
@@ -214,7 +220,7 @@ describe('ArtifactEditor', () => {
     vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
     const onSave = vi.fn();
 
-    render(
+    renderWithI18n(
       <ArtifactEditor templateId="pmp-01" projectKey="TEST" onSave={onSave} />
     );
 
@@ -239,7 +245,7 @@ describe('ArtifactEditor', () => {
     vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
     const onSave = vi.fn();
 
-    render(
+    renderWithI18n(
       <ArtifactEditor templateId="pmp-01" projectKey="TEST" onSave={onSave} />
     );
 
@@ -275,7 +281,7 @@ describe('ArtifactEditor', () => {
   it('clears field error on change', async () => {
     vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
 
-    render(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
+    renderWithI18n(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
 
     await waitFor(() => {
       expect(screen.getByText('Project Management Plan')).toBeInTheDocument();
@@ -302,7 +308,7 @@ describe('ArtifactEditor', () => {
     vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
     const onCancel = vi.fn();
 
-    render(
+    renderWithI18n(
       <ArtifactEditor
         templateId="pmp-01"
         projectKey="TEST"
@@ -329,7 +335,7 @@ describe('ArtifactEditor', () => {
       priority: 'Medium',
     };
 
-    render(
+    renderWithI18n(
       <ArtifactEditor
         templateId="pmp-01"
         projectKey="TEST"
@@ -354,7 +360,7 @@ describe('ArtifactEditor', () => {
   it('disables save button when form is invalid', async () => {
     vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
 
-    render(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
+    renderWithI18n(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
 
     await waitFor(() => {
       expect(screen.getByText('Project Management Plan')).toBeInTheDocument();
