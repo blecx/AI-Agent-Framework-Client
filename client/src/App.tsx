@@ -20,6 +20,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import ConnectionStatus from './components/ConnectionStatus';
 import ConnectionBanner from './components/ConnectionBanner';
+import SyncPanel from './components/SyncPanel';
 import { useConnection } from './hooks/useConnection';
 import { ProjectsStateProvider } from './state/projectsState';
 import { RaidStateProvider } from './state/raidState';
@@ -154,6 +155,14 @@ function App() {
                             element={
                               <ErrorBoundary name="ProjectView">
                                 <ProjectView />
+                              </ErrorBoundary>
+                            }
+                          />
+                          <Route
+                            path="/projects/:projectKey/sync"
+                            element={
+                              <ErrorBoundary name="SyncPanel">
+                                <SyncPanel />
                               </ErrorBoundary>
                             }
                           />

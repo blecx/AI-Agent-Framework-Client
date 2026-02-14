@@ -251,12 +251,60 @@
   },
   "sync": {
     "title": "Sync",
-    "cta": {
-      "start": "Start sync",
-      "openConflicts": "Open conflicts"
-    },
     "state": {
+      "clean": "In sync",
+      "ahead": "Ahead",
+      "behind": "Behind",
+      "diverged": "Diverged",
+      "running": "Syncing…",
+      "failed": "Sync failed",
       "conflict": "Conflict"
+    },
+    "description": {
+      "clean": "No changes pending. Everything is up to date.",
+      "ahead": "You have {{count}} local change(s) not synced yet.",
+      "behind": "There are {{count}} remote change(s) waiting to be pulled.",
+      "diverged": "Local ({{local}}) and remote ({{remote}}) changes both exist.",
+      "running": "Sync is currently running. Please wait...",
+      "failed": "Sync failed: {{error}}",
+      "conflict": "Conflicts require manual resolution before sync can complete."
+    },
+    "action": {
+      "syncNow": "Sync now",
+      "viewHistory": "View history"
+    },
+    "conflict": {
+      "title": "Resolve conflict: {{file}}",
+      "resolutionOptions": "Resolution options",
+      "keepMine": "Keep mine",
+      "useTheirs": "Use theirs",
+      "aiSuggestion": "AI suggestion",
+      "manual": "Manual edit",
+      "mine": "Keep mine",
+      "theirs": "Use theirs",
+      "ai": "AI suggestion",
+      "cancel": "Cancel",
+      "apply": "Apply resolution"
+    },
+    "history": {
+      "title": "Sync history",
+      "synced": "Synchronization completed successfully.",
+      "localChanges": "Local changes detected.",
+      "started": "Synchronization started.",
+      "failed": "Synchronization failed.",
+      "conflictDetected": "Conflict detected during sync.",
+      "remoteChanges": "Remote changes detected.",
+      "diverged": "Local and remote branches diverged."
+    },
+    "demo": {
+      "title": "Demo states"
+    },
+    "feedback": {
+      "syncRequested": "Sync requested (mock).",
+      "resolved": "Resolution applied (mock): {{resolution}}"
+    },
+    "error": {
+      "unknown": "Unknown sync error"
     }
   }
 }

@@ -1,0 +1,44 @@
+.conflict-resolver {
+  margin-top: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  padding: 1rem;
+}
+
+.conflict-resolver h3 {
+  margin: 0 0 0.75rem;
+}
+
+.conflict-options {
+  margin: 1rem 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.conflict-options legend {
+  font-weight: 600;
+  padding: 0 0.25rem;
+}
+
+.conflict-options label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.conflict-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .conflict-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
