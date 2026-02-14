@@ -343,6 +343,54 @@
       "reject": "Verwerfen"
     }
   },
+  "reviewGate": {
+    "diff": {
+      "title": "Änderungen",
+      "modeLabel": "Ansicht",
+      "sideBySide": "Nebeneinander",
+      "unified": "Vereinheitlicht",
+      "inline": "Inline",
+      "before": "Aktuell",
+      "after": "Vorgeschlagen"
+    },
+    "checks": {
+      "title": "Validierungsprüfungen"
+    },
+    "actions": {
+      "approve": "Änderungen anwenden",
+      "reject": "Verwerfen",
+      "edit": "Bearbeiten",
+      "applying": "Wird verarbeitet...",
+      "approveBlocked": "Behebe blockierende Prüfungen vor dem Anwenden"
+    },
+    "reject": {
+      "title": "Änderungen verwerfen",
+      "reasonLabel": "Grund (optional)",
+      "reasonPlaceholder": "Erkläre, warum diese Änderungen verworfen werden...",
+      "cancel": "Abbrechen",
+      "confirm": "Verwerfen"
+    },
+    "meta": {
+      "target": "Ziel",
+      "changeType": "Änderungstyp",
+      "status": "Status",
+      "author": "Autor",
+      "rationale": "Begründung",
+      "alreadyProcessed": "Dieser Vorschlag wurde bereits {{status}}."
+    },
+    "defaultChecks": {
+      "syntaxValid": "Syntax gültig",
+      "noConflicts": "Keine Konflikte",
+      "changeSize": "Änderungsumfang",
+      "changeSizeWarning": "Großer Änderungssatz. Bitte sorgfältig prüfen."
+    },
+    "toasts": {
+      "approveSuccess": "Änderungen erfolgreich angewendet",
+      "approveFailed": "Änderungen konnten nicht angewendet werden",
+      "rejectSuccess": "Änderungen verworfen",
+      "rejectFailed": "Änderungen konnten nicht verworfen werden"
+    }
+  },
   "rd": {
     "title": "Readiness Builder",
     "loading": "Readiness wird geladen...",
