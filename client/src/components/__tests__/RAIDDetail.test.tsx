@@ -32,17 +32,17 @@ vi.mock('../../utils/toast', () => ({
 }));
 
 vi.mock('../raid/RAIDBadge', () => ({
-  TypeBadge: ({ value }: any) => (
+  TypeBadge: ({ value }: { value: string }) => (
     <span data-testid="type-badge">
       {value.charAt(0).toUpperCase() + value.slice(1)}
     </span>
   ),
-  StatusBadge: ({ value }: any) => (
+  StatusBadge: ({ value }: { value: string }) => (
     <span data-testid="status-badge">
       {value.split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
     </span>
   ),
-  PriorityBadge: ({ value }: any) => (
+  PriorityBadge: ({ value }: { value: string }) => (
     <span data-testid="priority-badge">
       {value.toUpperCase()}
     </span>

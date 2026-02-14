@@ -81,7 +81,72 @@
     "python -m black": true,
     "python -m flake8": true,
     "python -m pytest": true,
-    "pytest": true
+    "pytest": true,
+    "unzip": true,
+    "diff": true,
+    "basename": true,
+    "test": true,
+    "sh": true,
+    "for": true,
+    "while": true,
+    "if": true,
+    "do": true,
+    "done": true,
+    "xargs": true,
+    "jq": true,
+    "sort": true,
+    "uniq": true,
+    "tee": true,
+    "/^.*\\|\\|.*$/": {
+      "approve": true,
+      "matchCommandLine": true,
+      "description": "Allow commands with OR operator"
+    },
+    "/^.*2>\\/dev\\/null.*$/": {
+      "approve": true,
+      "matchCommandLine": true,
+      "description": "Allow commands with stderr redirect"
+    },
+    "/^cd .* && .*$/": {
+      "approve": true,
+      "matchCommandLine": true,
+      "description": "Allow cd with command chaining"
+    },
+    "/^for .* in .*; do .*; done$/": {
+      "approve": true,
+      "matchCommandLine": true,
+      "description": "Allow for loops"
+    },
+    "/^.*\\| head.*$/": {
+      "approve": true,
+      "matchCommandLine": true,
+      "description": "Allow piped head commands"
+    },
+    "/^.*\\| grep.*$/": {
+      "approve": true,
+      "matchCommandLine": true,
+      "description": "Allow piped grep commands"
+    },
+    "/^.*\\| xargs.*$/": {
+      "approve": true,
+      "matchCommandLine": true,
+      "description": "Allow piped xargs commands"
+    },
+    "/^.*\\| jq.*$/": {
+      "approve": true,
+      "matchCommandLine": true,
+      "description": "Allow piped jq commands"
+    },
+    "/^unzip -q .* -d .*$/": {
+      "approve": true,
+      "matchCommandLine": true,
+      "description": "Allow unzip with quiet and destination"
+    },
+    "/^diff -q .*$/": {
+      "approve": true,
+      "matchCommandLine": true,
+      "description": "Allow diff quiet mode"
+    }
   },
   "chat.allowAnonymousAccess": true,
   "chat.checkpoints.showFileChanges": true,

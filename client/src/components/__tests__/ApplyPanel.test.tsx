@@ -28,7 +28,14 @@ vi.mock('../../hooks/useToast', () => ({
 }));
 
 vi.mock('../ConfirmDialog', () => ({
-  default: ({ isOpen, onConfirm, onCancel, title, message, confirmText }: any) =>
+  default: ({ isOpen, onConfirm, onCancel, title, message, confirmText }: {
+    isOpen: boolean;
+    onConfirm: () => void;
+    onCancel: () => void;
+    title: string;
+    message: string;
+    confirmText?: string;
+  }) =>
     isOpen ? (
       <div data-testid="confirm-dialog">
         <h3>{title}</h3>
@@ -42,6 +49,7 @@ vi.mock('../ConfirmDialog', () => ({
 describe('ApplyPanel', () => {
   const mockPendingProposal: Proposal = {
     id: 'prop-1',
+    projectKey: 'TEST-001',
     title: 'Add new feature',
     description: 'Implement feature X',
     status: 'pending',
@@ -57,6 +65,7 @@ describe('ApplyPanel', () => {
 
   const mockAppliedProposal: Proposal = {
     id: 'prop-2',
+    projectKey: 'TEST-001',
     title: 'Bug fix',
     description: 'Fixed critical bug',
     status: 'applied',
@@ -74,6 +83,7 @@ describe('ApplyPanel', () => {
 
   const mockRejectedProposal: Proposal = {
     id: 'prop-3',
+    projectKey: 'TEST-001',
     title: 'Rejected change',
     description: 'This was rejected',
     status: 'rejected',
