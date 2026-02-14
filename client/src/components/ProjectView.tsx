@@ -17,8 +17,7 @@ type TabType = 'overview' | 'propose' | 'apply' | 'commands' | 'artifacts' | 'au
 
 export default function ProjectView() {
   const { t } = useTranslation();
-  const params = useParams<{ projectKey?: string; key?: string }>();
-  const projectKey = params.projectKey ?? params.key;
+  const { projectKey } = useParams<{ projectKey: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('overview');
 

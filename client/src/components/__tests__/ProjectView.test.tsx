@@ -72,7 +72,7 @@ function renderWithProviders(ui: React.ReactElement, { route = '/projects/TEST-1
       <QueryClientProvider client={queryClient}>
         <MemoryRouter initialEntries={[route]}>
           <Routes>
-            <Route path="/projects/:key" element={ui} />
+            <Route path="/projects/:projectKey" element={ui} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
