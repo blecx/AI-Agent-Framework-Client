@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -37,11 +37,7 @@ export default function ProjectView() {
   const { projectKey } = useParams<{ projectKey: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<TabType>('overview');
-
-  useEffect(() => {
-    setActiveTab(tabFromPath(location.pathname));
-  }, [location.pathname]);
+  const [activeTab, setActiveTab] = useState<TabType>(() => tabFromPath(location.pathname));
 
   // Fetch project data
   const {
