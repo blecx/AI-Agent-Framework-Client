@@ -38,6 +38,12 @@
   "projects": {
     "list": {
       "title": "Projects",
+      "table": {
+        "name": "Name",
+        "description": "Description",
+        "branch": "Branch",
+        "searchPlaceholder": "Search by key, name, or description"
+      },
       "cta": {
         "new": "New project",
         "import": "Import"
@@ -79,6 +85,16 @@
         "requiredKeyAndName": "Project key and name are required"
       }
     }
+  },
+  "table": {
+    "all": "All",
+    "search": "Search",
+    "emptyTitle": "No data available",
+    "emptyDescription": "Try adjusting filters or create new data.",
+    "prev": "Previous",
+    "next": "Next",
+    "pageSize": "Page size",
+    "showing": "Showing {{start}}-{{end}} of {{total}}"
   },
   "projectView": {
     "actions": {
