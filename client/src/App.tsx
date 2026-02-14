@@ -25,6 +25,7 @@ import ConnectionBanner from './components/ConnectionBanner';
 import SyncPanel from './components/SyncPanel';
 import { useConnection } from './hooks/useConnection';
 import AssistedCreation from './components/AssistedCreation';
+import SkipToContent from './components/SkipToContent';
 import { ProjectsStateProvider } from './state/projectsState';
 import { RaidStateProvider } from './state/raidState';
 import { UiPreferencesProvider } from './state/uiPreferences';
@@ -61,7 +62,7 @@ function Navigation({ connectionState }: NavigationProps) {
   const location = useLocation();
 
   return (
-    <nav className="app-nav">
+    <nav className="app-nav" aria-label="Primary navigation">
       <div className="nav-brand">
         <h1>AI Agent Framework</h1>
       </div>
@@ -115,15 +116,13 @@ function App() {
                 <ErrorBoundary>
                   <Router>
                     <div className="App">
-                      <a href="#main-content" className="skip-to-content">
-                        Skip to main content
-                      </a>
+                      <SkipToContent />
                       <Navigation connectionState={connectionState} />
                       <ConnectionBanner
                         state={connectionState}
                         onRetry={retryConnection}
                       />
-                      <main id="main-content" className="app-main">
+                      <main id="main-content" className="app-main" tabIndex={-1}>
                         <Routes>
                           <Route
                             path="/"

@@ -1,5 +1,5 @@
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 interface ArtifactsStepProps {
   projectKey: string;
@@ -7,9 +7,13 @@ interface ArtifactsStepProps {
   onChange: (artifacts: string[]) => void;
 }
 
-const ALL_ARTIFACTS = ['charter', 'wbs', 'raid', 'schedule'];
+const ALL_ARTIFACTS = ["charter", "wbs", "raid", "schedule"];
 
-export default function ArtifactsStep({ projectKey, selectedArtifacts, onChange }: ArtifactsStepProps) {
+export default function ArtifactsStep({
+  projectKey,
+  selectedArtifacts,
+  onChange,
+}: ArtifactsStepProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -24,8 +28,8 @@ export default function ArtifactsStep({ projectKey, selectedArtifacts, onChange 
 
   return (
     <section className="guided-step">
-      <h2>{t('gb.step.artifacts')}</h2>
-      <p>{t('gb.artifacts.description')}</p>
+      <h2>{t("gb.step.artifacts")}</h2>
+      <p>{t("gb.artifacts.description")}</p>
 
       <div className="guided-checkbox-grid">
         {ALL_ARTIFACTS.map((artifact) => (
@@ -45,13 +49,13 @@ export default function ArtifactsStep({ projectKey, selectedArtifacts, onChange 
         className="btn-primary"
         onClick={() =>
           navigate(
-            `/projects/${projectKey || 'guided-builder'}/assisted-creation?artifactType=${
-              selectedArtifacts[0] || 'charter'
+            `/projects/${projectKey || "guided-builder"}/assisted-creation?artifactType=${
+              selectedArtifacts[0] || "charter"
             }`,
           )
         }
       >
-        {t('ac.entry.cta.start')}
+        {t("ac.entry.cta.start")}
       </button>
     </section>
   );

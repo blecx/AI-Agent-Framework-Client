@@ -25,11 +25,31 @@ export default function ConfirmDialog({
   cancelText = 'Cancel',
 }: ConfirmDialogProps) {
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  const getFocusableElements = () => {
+    if (!dialogRef.current) return [] as HTMLElement[];
+
+    return Array.from(
+      dialogRef.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      ),
+    ).filter((el) => !el.hasAttribute('disabled'));
+  };
 
   // Focus management
   useEffect(() => {
+    if (isOpen) {
+      previousFocusRef.current = document.activeElement as HTMLElement;
+    }
+
     if (isOpen && confirmButtonRef.current) {
       confirmButtonRef.current.focus();
+    }
+
+    if (!isOpen) {
+      previousFocusRef.current?.focus();
     }
   }, [isOpen]);
 
@@ -54,6 +74,26 @@ export default function ConfirmDialog({
         e.preventDefault();
         onCancel();
       }
+
+      if (e.key === 'Tab') {
+        const focusables = getFocusableElements();
+        if (!focusables.length) {
+          e.preventDefault();
+          return;
+        }
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+
       // Enter key confirms (when focused on dialog elements)
       if (e.key === 'Enter' && e.target instanceof HTMLElement) {
         const isInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
@@ -73,11 +113,13 @@ export default function ConfirmDialog({
   return (
     <div className="dialog-overlay" onClick={onCancel}>
       <div
+        ref={dialogRef}
         className="dialog-container"
         role="dialog"
         aria-labelledby="dialog-title"
         aria-describedby="dialog-description"
         aria-modal="true"
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="dialog-header">

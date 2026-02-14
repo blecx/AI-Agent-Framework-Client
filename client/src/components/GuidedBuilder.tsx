@@ -1,35 +1,35 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import GuidedBuilderNav from './GuidedBuilderNav';
-import GuidedBuilderProgress from './GuidedBuilderProgress';
-import WelcomeStep from './guided-builder/WelcomeStep';
-import ProjectSetupStep from './guided-builder/ProjectSetupStep';
-import ArtifactsStep from './guided-builder/ArtifactsStep';
-import ReviewStep from './guided-builder/ReviewStep';
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import GuidedBuilderNav from "./GuidedBuilderNav";
+import GuidedBuilderProgress from "./GuidedBuilderProgress";
+import WelcomeStep from "./guided-builder/WelcomeStep";
+import ProjectSetupStep from "./guided-builder/ProjectSetupStep";
+import ArtifactsStep from "./guided-builder/ArtifactsStep";
+import ReviewStep from "./guided-builder/ReviewStep";
 import type {
   GuidedBuilderState,
   GuidedBuilderStep,
-} from '../types/guidedBuilder';
-import './GuidedBuilder.css';
+} from "../types/guidedBuilder";
+import "./GuidedBuilder.css";
 
 const STEPS: GuidedBuilderStep[] = [
-  'welcome',
-  'project-setup',
-  'artifacts',
-  'review',
+  "welcome",
+  "project-setup",
+  "artifacts",
+  "review",
 ];
 
-const STORAGE_KEY = 'guided-builder-state';
+const STORAGE_KEY = "guided-builder-state";
 
 const DEFAULT_STATE: GuidedBuilderState = {
-  currentStep: 'welcome',
+  currentStep: "welcome",
   completedSteps: [],
   projectData: {
-    name: '',
-    key: '',
-    description: '',
-    standard: 'ISO 21500',
+    name: "",
+    key: "",
+    description: "",
+    standard: "ISO 21500",
   },
   selectedArtifacts: [],
 };
@@ -112,32 +112,33 @@ export default function GuidedBuilder() {
   };
 
   const handleSkip = () => {
-    goToStep('review');
+    goToStep("review");
   };
 
   const handleExit = () => {
-    navigate('/projects');
+    navigate("/projects");
   };
 
   return (
     <div className="guided-builder-page" data-testid="guided-builder">
       <header className="guided-builder-header">
-        <GuidedBuilderProgress current={currentStepIndex + 1} total={STEPS.length} />
+        <GuidedBuilderProgress
+          current={currentStepIndex + 1}
+          total={STEPS.length}
+        />
         <button
           type="button"
           className="guided-builder-exit"
           onClick={handleExit}
-          aria-label={t('gb.exit')}
+          aria-label={t("gb.exit")}
         >
           ×
         </button>
       </header>
 
       <main className="guided-builder-content">
-        {currentStep === 'welcome' && (
-          <WelcomeStep onGetStarted={handleNext} />
-        )}
-        {currentStep === 'project-setup' && (
+        {currentStep === "welcome" && <WelcomeStep onGetStarted={handleNext} />}
+        {currentStep === "project-setup" && (
           <ProjectSetupStep
             data={state.projectData}
             onChange={(projectData) =>
@@ -145,7 +146,7 @@ export default function GuidedBuilder() {
             }
           />
         )}
-        {currentStep === 'artifacts' && (
+        {currentStep === "artifacts" && (
           <ArtifactsStep
             projectKey={state.projectData.key}
             selectedArtifacts={state.selectedArtifacts}
@@ -154,7 +155,7 @@ export default function GuidedBuilder() {
             }
           />
         )}
-        {currentStep === 'review' && (
+        {currentStep === "review" && (
           <ReviewStep
             projectData={state.projectData}
             selectedArtifacts={state.selectedArtifacts}

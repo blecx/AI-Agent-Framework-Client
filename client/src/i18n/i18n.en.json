@@ -19,6 +19,12 @@
       "guidedCoAuthoring": "Guided Co-Authoring"
     }
   },
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "loading": "Loading...",
+    "closeDialog": "Close dialog",
+    "closeNotification": "Close notification"
+  },
   "conn": {
     "state": {
       "online": "Online",

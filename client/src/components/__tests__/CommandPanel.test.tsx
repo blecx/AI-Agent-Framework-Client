@@ -2,17 +2,23 @@
  * CommandPanel Component Tests
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, within, cleanup } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
-import CommandPanel from '../CommandPanel';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import {
+  render,
+  screen,
+  waitFor,
+  within,
+  cleanup,
+} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
+import CommandPanel from "../CommandPanel";
 
 // Create mock navigate function
 const mockNavigate = vi.fn();
 
 // Mock dependencies
-vi.mock('../../services/apiClient', () => ({
+vi.mock("../../services/apiClient", () => ({
   default: {
     createProject: vi.fn(),
     listProjects: vi.fn(),
@@ -21,7 +27,7 @@ vi.mock('../../services/apiClient', () => ({
   },
 }));
 
-vi.mock('../../hooks/useToast', () => ({
+vi.mock("../../hooks/useToast", () => ({
   useToast: () => ({
     showSuccess: vi.fn(),
     showError: vi.fn(),
@@ -29,8 +35,8 @@ vi.mock('../../hooks/useToast', () => ({
   }),
 }));
 
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
   return {
     ...actual,
     useNavigate: () => mockNavigate,
@@ -41,7 +47,7 @@ function renderWithRouter(ui: React.ReactElement) {
   return render(<MemoryRouter>{ui}</MemoryRouter>);
 }
 
-describe('CommandPanel', () => {
+describe("CommandPanel", () => {
   let mockCreateProject: ReturnType<typeof vi.fn>;
   let mockListProjects: ReturnType<typeof vi.fn>;
   let mockCheckHealth: ReturnType<typeof vi.fn>;
@@ -53,9 +59,13 @@ describe('CommandPanel', () => {
     mockNavigate.mockClear();
 
     // Import mocked apiClient after mocks are set up
-    const apiClient = await import('../../services/apiClient');
-    mockCreateProject = apiClient.default.createProject as ReturnType<typeof vi.fn>;
-    mockListProjects = apiClient.default.listProjects as ReturnType<typeof vi.fn>;
+    const apiClient = await import("../../services/apiClient");
+    mockCreateProject = apiClient.default.createProject as ReturnType<
+      typeof vi.fn
+    >;
+    mockListProjects = apiClient.default.listProjects as ReturnType<
+      typeof vi.fn
+    >;
     mockCheckHealth = apiClient.default.checkHealth as ReturnType<typeof vi.fn>;
     mockGetInfo = apiClient.default.getInfo as ReturnType<typeof vi.fn>;
   });
@@ -66,164 +76,204 @@ describe('CommandPanel', () => {
     cleanup();
   });
 
-  it('renders command panel with header', () => {
+  it("renders command panel with header", () => {
     renderWithRouter(<CommandPanel />);
-    
-    expect(screen.getByText('Command Panel')).toBeInTheDocument();
-    expect(screen.getByText('Quick actions and command history')).toBeInTheDocument();
+
+    expect(screen.getByText("Command Panel")).toBeInTheDocument();
+    expect(
+      screen.getByText("Quick actions and command history"),
+    ).toBeInTheDocument();
   });
 
-  it('renders all quick action buttons', () => {
+  it("renders all quick action buttons", () => {
     renderWithRouter(<CommandPanel />);
-    
-    expect(screen.getByRole('button', { name: /Create new project/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /List all projects/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Check API health/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Get API information/i })).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("button", { name: /Create new project/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /List all projects/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Check API health/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Get API information/i }),
+    ).toBeInTheDocument();
   });
 
-  it('shows empty history message initially', () => {
+  it("shows empty history message initially", () => {
     renderWithRouter(<CommandPanel />);
-    
+
     expect(screen.getByText(/No commands executed yet/i)).toBeInTheDocument();
   });
 
-  it('opens project name modal when create project is clicked', async () => {
+  it("opens project name modal when create project is clicked", async () => {
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
-    const createButton = screen.getByRole('button', { name: /Create new project/i });
+
+    const createButton = screen.getByRole("button", {
+      name: /Create new project/i,
+    });
     await user.click(createButton);
-    
-    expect(screen.getByText('Create New Project')).toBeInTheDocument();
+
+    expect(screen.getByText("Create New Project")).toBeInTheDocument();
     expect(screen.getByLabelText(/Project Name/i)).toBeInTheDocument();
   });
 
-  it('progresses through project creation flow', async () => {
+  it("progresses through project creation flow", async () => {
     mockCreateProject.mockResolvedValue({
       success: true,
-      data: { key: 'test-project', name: 'Test Project' },
+      data: { key: "test-project", name: "Test Project" },
     });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
+
     // Click create project
-    const createButton = screen.getByRole('button', { name: /Create new project/i });
+    const createButton = screen.getByRole("button", {
+      name: /Create new project/i,
+    });
     await user.click(createButton);
-    
+
     // Enter project name
     const nameInput = screen.getByPlaceholderText(/My Awesome Project/i);
-    await user.type(nameInput, 'Test Project');
-    await user.click(screen.getByRole('button', { name: /Next/i }));
-    
+    await user.type(nameInput, "Test Project");
+    await user.click(screen.getByRole("button", { name: /Next/i }));
+
     // Should show key input modal
     await waitFor(() => {
       expect(screen.getByLabelText(/Project Key/i)).toBeInTheDocument();
     });
-    
+
     // Enter project key and submit
     const keyInput = screen.getByPlaceholderText(/my-project/i);
-    await user.type(keyInput, 'test-project');
-    
+    await user.type(keyInput, "test-project");
+
     // Get submit button within modal dialog
-    const modal = screen.getByRole('dialog');
-    const submitButton = within(modal).getByRole('button', { name: /Create/i });
+    const modal = screen.getByRole("dialog");
+    const submitButton = within(modal).getByRole("button", { name: /Create/i });
     await user.click(submitButton);
-    
+
     // Should call API
     await waitFor(() => {
-      expect(mockCreateProject).toHaveBeenCalledWith('test-project', 'Test Project');
+      expect(mockCreateProject).toHaveBeenCalledWith(
+        "test-project",
+        "Test Project",
+      );
     });
   });
 
-  it('creates project with auto-generated key when empty', async () => {
+  it("creates project with auto-generated key when empty", async () => {
     mockCreateProject.mockResolvedValue({
       success: true,
-      data: { key: 'my-project', name: 'My Project' },
+      data: { key: "my-project", name: "My Project" },
     });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
+
     // Open modal and enter name
-    await user.click(screen.getByRole('button', { name: /Create new project/i }));
-    await user.type(screen.getByPlaceholderText(/My Awesome Project/i), 'My Project');
-    await user.click(screen.getByRole('button', { name: /Next/i }));
-    
+    await user.click(
+      screen.getByRole("button", { name: /Create new project/i }),
+    );
+    await user.type(
+      screen.getByPlaceholderText(/My Awesome Project/i),
+      "My Project",
+    );
+    await user.click(screen.getByRole("button", { name: /Next/i }));
+
     // Skip key input (empty) and submit
     await waitFor(() => {
       expect(screen.getByLabelText(/Project Key/i)).toBeInTheDocument();
     });
-    
+
     // Get submit button within modal dialog
-    const modal = screen.getByRole('dialog');
-    const submitButton = within(modal).getByRole('button', { name: /Create/i });
+    const modal = screen.getByRole("dialog");
+    const submitButton = within(modal).getByRole("button", { name: /Create/i });
     await user.click(submitButton);
-    
+
     // Should create with auto-generated key
     await waitFor(() => {
-      expect(mockCreateProject).toHaveBeenCalledWith('my-project', 'My Project');
+      expect(mockCreateProject).toHaveBeenCalledWith(
+        "my-project",
+        "My Project",
+      );
     });
   });
 
-  it('shows success message and navigates after project creation', async () => {
+  it("shows success message and navigates after project creation", async () => {
     mockCreateProject.mockResolvedValue({
       success: true,
-      data: { key: 'test-123', name: 'Test Project' },
+      data: { key: "test-123", name: "Test Project" },
     });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
+
     // Complete create flow
-    await user.click(screen.getByRole('button', { name: /Create new project/i }));
-    await user.type(screen.getByPlaceholderText(/My Awesome Project/i), 'Test Project');
-    await user.click(screen.getByRole('button', { name: /Next/i }));
-    
+    await user.click(
+      screen.getByRole("button", { name: /Create new project/i }),
+    );
+    await user.type(
+      screen.getByPlaceholderText(/My Awesome Project/i),
+      "Test Project",
+    );
+    await user.click(screen.getByRole("button", { name: /Next/i }));
+
     await waitFor(() => {
       expect(screen.getByLabelText(/Project Key/i)).toBeInTheDocument();
     });
-    
+
     // Get submit button within modal dialog
-    const modal = screen.getByRole('dialog');
-    const submitButton = within(modal).getByRole('button', { name: /Create/i });
+    const modal = screen.getByRole("dialog");
+    const submitButton = within(modal).getByRole("button", { name: /Create/i });
     await user.click(submitButton);
-    
+
     // Should show success message
     await waitFor(() => {
-      expect(screen.getByText(/Project "Test Project" created successfully/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Project "Test Project" created successfully/i),
+      ).toBeInTheDocument();
     });
-    
+
     // Should navigate after delay (no fake timers - just wait for it)
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/projects/test-123');
-    }, { timeout: 2000 });
+    await waitFor(
+      () => {
+        expect(mockNavigate).toHaveBeenCalledWith("/projects/test-123");
+      },
+      { timeout: 2000 },
+    );
   });
 
-  it('shows error message when project creation fails', async () => {
+  it("shows error message when project creation fails", async () => {
     mockCreateProject.mockResolvedValue({
       success: false,
-      error: 'Project key already exists',
+      error: "Project key already exists",
     });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
+
     // Complete create flow
-    await user.click(screen.getByRole('button', { name: /Create new project/i }));
-    await user.type(screen.getByPlaceholderText(/My Awesome Project/i), 'Test Project');
-    await user.click(screen.getByRole('button', { name: /Next/i }));
-    
+    await user.click(
+      screen.getByRole("button", { name: /Create new project/i }),
+    );
+    await user.type(
+      screen.getByPlaceholderText(/My Awesome Project/i),
+      "Test Project",
+    );
+    await user.click(screen.getByRole("button", { name: /Next/i }));
+
     await waitFor(() => {
       expect(screen.getByLabelText(/Project Key/i)).toBeInTheDocument();
     });
-    
+
     // Get submit button within modal dialog
-    const modal = screen.getByRole('dialog');
-    const submitButton = within(modal).getByRole('button', { name: /Create/i });
+    const modal = screen.getByRole("dialog");
+    const submitButton = within(modal).getByRole("button", { name: /Create/i });
     await user.click(submitButton);
-    
+
     // Should show error message (use getAllByText since error appears in status and possibly history)
     await waitFor(() => {
       const errorElements = screen.getAllByText(/Project key already exists/i);
@@ -231,40 +281,47 @@ describe('CommandPanel', () => {
     });
   });
 
-  it('lists projects successfully', async () => {
+  it("lists projects successfully", async () => {
     mockListProjects.mockResolvedValue({
       success: true,
-      data: [{ key: 'test-1' }, { key: 'test-2' }],
+      data: [{ key: "test-1" }, { key: "test-2" }],
     });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
-    const listButton = screen.getByRole('button', { name: /List all projects/i });
+
+    const listButton = screen.getByRole("button", {
+      name: /List all projects/i,
+    });
     await user.click(listButton);
-    
+
     await waitFor(() => {
       expect(mockListProjects).toHaveBeenCalled();
     });
-    
+
     await waitFor(() => {
       expect(screen.getByText(/Found 2 project\(s\)/i)).toBeInTheDocument();
     });
-    
+
     // Should navigate after delay
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/projects');
-    }, { timeout: 2000 });
+    await waitFor(
+      () => {
+        expect(mockNavigate).toHaveBeenCalledWith("/projects");
+      },
+      { timeout: 2000 },
+    );
   });
 
-  it('handles list projects error', async () => {
-    mockListProjects.mockRejectedValue(new Error('Network error'));
+  it("handles list projects error", async () => {
+    mockListProjects.mockRejectedValue(new Error("Network error"));
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
-    await user.click(screen.getByRole('button', { name: /List all projects/i }));
-    
+
+    await user.click(
+      screen.getByRole("button", { name: /List all projects/i }),
+    );
+
     // Use getAllByText since error appears in status and history
     await waitFor(() => {
       const errorElements = screen.getAllByText(/Network error/i);
@@ -272,31 +329,31 @@ describe('CommandPanel', () => {
     });
   });
 
-  it('checks API health successfully', async () => {
-    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
+  it("checks API health successfully", async () => {
+    mockCheckHealth.mockResolvedValue({ status: "healthy" });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
-    await user.click(screen.getByRole('button', { name: /Check API health/i }));
-    
+
+    await user.click(screen.getByRole("button", { name: /Check API health/i }));
+
     await waitFor(() => {
       expect(mockCheckHealth).toHaveBeenCalled();
     });
-    
+
     await waitFor(() => {
       expect(screen.getByText(/API is healthy/i)).toBeInTheDocument();
     });
   });
 
-  it('handles health check error', async () => {
-    mockCheckHealth.mockRejectedValue(new Error('API unreachable'));
+  it("handles health check error", async () => {
+    mockCheckHealth.mockRejectedValue(new Error("API unreachable"));
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
-    await user.click(screen.getByRole('button', { name: /Check API health/i }));
-    
+
+    await user.click(screen.getByRole("button", { name: /Check API health/i }));
+
     // Use getAllByText since error appears in status and history
     await waitFor(() => {
       const errorElements = screen.getAllByText(/API unreachable/i);
@@ -304,21 +361,23 @@ describe('CommandPanel', () => {
     });
   });
 
-  it('gets API info successfully', async () => {
+  it("gets API info successfully", async () => {
     mockGetInfo.mockResolvedValue({
-      name: 'Test API',
-      version: '1.0.0',
+      name: "Test API",
+      version: "1.0.0",
     });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
-    await user.click(screen.getByRole('button', { name: /Get API information/i }));
-    
+
+    await user.click(
+      screen.getByRole("button", { name: /Get API information/i }),
+    );
+
     await waitFor(() => {
       expect(mockGetInfo).toHaveBeenCalled();
     });
-    
+
     // Use getAllByText since info appears in status and history
     await waitFor(() => {
       const infoElements = screen.getAllByText(/Test API v1\.0\.0/i);
@@ -326,14 +385,16 @@ describe('CommandPanel', () => {
     });
   });
 
-  it('handles get info error', async () => {
-    mockGetInfo.mockRejectedValue(new Error('Failed to get info'));
+  it("handles get info error", async () => {
+    mockGetInfo.mockRejectedValue(new Error("Failed to get info"));
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
-    await user.click(screen.getByRole('button', { name: /Get API information/i }));
-    
+
+    await user.click(
+      screen.getByRole("button", { name: /Get API information/i }),
+    );
+
     // Use getAllByText since error appears in status and history
     await waitFor(() => {
       const errorElements = screen.getAllByText(/Failed to get info/i);
@@ -341,193 +402,213 @@ describe('CommandPanel', () => {
     });
   });
 
-  it('adds commands to history', async () => {
-    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
+  it("adds commands to history", async () => {
+    mockCheckHealth.mockResolvedValue({ status: "healthy" });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
+
     // Initially no history
     expect(screen.getByText(/No commands executed yet/i)).toBeInTheDocument();
-    
+
     // Execute command
-    await user.click(screen.getByRole('button', { name: /Check API health/i }));
-    
+    await user.click(screen.getByRole("button", { name: /Check API health/i }));
+
     await waitFor(() => {
-      expect(screen.queryByText(/No commands executed yet/i)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/No commands executed yet/i),
+      ).not.toBeInTheDocument();
     });
-    
+
     // Should show in history
-    expect(screen.getByText('Check API health')).toBeInTheDocument();
+    expect(screen.getByText("Check API health")).toBeInTheDocument();
     expect(screen.getByText(/Status: healthy/i)).toBeInTheDocument();
   });
 
-  it('shows clear history button when history exists', async () => {
-    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
+  it("shows clear history button when history exists", async () => {
+    mockCheckHealth.mockResolvedValue({ status: "healthy" });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
+
     // No clear button initially
-    expect(screen.queryByRole('button', { name: /Clear History/i })).not.toBeInTheDocument();
-    
+    expect(
+      screen.queryByRole("button", { name: /Clear History/i }),
+    ).not.toBeInTheDocument();
+
     // Execute command
-    await user.click(screen.getByRole('button', { name: /Check API health/i }));
-    
+    await user.click(screen.getByRole("button", { name: /Check API health/i }));
+
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Clear History/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /Clear History/i }),
+      ).toBeInTheDocument();
     });
   });
 
-  it('clears history with confirmation', async () => {
-    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
+  it("clears history with confirmation", async () => {
+    mockCheckHealth.mockResolvedValue({ status: "healthy" });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
+
     // Execute command to create history
-    await user.click(screen.getByRole('button', { name: /Check API health/i }));
-    
+    await user.click(screen.getByRole("button", { name: /Check API health/i }));
+
     await waitFor(() => {
-      const healthTexts = screen.getAllByText('Check API health');
+      const healthTexts = screen.getAllByText("Check API health");
       expect(healthTexts.length).toBeGreaterThan(0);
     });
-    
+
     // Click clear history
-    await user.click(screen.getByRole('button', { name: /Clear History/i }));
-    
+    await user.click(screen.getByRole("button", { name: /Clear History/i }));
+
     // Should show confirmation dialog
-    expect(screen.getByText(/Are you sure you want to clear all command history/i)).toBeInTheDocument();
-    
+    expect(
+      screen.getByText(/Are you sure you want to clear all command history/i),
+    ).toBeInTheDocument();
+
     // Confirm - use exact text to distinguish from "Clear History" button
-    const confirmButton = screen.getByRole('button', { name: 'Clear' });
+    const confirmButton = screen.getByRole("button", { name: "Clear" });
     await user.click(confirmButton);
-    
+
     // History should be cleared
     await waitFor(() => {
       expect(screen.getByText(/No commands executed yet/i)).toBeInTheDocument();
     });
   });
 
-  it('cancels clear history', async () => {
-    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
+  it("cancels clear history", async () => {
+    mockCheckHealth.mockResolvedValue({ status: "healthy" });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
+
     // Execute command
-    await user.click(screen.getByRole('button', { name: /Check API health/i }));
-    
+    await user.click(screen.getByRole("button", { name: /Check API health/i }));
+
     await waitFor(() => {
-      expect(screen.getByText('Check API health')).toBeInTheDocument();
+      expect(screen.getByText("Check API health")).toBeInTheDocument();
     });
-    
+
     // Click clear history then cancel
-    await user.click(screen.getByRole('button', { name: /Clear History/i }));
-    await user.click(screen.getByRole('button', { name: /Cancel/i }));
-    
+    await user.click(screen.getByRole("button", { name: /Clear History/i }));
+    await user.click(screen.getByRole("button", { name: /Cancel/i }));
+
     // History should still exist
-    expect(screen.getByText('Check API health')).toBeInTheDocument();
+    expect(screen.getByText("Check API health")).toBeInTheDocument();
   });
 
-  it('disables buttons while loading', async () => {
+  it("disables buttons while loading", async () => {
     mockCheckHealth.mockImplementation(() => new Promise(() => {})); // Never resolves
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
-    const healthButton = screen.getByRole('button', { name: /Check API health/i });
+
+    const healthButton = screen.getByRole("button", {
+      name: /Check API health/i,
+    });
     await user.click(healthButton);
-    
+
     // All action buttons should be disabled during loading
-    expect(screen.getByRole('button', { name: /Create new project/i })).toBeDisabled();
-    expect(screen.getByRole('button', { name: /List all projects/i })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: /Create new project/i }),
+    ).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: /List all projects/i }),
+    ).toBeDisabled();
     expect(healthButton).toBeDisabled();
-    expect(screen.getByRole('button', { name: /Get API information/i })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: /Get API information/i }),
+    ).toBeDisabled();
   });
 
-  it('can cancel input modal', async () => {
+  it("can cancel input modal", async () => {
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
+
     // Open create project modal
-    await user.click(screen.getByRole('button', { name: /Create new project/i }));
-    
-    expect(screen.getByText('Create New Project')).toBeInTheDocument();
-    
+    await user.click(
+      screen.getByRole("button", { name: /Create new project/i }),
+    );
+
+    expect(screen.getByText("Create New Project")).toBeInTheDocument();
+
     // Cancel
-    await user.click(screen.getByRole('button', { name: /Cancel/i }));
-    
+    await user.click(screen.getByRole("button", { name: /Cancel/i }));
+
     // Modal should close
     await waitFor(() => {
-      expect(screen.queryByText('Create New Project')).not.toBeInTheDocument();
+      expect(screen.queryByText("Create New Project")).not.toBeInTheDocument();
     });
   });
 
-  it('dismisses status message when close button clicked', async () => {
-    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
+  it("dismisses status message when close button clicked", async () => {
+    mockCheckHealth.mockResolvedValue({ status: "healthy" });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
-    await user.click(screen.getByRole('button', { name: /Check API health/i }));
-    
+
+    await user.click(screen.getByRole("button", { name: /Check API health/i }));
+
     await waitFor(() => {
       expect(screen.getByText(/API is healthy/i)).toBeInTheDocument();
     });
-    
+
     // Click close button
-    const closeButton = screen.getByRole('button', { name: /×/i });
+    const closeButton = screen.getByRole("button", { name: /×/i });
     await user.click(closeButton);
-    
+
     // Status message should be dismissed
     await waitFor(() => {
       expect(screen.queryByText(/API is healthy/i)).not.toBeInTheDocument();
     });
   });
 
-  it('displays error status with error styling', async () => {
-    mockCheckHealth.mockRejectedValue(new Error('Connection failed'));
+  it("displays error status with error styling", async () => {
+    mockCheckHealth.mockRejectedValue(new Error("Connection failed"));
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
-    await user.click(screen.getByRole('button', { name: /Check API health/i }));
-    
+
+    await user.click(screen.getByRole("button", { name: /Check API health/i }));
+
     // Use getAllByText since error appears in status and history
     await waitFor(() => {
       const errorElements = screen.getAllByText(/Connection failed/i);
       expect(errorElements.length).toBeGreaterThan(0);
-      const statusMessage = errorElements[0].closest('.status-message');
-      expect(statusMessage).toHaveClass('error');
+      const statusMessage = errorElements[0].closest(".status-message");
+      expect(statusMessage).toHaveClass("error");
     });
   });
 
-  it('displays success status with success styling', async () => {
-    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
+  it("displays success status with success styling", async () => {
+    mockCheckHealth.mockResolvedValue({ status: "healthy" });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
-    await user.click(screen.getByRole('button', { name: /Check API health/i }));
-    
+
+    await user.click(screen.getByRole("button", { name: /Check API health/i }));
+
     await waitFor(() => {
-      const statusMessage = screen.getByText(/API is healthy/i).closest('.status-message');
-      expect(statusMessage).toHaveClass('success');
+      const statusMessage = screen
+        .getByText(/API is healthy/i)
+        .closest(".status-message");
+      expect(statusMessage).toHaveClass("success");
     });
   });
 
-  it('shows timestamps for history entries', async () => {
-    mockCheckHealth.mockResolvedValue({ status: 'healthy' });
+  it("shows timestamps for history entries", async () => {
+    mockCheckHealth.mockResolvedValue({ status: "healthy" });
 
     const user = userEvent.setup();
     renderWithRouter(<CommandPanel />);
-    
-    await user.click(screen.getByRole('button', { name: /Check API health/i }));
-    
+
+    await user.click(screen.getByRole("button", { name: /Check API health/i }));
+
     await waitFor(() => {
       // Should show formatted time
-      const timeElements = document.querySelectorAll('.history-timestamp');
+      const timeElements = document.querySelectorAll(".history-timestamp");
       expect(timeElements.length).toBeGreaterThan(0);
     });
   });

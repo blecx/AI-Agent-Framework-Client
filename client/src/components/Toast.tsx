@@ -31,10 +31,15 @@ export default function Toast({ id, type, message, onClose }: ToastProps) {
   };
 
   return (
-    <div className={`toast toast-${type}`} role="alert" aria-live="polite">
+    <div
+      className={`toast toast-${type}`}
+      role="alert"
+      aria-live={type === 'error' || type === 'warning' ? 'assertive' : 'polite'}
+    >
       <span className="toast-icon">{getIcon()}</span>
       <span className="toast-message">{message}</span>
       <button
+        type="button"
         className="toast-close"
         onClick={() => onClose(id)}
         aria-label="Close notification"
