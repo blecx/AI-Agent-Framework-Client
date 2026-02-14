@@ -2,6 +2,12 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import EmptyState from '../../../components/ui/EmptyState';
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: { defaultValue?: string }) => options?.defaultValue ?? key,
+  }),
+}));
+
 describe('EmptyState', () => {
   it('renders with title', () => {
     render(<EmptyState title="No items found" />);
@@ -35,6 +41,24 @@ describe('EmptyState', () => {
           label: 'Create Project',
           onClick: handleClick,
         }}
+      />,
+    );
+
+    const button = screen.getByRole('button', { name: 'Create Project' });
+    expect(button).toBeTruthy();
+
+    fireEvent.click(button);
+    expect(handleClick).toHaveBeenCalledOnce();
+  });
+
+  it('renders CTA button with cta props and calls ctaAction', () => {
+    const handleClick = vi.fn();
+
+    render(
+      <EmptyState
+        title="No projects"
+        ctaLabel="Create Project"
+        ctaAction={handleClick}
       />,
     );
 

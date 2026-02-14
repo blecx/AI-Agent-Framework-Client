@@ -9,6 +9,28 @@ import { ArtifactList } from '../ArtifactList';
 import { ArtifactApiClient, type Artifact } from '../../services/ArtifactApiClient';
 
 vi.mock('../../services/ArtifactApiClient');
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: { defaultValue?: string; message?: string }) => {
+      if (options?.defaultValue) {
+        return options.defaultValue;
+      }
+
+      const translations: Record<string, string> = {
+        'art.list.loading': 'Loading artifacts...',
+        'art.list.title': 'Artifacts',
+        'art.list.actions.createNew': 'Create New Artifact',
+        'art.list.actions.createNewAria': 'Create new artifact',
+        'art.list.empty.title': 'No artifacts yet',
+        'art.list.empty.description': 'Create your first artifact to get started.',
+        'art.list.cta.create': 'Create New Artifact',
+        'art.list.errors.loadingWithMessage': `Error: ${options?.message ?? ''}`,
+      };
+
+      return translations[key] ?? key;
+    },
+  }),
+}));
 
 describe('ArtifactList', () => {
   const mockProjectKey = 'TEST-001';
@@ -76,8 +98,9 @@ describe('ArtifactList', () => {
     render(<ArtifactList projectKey={mockProjectKey} />);
 
     await waitFor(() => {
+      expect(screen.getByText(/No artifacts yet/i)).toBeInTheDocument();
       expect(
-        screen.getByText(/No artifacts yet. Create your first artifact to get started./i)
+        screen.getByText(/Create your first artifact to get started./i)
       ).toBeInTheDocument();
     });
   });

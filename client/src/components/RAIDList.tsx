@@ -245,10 +245,8 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
           icon="📋"
           title={t('raid.list.empty.title')}
           description={t('raid.list.empty.description')}
-          action={{
-            label: t('raid.list.actions.addFirstItem'),
-            onClick: () => setShowCreateModal(true),
-          }}
+          ctaLabel={t('raid.list.actions.addFirstItem')}
+          ctaAction={() => setShowCreateModal(true)}
         />
       </div>
     );
