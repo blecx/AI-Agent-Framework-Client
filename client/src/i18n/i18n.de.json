@@ -251,12 +251,60 @@
   },
   "sync": {
     "title": "Sync",
-    "cta": {
-      "start": "Sync starten",
-      "openConflicts": "Konflikte öffnen"
-    },
     "state": {
+      "clean": "Synchron",
+      "ahead": "Voraus",
+      "behind": "Zurück",
+      "diverged": "Auseinandergelaufen",
+      "running": "Synchronisiere…",
+      "failed": "Synchronisierung fehlgeschlagen",
       "conflict": "Konflikt"
+    },
+    "description": {
+      "clean": "Keine ausstehenden Änderungen. Alles ist aktuell.",
+      "ahead": "Sie haben {{count}} lokale Änderung(en), die noch nicht synchronisiert wurden.",
+      "behind": "Es gibt {{count}} entfernte Änderung(en), die noch übernommen werden müssen.",
+      "diverged": "Lokale ({{local}}) und entfernte ({{remote}}) Änderungen liegen gleichzeitig vor.",
+      "running": "Synchronisierung läuft gerade. Bitte warten...",
+      "failed": "Synchronisierung fehlgeschlagen: {{error}}",
+      "conflict": "Konflikte erfordern eine manuelle Auflösung, bevor die Synchronisierung abgeschlossen werden kann."
+    },
+    "action": {
+      "syncNow": "Jetzt synchronisieren",
+      "viewHistory": "Verlauf anzeigen"
+    },
+    "conflict": {
+      "title": "Konflikt lösen: {{file}}",
+      "resolutionOptions": "Auflösungsoptionen",
+      "keepMine": "Meine Version behalten",
+      "useTheirs": "Remote-Version verwenden",
+      "aiSuggestion": "KI-Vorschlag",
+      "manual": "Manuell bearbeiten",
+      "mine": "Meine Version behalten",
+      "theirs": "Remote-Version verwenden",
+      "ai": "KI-Vorschlag",
+      "cancel": "Abbrechen",
+      "apply": "Auflösung anwenden"
+    },
+    "history": {
+      "title": "Synchronisierungsverlauf",
+      "synced": "Synchronisierung erfolgreich abgeschlossen.",
+      "localChanges": "Lokale Änderungen erkannt.",
+      "started": "Synchronisierung gestartet.",
+      "failed": "Synchronisierung fehlgeschlagen.",
+      "conflictDetected": "Konflikt während der Synchronisierung erkannt.",
+      "remoteChanges": "Remote-Änderungen erkannt.",
+      "diverged": "Lokaler und entfernter Branch sind auseinandergelaufen."
+    },
+    "demo": {
+      "title": "Demo-Zustände"
+    },
+    "feedback": {
+      "syncRequested": "Synchronisierung angefordert (Mock).",
+      "resolved": "Auflösung angewendet (Mock): {{resolution}}"
+    },
+    "error": {
+      "unknown": "Unbekannter Synchronisierungsfehler"
     }
   }
 }
