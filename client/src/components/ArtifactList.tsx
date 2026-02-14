@@ -4,8 +4,10 @@
  */
 
 import React, { useEffect, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArtifactApiClient, type Artifact } from '../services/ArtifactApiClient';
 import { AuditApiClient } from '../services/AuditApiClient';
+import EmptyState from './ui/EmptyState';
 import './ArtifactList.css';
 
 interface ArtifactListProps {
@@ -22,6 +24,7 @@ export const ArtifactList: React.FC<ArtifactListProps> = ({
   onCreateNew,
   onSelectArtifact,
 }) => {
+  const { t } = useTranslation();
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +43,9 @@ export const ArtifactList: React.FC<ArtifactListProps> = ({
         const data = await apiClient.listArtifacts(projectKey);
         setArtifacts(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load artifacts');
+        setError(
+          err instanceof Error ? err.message : t('art.list.errors.failedToLoad')
+        );
       } finally {
         setLoading(false);
       }
@@ -49,7 +54,7 @@ export const ArtifactList: React.FC<ArtifactListProps> = ({
     if (projectKey) {
       fetchArtifacts();
     }
-  }, [projectKey, apiClient]);
+  }, [projectKey, apiClient, t]);
 
   useEffect(() => {
     const fetchAuditData = async () => {
@@ -114,30 +119,38 @@ export const ArtifactList: React.FC<ArtifactListProps> = ({
   };
 
   if (loading) {
-    return <div className="artifact-list-loading">Loading artifacts...</div>;
+    return <div className="artifact-list-loading">{t('art.list.loading')}</div>;
   }
 
   if (error) {
-    return <div className="artifact-list-error">Error: {error}</div>;
+    return (
+      <div className="artifact-list-error">
+        {t('art.list.errors.loadingWithMessage', { message: error })}
+      </div>
+    );
   }
 
   return (
     <div className="artifact-list">
       <div className="artifact-list-header">
-        <h2>Artifacts</h2>
+        <h2>{t('art.list.title')}</h2>
         <button
           className="btn-create-artifact"
           onClick={onCreateNew}
-          aria-label="Create new artifact"
+          aria-label={t('art.list.actions.createNewAria')}
         >
-          Create New Artifact
+          {t('art.list.actions.createNew')}
         </button>
       </div>
 
       {sortedArtifacts.length === 0 ? (
-        <div className="artifact-list-empty">
-          <p>No artifacts yet. Create your first artifact to get started.</p>
-        </div>
+        <EmptyState
+          icon="📄"
+          title={t('art.list.empty.title')}
+          description={t('art.list.empty.description')}
+          ctaLabel={t('art.list.cta.create')}
+          ctaAction={() => onCreateNew?.()}
+        />
       ) : (
         <table className="artifact-list-table">
           <thead>

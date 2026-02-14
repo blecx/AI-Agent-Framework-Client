@@ -197,10 +197,8 @@ export default function ProjectList() {
           icon="📁"
           title={t('projects.list.empty.title')}
           description={t('projects.list.empty.text')}
-          action={{
-            label: t('projects.list.cta.new'),
-            onClick: () => setShowCreateForm(true),
-          }}
+          ctaLabel={t('projects.list.cta.new')}
+          ctaAction={() => setShowCreateForm(true)}
         />
       ) : (
         <div className="projects-grid">

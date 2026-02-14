@@ -212,8 +212,21 @@
   "art": {
     "list": {
       "title": "Artifacts",
+      "loading": "Loading artifacts...",
+      "empty": {
+        "title": "No artifacts yet",
+        "description": "Create your first artifact to get started."
+      },
+      "actions": {
+        "createNew": "Create New Artifact",
+        "createNewAria": "Create new artifact"
+      },
       "cta": {
         "create": "Create artifact"
+      },
+      "errors": {
+        "failedToLoad": "Failed to load artifacts",
+        "loadingWithMessage": "Error: {{message}}"
       }
     },
     "action": {

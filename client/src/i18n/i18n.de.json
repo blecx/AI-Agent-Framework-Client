@@ -212,8 +212,21 @@
   "art": {
     "list": {
       "title": "Artefakte",
+      "loading": "Artefakte werden geladen...",
+      "empty": {
+        "title": "Noch keine Artefakte",
+        "description": "Erstellen Sie Ihr erstes Artefakt, um zu beginnen."
+      },
+      "actions": {
+        "createNew": "Neues Artefakt erstellen",
+        "createNewAria": "Neues Artefakt erstellen"
+      },
       "cta": {
         "create": "Artefakt erstellen"
+      },
+      "errors": {
+        "failedToLoad": "Artefakte konnten nicht geladen werden",
+        "loadingWithMessage": "Fehler: {{message}}"
       }
     },
     "action": {
