@@ -189,4 +189,23 @@ Update issue statuses here as work progresses:
 - 🟢 **Completed:** Merged to main
 - 🔴 **Blocked:** Waiting on dependencies
 
+---
+
+## Work In Progress
+
+**Stashed Implementation (Not in This PR):**
+- `stash@{0}`: WIP: Issue #150 i18n implementation (441 lines, 7 files)
+  - 4 components updated with i18n hooks (ProjectList, ProjectView, ArtifactEditor, RAIDList)
+  - 136 lines added to i18n.en.json
+  - 136 lines added to i18n.de.json
+  - Ready to apply when Issue #150 implementation begins
+
+**To restore for Issue #150:**
+```bash
+git stash list  # Find the stash
+git stash apply stash@{0}  # Apply i18n implementation
+```
+
+---
+
 **Last Updated:** 2026-02-14
