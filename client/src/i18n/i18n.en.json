@@ -42,6 +42,19 @@
         "new": "New project",
         "import": "Import"
       },
+      "errors": {
+        "load": "Failed to load projects",
+        "create": "Failed to create project",
+        "loadingWithMessage": "Error loading projects: {{message}}"
+      },
+      "toast": {
+        "created": "Project created successfully!",
+        "createFailed": "Failed to create project: {{message}}"
+      },
+      "meta": {
+        "key": "Key",
+        "created": "Created"
+      },
       "empty": {
         "title": "No projects yet",
         "text": "Create a project or import an existing workspace."
@@ -52,6 +65,123 @@
       "cta": {
         "create": "Create project",
         "cancel": "Cancel"
+      },
+      "form": {
+        "keyLabel": "Project key *",
+        "keyPlaceholder": "e.g., my-project",
+        "keyHelp": "Unique identifier (lowercase, hyphens allowed)",
+        "nameLabel": "Project name *",
+        "namePlaceholder": "e.g., My Awesome Project",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Optional project description"
+      },
+      "errors": {
+        "requiredKeyAndName": "Project key and name are required"
+      }
+    }
+  },
+  "projectView": {
+    "actions": {
+      "backToProjects": "← Back to Projects",
+      "backToProjectsText": "Back to Projects"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "proposeChanges": "Propose Changes",
+      "applyProposals": "Apply Proposals",
+      "commands": "Commands",
+      "artifacts": "Artifacts",
+      "audit": "Audit"
+    },
+    "sections": {
+      "projectDetails": "Project Details",
+      "gitRepository": "Git Repository",
+      "documents": "Documents ({{count}})"
+    },
+    "labels": {
+      "key": "Key",
+      "created": "Created",
+      "lastUpdated": "Last Updated",
+      "url": "URL",
+      "branch": "Branch",
+      "lastCommit": "Last Commit",
+      "status": "Status",
+      "lastModified": "Last modified:"
+    },
+    "errors": {
+      "projectKeyRequired": "Project key is required",
+      "failedToLoadProject": "Failed to load project",
+      "unknownError": "Unknown error",
+      "loadingWithMessage": "Error loading project: {{message}}"
+    }
+  },
+  "artifactEditor": {
+    "actions": {
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "aria": {
+      "loadingTemplate": "Loading template",
+      "editorForm": "Artifact editor form",
+      "required": "required"
+    },
+    "form": {
+      "selectField": "Select {{field}}"
+    },
+    "labels": {
+      "templateType": "{{type}}"
+    },
+    "validation": {
+      "required": "{{field}} is required",
+      "mustBeString": "Must be a string",
+      "mustBeNumber": "Must be a number",
+      "minLength": "Minimum length is {{min}}",
+      "maxLength": "Maximum length is {{max}}",
+      "invalidFormat": "Invalid format"
+    },
+    "messages": {
+      "fixValidationErrors": "Please fix validation errors before saving",
+      "savedSuccessfully": "Artifact saved successfully"
+    },
+    "errors": {
+      "failedToLoadTemplate": "Failed to load template",
+      "failedToSaveArtifact": "Failed to save artifact",
+      "templateNotFound": "Template not found"
+    },
+    "unsaved": {
+      "title": "Unsaved Changes",
+      "message": "You have unsaved changes. Are you sure you want to leave?",
+      "stay": "Stay",
+      "leave": "Leave"
+    }
+  },
+  "raid": {
+    "list": {
+      "title": "RAID Register",
+      "itemCount_one": "{{count}} item",
+      "itemCount_other": "{{count}} items",
+      "actions": {
+        "addItem": "+ Add RAID Item",
+        "addFirstItem": "Add First Item"
+      },
+      "table": {
+        "type": "Type",
+        "title": "Title",
+        "status": "Status",
+        "priority": "Priority",
+        "owner": "Owner",
+        "created": "Created"
+      },
+      "empty": {
+        "title": "No RAID items yet",
+        "description": "Track Risks, Assumptions, Issues, and Dependencies for this project.",
+        "noFilterMatchesTitle": "No items match your filters",
+        "noFilterMatchesDescription": "Try adjusting or clearing your filters to see more results."
+      },
+      "errors": {
+        "failedToLoadItems": "Failed to load RAID items",
+        "loadingWithMessage": "Error loading RAID items: {{message}}"
       }
     }
   },

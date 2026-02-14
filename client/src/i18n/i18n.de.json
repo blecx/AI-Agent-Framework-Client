@@ -42,6 +42,19 @@
         "new": "Neues Projekt",
         "import": "Importieren"
       },
+      "errors": {
+        "load": "Projekte konnten nicht geladen werden",
+        "create": "Projekt konnte nicht erstellt werden",
+        "loadingWithMessage": "Fehler beim Laden der Projekte: {{message}}"
+      },
+      "toast": {
+        "created": "Projekt erfolgreich erstellt!",
+        "createFailed": "Projekt konnte nicht erstellt werden: {{message}}"
+      },
+      "meta": {
+        "key": "Schlüssel",
+        "created": "Erstellt"
+      },
       "empty": {
         "title": "Noch keine Projekte",
         "text": "Erstelle ein Projekt oder importiere einen bestehenden Workspace."
@@ -52,6 +65,123 @@
       "cta": {
         "create": "Projekt erstellen",
         "cancel": "Abbrechen"
+      },
+      "form": {
+        "keyLabel": "Projektschlüssel *",
+        "keyPlaceholder": "z. B. mein-projekt",
+        "keyHelp": "Eindeutiger Bezeichner (Kleinbuchstaben, Bindestriche erlaubt)",
+        "nameLabel": "Projektname *",
+        "namePlaceholder": "z. B. Mein tolles Projekt",
+        "descriptionLabel": "Beschreibung",
+        "descriptionPlaceholder": "Optionale Projektbeschreibung"
+      },
+      "errors": {
+        "requiredKeyAndName": "Projektschlüssel und Projektname sind erforderlich"
+      }
+    }
+  },
+  "projectView": {
+    "actions": {
+      "backToProjects": "← Zurück zu Projekten",
+      "backToProjectsText": "Zurück zu Projekten"
+    },
+    "tabs": {
+      "overview": "Überblick",
+      "proposeChanges": "Änderungen vorschlagen",
+      "applyProposals": "Vorschläge anwenden",
+      "commands": "Befehle",
+      "artifacts": "Artefakte",
+      "audit": "Audit"
+    },
+    "sections": {
+      "projectDetails": "Projektdetails",
+      "gitRepository": "Git-Repository",
+      "documents": "Dokumente ({{count}})"
+    },
+    "labels": {
+      "key": "Schlüssel",
+      "created": "Erstellt",
+      "lastUpdated": "Zuletzt aktualisiert",
+      "url": "URL",
+      "branch": "Branch",
+      "lastCommit": "Letzter Commit",
+      "status": "Status",
+      "lastModified": "Zuletzt geändert:"
+    },
+    "errors": {
+      "projectKeyRequired": "Projektschlüssel ist erforderlich",
+      "failedToLoadProject": "Projekt konnte nicht geladen werden",
+      "unknownError": "Unbekannter Fehler",
+      "loadingWithMessage": "Fehler beim Laden des Projekts: {{message}}"
+    }
+  },
+  "artifactEditor": {
+    "actions": {
+      "save": "Speichern",
+      "saving": "Speichere...",
+      "cancel": "Abbrechen"
+    },
+    "aria": {
+      "loadingTemplate": "Lade Vorlage",
+      "editorForm": "Artefakt-Editor-Formular",
+      "required": "erforderlich"
+    },
+    "form": {
+      "selectField": "{{field}} auswählen"
+    },
+    "labels": {
+      "templateType": "{{type}}"
+    },
+    "validation": {
+      "required": "{{field}} ist erforderlich",
+      "mustBeString": "Muss eine Zeichenfolge sein",
+      "mustBeNumber": "Muss eine Zahl sein",
+      "minLength": "Minimale Länge ist {{min}}",
+      "maxLength": "Maximale Länge ist {{max}}",
+      "invalidFormat": "Ungültiges Format"
+    },
+    "messages": {
+      "fixValidationErrors": "Bitte behebe die Validierungsfehler vor dem Speichern",
+      "savedSuccessfully": "Artefakt erfolgreich gespeichert"
+    },
+    "errors": {
+      "failedToLoadTemplate": "Vorlage konnte nicht geladen werden",
+      "failedToSaveArtifact": "Artefakt konnte nicht gespeichert werden",
+      "templateNotFound": "Vorlage nicht gefunden"
+    },
+    "unsaved": {
+      "title": "Ungespeicherte Änderungen",
+      "message": "Du hast ungespeicherte Änderungen. Möchtest du die Seite wirklich verlassen?",
+      "stay": "Bleiben",
+      "leave": "Verlassen"
+    }
+  },
+  "raid": {
+    "list": {
+      "title": "RAID-Register",
+      "itemCount_one": "{{count}} Eintrag",
+      "itemCount_other": "{{count}} Einträge",
+      "actions": {
+        "addItem": "+ RAID-Eintrag hinzufügen",
+        "addFirstItem": "Ersten Eintrag hinzufügen"
+      },
+      "table": {
+        "type": "Typ",
+        "title": "Titel",
+        "status": "Status",
+        "priority": "Priorität",
+        "owner": "Verantwortlich",
+        "created": "Erstellt"
+      },
+      "empty": {
+        "title": "Noch keine RAID-Einträge",
+        "description": "Verfolge Risiken, Annahmen, Probleme und Abhängigkeiten für dieses Projekt.",
+        "noFilterMatchesTitle": "Keine Einträge entsprechen deinen Filtern",
+        "noFilterMatchesDescription": "Passe deine Filter an oder entferne sie, um mehr Ergebnisse zu sehen."
+      },
+      "errors": {
+        "failedToLoadItems": "RAID-Einträge konnten nicht geladen werden",
+        "loadingWithMessage": "Fehler beim Laden der RAID-Einträge: {{message}}"
       }
     }
   },

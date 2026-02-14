@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Template, JSONSchemaProperty } from '../types/template';
 import { templateApiClient } from '../services/TemplateApiClient';
 import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
@@ -26,6 +27,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
   onSave,
   onCancel,
 }) => {
+  const { t } = useTranslation();
   const [template, setTemplate] = useState<Template | null>(null);
   const [formData, setFormData] = useState<Record<string, unknown>>(initialData);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -82,7 +84,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
       const tmpl = await templateApiClient.getTemplate(templateId);
       setTemplate(tmpl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load template');
+      setError(err instanceof Error ? err.message : t('artifactEditor.errors.failedToLoadTemplate'));
     } finally {
       setLoading(false);
     }
@@ -95,28 +97,28 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
   ): string | null => {
     // Required validation
     if (template?.schema.required?.includes(fieldName) && !value) {
-      return `${schema.title || fieldName} is required`;
+      return t('artifactEditor.validation.required', { field: schema.title || fieldName });
     }
 
     // Type validation
     if (value) {
       if (schema.type === 'string' && typeof value !== 'string') {
-        return 'Must be a string';
+        return t('artifactEditor.validation.mustBeString');
       }
       if (schema.type === 'number' && typeof value !== 'number') {
-        return 'Must be a number';
+        return t('artifactEditor.validation.mustBeNumber');
       }
 
       // String length validation
       if (typeof value === 'string') {
         if (schema.minLength && value.length < schema.minLength) {
-          return `Minimum length is ${schema.minLength}`;
+          return t('artifactEditor.validation.minLength', { min: schema.minLength });
         }
         if (schema.maxLength && value.length > schema.maxLength) {
-          return `Maximum length is ${schema.maxLength}`;
+          return t('artifactEditor.validation.maxLength', { max: schema.maxLength });
         }
         if (schema.pattern && !new RegExp(schema.pattern).test(value)) {
-          return `Invalid format`;
+          return t('artifactEditor.validation.invalidFormat');
         }
       }
     }
@@ -154,7 +156,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
 
   const handleSave = async () => {
     if (!validateForm()) {
-      toast.showError('Please fix validation errors before saving');
+      toast.showError(t('artifactEditor.messages.fixValidationErrors'));
       return;
     }
 
@@ -165,11 +167,11 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
       // Optimistic update - call onSave immediately
       await onSave?.(formData);
       setHasChanges(false);
-      toast.showSuccess('Artifact saved successfully');
+      toast.showSuccess(t('artifactEditor.messages.savedSuccessfully'));
     } catch (err) {
       // Rollback on error
       setFormData(previousData);
-      const errorMsg = err instanceof Error ? err.message : 'Failed to save artifact';
+      const errorMsg = err instanceof Error ? err.message : t('artifactEditor.errors.failedToSaveArtifact');
       toast.showError(errorMsg);
       console.error('Save error:', err);
     } finally {
@@ -206,7 +208,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
           onChange={(e) => handleFieldChange(fieldName, e.target.value)}
           className={errors[fieldName] ? 'error' : ''}
         >
-          <option value="">Select {label}</option>
+          <option value="">{t('artifactEditor.form.selectField', { field: label })}</option>
           {fieldSchema.enum.map((option) => (
             <option key={option} value={option}>
               {option}
@@ -266,7 +268,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
 
   if (loading) {
     return (
-      <div className="artifact-editor" aria-busy="true" aria-label="Loading template">
+      <div className="artifact-editor" aria-busy="true" aria-label={t('artifactEditor.aria.loadingTemplate')}>
         <FormSkeleton fields={5} />
       </div>
     );
@@ -283,7 +285,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
   if (!template) {
     return (
       <div className="artifact-editor error" role="alert">
-        Template not found
+        {t('artifactEditor.errors.templateNotFound')}
       </div>
     );
   }
@@ -294,14 +296,14 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
       {isBlocked && (
         <div className="unsaved-changes-dialog" role="dialog" aria-modal="true" aria-labelledby="unsaved-dialog-title">
           <div className="dialog-content">
-            <h3 id="unsaved-dialog-title">Unsaved Changes</h3>
-            <p>You have unsaved changes. Are you sure you want to leave?</p>
+            <h3 id="unsaved-dialog-title">{t('artifactEditor.unsaved.title')}</h3>
+            <p>{t('artifactEditor.unsaved.message')}</p>
             <div className="dialog-actions">
               <button onClick={cancelNavigation} className="btn-primary">
-                Stay
+                {t('artifactEditor.unsaved.stay')}
               </button>
               <button onClick={confirmNavigation} className="btn-secondary">
-                Leave
+                {t('artifactEditor.unsaved.leave')}
               </button>
             </div>
           </div>
@@ -310,11 +312,11 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
 
       <h2>
         {template.name}
-        <span className="template-type">{template.artifact_type}</span>
+        <span className="template-type">{t('artifactEditor.labels.templateType', { type: template.artifact_type })}</span>
       </h2>
       <p className="template-description">{template.description}</p>
 
-      <form ref={formRef} onSubmit={(e) => { e.preventDefault(); handleSave(); }} aria-label="Artifact editor form">
+      <form ref={formRef} onSubmit={(e) => { e.preventDefault(); handleSave(); }} aria-label={t('artifactEditor.aria.editorForm')}>
         {Object.entries(template.schema.properties).map(([fieldName, fieldSchema]) => {
           const isRequired = template.schema.required?.includes(fieldName);
           const label = fieldSchema.title || fieldName;
@@ -324,7 +326,7 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
             <div key={fieldName} className="form-field">
               <label htmlFor={fieldId}>
                 {label}
-                {isRequired && <span className="required" aria-label="required">*</span>}
+                {isRequired && <span className="required" aria-label={t('artifactEditor.aria.required')}>*</span>}
               </label>
               {fieldSchema.description && (
                 <p id={`${fieldId}-desc`} className="field-description">{fieldSchema.description}</p>
@@ -346,11 +348,11 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
             disabled={!isFormValid || isSaving}
             aria-busy={isSaving}
           >
-            {isSaving ? 'Saving...' : 'Save'}
+            {isSaving ? t('artifactEditor.actions.saving') : t('artifactEditor.actions.save')}
           </button>
           {onCancel && (
             <button type="button" className="btn-secondary" onClick={onCancel}>
-              Cancel
+              {t('artifactEditor.actions.cancel')}
             </button>
           )}
         </div>

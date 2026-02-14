@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import apiClient from '../services/apiClient';
 import type { RAIDItem, RAIDType, RAIDStatus, RAIDPriority } from '../types';
 import EmptyState from './ui/EmptyState';
@@ -15,6 +16,7 @@ interface RAIDListProps {
 }
 
 export default function RAIDList({ projectKey }: RAIDListProps) {
+  const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -67,7 +69,7 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
         selectedFilters,
       );
       if (!response.success) {
-        throw new Error(response.error || 'Failed to load RAID items');
+        throw new Error(response.error || t('raid.list.errors.failedToLoadItems'));
       }
       return response.data;
     },
@@ -75,7 +77,7 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(i18n.language, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -128,18 +130,18 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
     return (
       <div className="raid-list-container">
         <header className="raid-list-header">
-          <h2>RAID Register</h2>
+          <h2>{t('raid.list.title')}</h2>
         </header>
         <div className="raid-table">
           <table>
             <thead>
               <tr>
-                <th>Type</th>
-                <th>Title</th>
-                <th>Status</th>
-                <th>Priority</th>
-                <th>Owner</th>
-                <th>Created</th>
+                <th>{t('raid.list.table.type')}</th>
+                <th>{t('raid.list.table.title')}</th>
+                <th>{t('raid.list.table.status')}</th>
+                <th>{t('raid.list.table.priority')}</th>
+                <th>{t('raid.list.table.owner')}</th>
+                <th>{t('raid.list.table.created')}</th>
               </tr>
             </thead>
             <tbody>
@@ -214,10 +216,10 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
     return (
       <div className="raid-list-container">
         <header className="raid-list-header">
-          <h2>RAID Register</h2>
+          <h2>{t('raid.list.title')}</h2>
         </header>
         <div className="error-message">
-          Error loading RAID items: {(queryError as Error).message}
+          {t('raid.list.errors.loadingWithMessage', { message: (queryError as Error).message })}
         </div>
       </div>
     );
@@ -234,17 +236,17 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
     return (
       <div className="raid-list-container">
         <header className="raid-list-header">
-          <h2>RAID Register</h2>
+          <h2>{t('raid.list.title')}</h2>
           <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-            + Add RAID Item
+            {t('raid.list.actions.addItem')}
           </Button>
         </header>
         <EmptyState
           icon="📋"
-          title="No RAID items yet"
-          description="Track Risks, Assumptions, Issues, and Dependencies for this project."
+          title={t('raid.list.empty.title')}
+          description={t('raid.list.empty.description')}
           action={{
-            label: 'Add First Item',
+            label: t('raid.list.actions.addFirstItem'),
             onClick: () => setShowCreateModal(true),
           }}
         />
@@ -256,13 +258,13 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
     <div className="raid-list-container">
       <header className="raid-list-header">
         <div className="header-left">
-          <h2>RAID Register</h2>
+          <h2>{t('raid.list.title')}</h2>
           <span className="item-count">
-            {items.length} {items.length === 1 ? 'item' : 'items'}
+            {t('raid.list.itemCount', { count: items.length })}
           </span>
         </div>
         <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-          + Add RAID Item
+          {t('raid.list.actions.addItem')}
         </Button>
       </header>
 
@@ -275,20 +277,20 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
       {items.length === 0 ? (
         <EmptyState
           icon="🔍"
-          title="No items match your filters"
-          description="Try adjusting or clearing your filters to see more results."
+          title={t('raid.list.empty.noFilterMatchesTitle')}
+          description={t('raid.list.empty.noFilterMatchesDescription')}
         />
       ) : (
         <div className="raid-table">
           <table>
             <thead>
               <tr>
-                <th>Type</th>
-                <th>Title</th>
-                <th>Status</th>
-                <th>Priority</th>
-                <th>Owner</th>
-                <th>Created</th>
+                <th>{t('raid.list.table.type')}</th>
+                <th>{t('raid.list.table.title')}</th>
+                <th>{t('raid.list.table.status')}</th>
+                <th>{t('raid.list.table.priority')}</th>
+                <th>{t('raid.list.table.owner')}</th>
+                <th>{t('raid.list.table.created')}</th>
               </tr>
             </thead>
             <tbody>
