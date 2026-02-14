@@ -276,6 +276,15 @@
     }
   },
   "art": {
+    "state": {
+      "draft": "Draft",
+      "inReview": "In Review",
+      "applied": "Applied",
+      "needsAttention": "Needs Attention",
+      "complete": "Complete",
+      "outdated": "Outdated",
+      "conflict": "Conflict"
+    },
     "list": {
       "title": "Artifacts",
       "loading": "Loading artifacts...",
@@ -296,7 +305,17 @@
       }
     },
     "action": {
-      "improveAi": "Improve with AI"
+      "improveAi": "Improve with AI",
+      "improveWithAI": "Improve with AI",
+      "propose": "Propose for Review",
+      "proposeChange": "Propose Change",
+      "export": "Export"
+    },
+    "messages": {
+      "readOnly": "This artifact is read-only in the current state",
+      "sentForReview": "Artifact proposed for review",
+      "changeProposed": "Change proposal created",
+      "exportTriggered": "Export started"
     }
   },
   "proposal": {

@@ -276,6 +276,15 @@
     }
   },
   "art": {
+    "state": {
+      "draft": "Entwurf",
+      "inReview": "In Prüfung",
+      "applied": "Angewendet",
+      "needsAttention": "Benötigt Aufmerksamkeit",
+      "complete": "Abgeschlossen",
+      "outdated": "Veraltet",
+      "conflict": "Konflikt"
+    },
     "list": {
       "title": "Artefakte",
       "loading": "Artefakte werden geladen...",
@@ -296,7 +305,17 @@
       }
     },
     "action": {
-      "improveAi": "Mit AI verbessern"
+      "improveAi": "Mit AI verbessern",
+      "improveWithAI": "Mit AI verbessern",
+      "propose": "Zur Prüfung vorschlagen",
+      "proposeChange": "Änderung vorschlagen",
+      "export": "Exportieren"
+    },
+    "messages": {
+      "readOnly": "Dieses Artefakt ist im aktuellen Status schreibgeschützt",
+      "sentForReview": "Artefakt zur Prüfung vorgeschlagen",
+      "changeProposed": "Änderungsvorschlag erstellt",
+      "exportTriggered": "Export gestartet"
     }
   },
   "proposal": {
