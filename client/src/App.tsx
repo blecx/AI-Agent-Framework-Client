@@ -87,7 +87,7 @@ function Navigation() {
       <div className="nav-links">
         <Link
           to="/projects"
-          className={location.pathname.startsWith('/project') ? 'active' : ''}
+          className={location.pathname.startsWith('/projects') ? 'active' : ''}
         >
           Projects
         </Link>
@@ -186,14 +186,6 @@ function App() {
                           />
                           <Route
                             path="/projects/:projectKey/artifacts"
-                            element={
-                              <ErrorBoundary name="ProjectView">
-                                <ProjectView />
-                              </ErrorBoundary>
-                            }
-                          />
-                          <Route
-                            path="/project/:key"
                             element={
                               <ErrorBoundary name="ProjectView">
                                 <ProjectView />
