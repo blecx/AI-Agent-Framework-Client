@@ -1,0 +1,71 @@
+.connection-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid transparent;
+}
+
+.connection-banner__icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.connection-banner__message {
+  margin: 0;
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+.connection-banner__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.connection-banner__button {
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.connection-banner__button--secondary {
+  background: #ffffff;
+  border-color: #d0d7de;
+  color: #24292f;
+}
+
+.connection-banner__button--primary {
+  background: #0969da;
+  color: #ffffff;
+}
+
+.connection-banner--offline {
+  background: #f5f6f8;
+  color: #364152;
+  border-bottom-color: #d0d7de;
+}
+
+.connection-banner--degraded,
+.connection-banner--reconnecting {
+  background: #fff4e5;
+  color: #8a4b08;
+  border-bottom-color: #ffd8a8;
+}
+
+@media (max-width: 768px) {
+  .connection-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .connection-banner__actions {
+    width: 100%;
+  }
+
+  .connection-banner__button {
+    flex: 1;
+  }
+}
