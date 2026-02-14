@@ -1,0 +1,72 @@
+.readiness-checks {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.readiness-checks h2 {
+  margin: 0 0 12px 0;
+}
+
+.readiness-checks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.readiness-check {
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #9e9e9e;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.readiness-check--pass {
+  border-left-color: #2e7d32;
+}
+
+.readiness-check--warn {
+  border-left-color: #ef6c00;
+}
+
+.readiness-check--fail {
+  border-left-color: #c62828;
+}
+
+.readiness-check--inProgress {
+  border-left-color: #1565c0;
+}
+
+.readiness-check-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.readiness-check-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.readiness-check-status {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
+.readiness-check-description,
+.readiness-check-message {
+  margin: 8px 0;
+  color: #555;
+}
+
+.readiness-check-action {
+  border: 1px solid #1565c0;
+  background: #1565c0;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}

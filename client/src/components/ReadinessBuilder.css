@@ -1,0 +1,18 @@
+.readiness-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.readiness-builder-loading,
+.readiness-builder-error {
+  padding: 16px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #ddd;
+}
+
+.readiness-builder-error {
+  color: #c62828;
+  border-color: #ef9a9a;
+}

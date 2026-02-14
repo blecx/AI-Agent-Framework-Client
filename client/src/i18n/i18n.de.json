@@ -329,6 +329,61 @@
   },
   "rd": {
     "title": "Readiness Builder",
+    "loading": "Readiness wird geladen...",
+    "nextActions": "Nächste Aktionen",
+    "state": {
+      "notAssessed": "Nicht bewertet",
+      "inProgress": "In Bearbeitung",
+      "pass": "Bestanden",
+      "warn": "Warnung",
+      "fail": "Fehlgeschlagen"
+    },
+    "summary": {
+      "passed": "{{count}} Checks bestanden",
+      "warnings": "{{count}} Warnungen",
+      "failed": "{{count}} fehlgeschlagen"
+    },
+    "checks": {
+      "title": "Readiness-Checks",
+      "items": {
+        "projectBasics": {
+          "name": "Projektgrundlagen",
+          "description": "Projekt hat Name, Schlüssel und Beschreibung",
+          "message": "Projektgrundlagen sind vollständig"
+        },
+        "projectCharter": {
+          "name": "Projektauftrag",
+          "description": "Projektauftrag existiert und ist vollständig",
+          "message": "Projektauftrag existiert, ist aber nicht geprüft"
+        },
+        "raidRegister": {
+          "name": "RAID-Register",
+          "description": "Risiken, Annahmen, Probleme und Abhängigkeiten sind dokumentiert",
+          "message": "Keine RAID-Einträge dokumentiert"
+        },
+        "workflowDefinition": {
+          "name": "Workflow-Definition",
+          "description": "Projektworkflow und Phasen sind definiert",
+          "message": "Es wurde noch kein Workflow definiert"
+        },
+        "proposalGovernance": {
+          "name": "Vorschlags-Governance",
+          "description": "Review-/Apply-Prozess für Vorschläge ist aktiv",
+          "message": "Governance-Setup ist in Bearbeitung"
+        }
+      }
+    },
+    "actions": {
+      "open": "Öffnen",
+      "reviewCharter": "Projektauftrag prüfen",
+      "createRaid": "RAID-Einträge erstellen",
+      "defineWorkflow": "Workflow definieren",
+      "continueGovernance": "Governance fortsetzen"
+    },
+    "errors": {
+      "missingProjectKey": "Projektschlüssel ist erforderlich",
+      "loadFailed": "Fehler beim Laden der Readiness-Daten"
+    },
     "cta": {
       "startAssessment": "Prüfung starten",
       "showGaps": "Lücken anzeigen"

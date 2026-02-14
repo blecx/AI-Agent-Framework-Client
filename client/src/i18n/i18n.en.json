@@ -329,6 +329,61 @@
   },
   "rd": {
     "title": "Readiness Builder",
+    "loading": "Loading readiness...",
+    "nextActions": "Next Actions",
+    "state": {
+      "notAssessed": "Not Assessed",
+      "inProgress": "In Progress",
+      "pass": "Pass",
+      "warn": "Warning",
+      "fail": "Failed"
+    },
+    "summary": {
+      "passed": "{{count}} checks passed",
+      "warnings": "{{count}} warnings",
+      "failed": "{{count}} failed"
+    },
+    "checks": {
+      "title": "Readiness Checks",
+      "items": {
+        "projectBasics": {
+          "name": "Project Basics",
+          "description": "Project has name, key, and description",
+          "message": "Project basics are complete"
+        },
+        "projectCharter": {
+          "name": "Project Charter",
+          "description": "Project charter exists and is complete",
+          "message": "Charter exists but is not reviewed"
+        },
+        "raidRegister": {
+          "name": "RAID Register",
+          "description": "Risks, assumptions, issues, and dependencies are documented",
+          "message": "No RAID items documented"
+        },
+        "workflowDefinition": {
+          "name": "Workflow Definition",
+          "description": "Project workflow and phases are defined",
+          "message": "No workflow has been defined yet"
+        },
+        "proposalGovernance": {
+          "name": "Proposal Governance",
+          "description": "Proposal review/apply process is active",
+          "message": "Governance setup is in progress"
+        }
+      }
+    },
+    "actions": {
+      "open": "Open",
+      "reviewCharter": "Review Charter",
+      "createRaid": "Create RAID Items",
+      "defineWorkflow": "Define Workflow",
+      "continueGovernance": "Continue Governance"
+    },
+    "errors": {
+      "missingProjectKey": "Project key is required",
+      "loadFailed": "Error loading readiness data"
+    },
     "cta": {
       "startAssessment": "Start assessment",
       "showGaps": "View gaps"

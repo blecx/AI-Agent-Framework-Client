@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import apiClient from '../services/apiClient';
@@ -8,18 +8,36 @@ import ApplyPanel from './ApplyPanel';
 import CommandPanel from './ProjectCommandPanel';
 import { ArtifactList } from './ArtifactList';
 import { AuditViewer } from './AuditViewer';
+import ReadinessBuilder from './ReadinessBuilder';
 import { AuditBadge } from './AuditBadge';
 import { AuditApiClient } from '../services/AuditApiClient';
 import Skeleton from './ui/Skeleton';
 import './ProjectView.css';
 
-type TabType = 'overview' | 'propose' | 'apply' | 'commands' | 'artifacts' | 'audit';
+type TabType =
+  | 'overview'
+  | 'propose'
+  | 'apply'
+  | 'commands'
+  | 'artifacts'
+  | 'readiness'
+  | 'audit';
+
+function tabFromPath(pathname: string): TabType {
+  if (pathname.endsWith('/propose')) return 'propose';
+  if (pathname.endsWith('/apply')) return 'apply';
+  if (pathname.endsWith('/artifacts')) return 'artifacts';
+  if (pathname.endsWith('/readiness')) return 'readiness';
+  if (pathname.endsWith('/audit')) return 'audit';
+  return 'overview';
+}
 
 export default function ProjectView() {
   const { t } = useTranslation();
   const { projectKey } = useParams<{ projectKey: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<TabType>(() => tabFromPath(location.pathname));
 
   // Fetch project data
   const {
@@ -158,6 +176,12 @@ export default function ProjectView() {
           {t('projectView.tabs.artifacts')}
         </button>
         <button
+          className={`tab ${activeTab === 'readiness' ? 'active' : ''}`}
+          onClick={() => setActiveTab('readiness')}
+        >
+          {t('nav.readinessBuilder')}
+        </button>
+        <button
           className={`tab ${activeTab === 'audit' ? 'active' : ''}`}
           onClick={() => setActiveTab('audit')}
         >
@@ -249,6 +273,7 @@ export default function ProjectView() {
             }}
           />
         )}
+        {activeTab === 'readiness' && projectKey && <ReadinessBuilder projectKey={projectKey} />}
         {activeTab === 'audit' && projectKey && <AuditViewer projectKey={projectKey} />}
       </div>
     </div>
