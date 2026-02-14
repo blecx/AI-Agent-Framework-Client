@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../../i18n/config';
 import ProjectView from '../ProjectView';
+import { AuditApiClient } from '../../services/AuditApiClient';
 
 // Mock dependencies
 vi.mock('../../services/apiClient', () => ({
@@ -18,17 +19,12 @@ vi.mock('../../services/apiClient', () => ({
   },
 }));
 
-vi.mock('../../services/AuditApiClient', () => ({
-  AuditApiClient: vi.fn().mockImplementation(() => ({
-    getAuditResults: vi.fn(),
-  })),
-}));
-
 vi.mock('../ProposePanel', () => ({ default: () => <div>ProposePanel</div> }));
 vi.mock('../ApplyPanel', () => ({ default: () => <div>ApplyPanel</div> }));
 vi.mock('../ProjectCommandPanel', () => ({ default: () => <div>CommandPanel</div> }));
 vi.mock('../ArtifactList', () => ({ ArtifactList: () => <div>ArtifactList</div> }));
 vi.mock('../AuditViewer', () => ({ AuditViewer: () => <div>AuditViewer</div> }));
+vi.mock('../ReadinessBuilder', () => ({ default: () => <div>ReadinessBuilder</div> }));
 
 const mockProject = {
   key: 'TEST-123',
@@ -85,20 +81,14 @@ describe('ProjectView', () => {
   let mockGetAuditResults: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
     mockGetProject = vi.fn();
-    mockGetAuditResults = vi.fn();
+    mockGetAuditResults = vi.fn().mockResolvedValue(mockAuditData);
 
     const apiClient = await import('../../services/apiClient');
     vi.mocked(apiClient.default.getProject).mockImplementation(mockGetProject);
 
-    const auditModule = await import('../../services/AuditApiClient');
-    vi.mocked(auditModule.AuditApiClient).mockImplementation(
-      () =>
-        ({
-          getAuditResults: mockGetAuditResults,
-        }) as unknown as InstanceType<typeof auditModule.AuditApiClient>
-    );
+    vi.spyOn(AuditApiClient.prototype, 'getAuditResults').mockImplementation(mockGetAuditResults);
   });
 
   it('renders loading state with skeletons', () => {
@@ -283,6 +273,25 @@ describe('ProjectView', () => {
 
     await waitFor(() => {
       expect(screen.getByText('AuditViewer')).toBeInTheDocument();
+    });
+  });
+
+  it('switches to readiness tab when clicked', async () => {
+    mockGetProject.mockResolvedValue({ success: true, data: mockProject });
+    mockGetAuditResults.mockResolvedValue(mockAuditData);
+
+    const user = userEvent.setup();
+    renderWithProviders(<ProjectView />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Project')).toBeInTheDocument();
+    });
+
+    const readinessTab = screen.getByRole('button', { name: /Readiness Builder/i });
+    await user.click(readinessTab);
+
+    await waitFor(() => {
+      expect(screen.getByText('ReadinessBuilder')).toBeInTheDocument();
     });
   });
 

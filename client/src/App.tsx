@@ -174,6 +174,14 @@ function App() {
                             }
                           />
                           <Route
+                            path="/projects/:projectKey/readiness"
+                            element={
+                              <ErrorBoundary name="ProjectView">
+                                <ProjectView />
+                              </ErrorBoundary>
+                            }
+                          />
+                          <Route
                             path="/projects/:projectKey/sync"
                             element={
                               <ErrorBoundary name="SyncPanel">

@@ -1,0 +1,69 @@
+.readiness-panel {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-left: 4px solid #9e9e9e;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.readiness-panel--pass {
+  border-left-color: #2e7d32;
+}
+
+.readiness-panel--warn {
+  border-left-color: #ef6c00;
+}
+
+.readiness-panel--fail {
+  border-left-color: #c62828;
+}
+
+.readiness-panel--inProgress {
+  border-left-color: #1565c0;
+}
+
+.readiness-panel-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.readiness-panel-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: #555;
+  margin-bottom: 12px;
+}
+
+.readiness-panel-actions h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+}
+
+.readiness-panel-actions ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.readiness-panel-actions li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.readiness-panel-cta {
+  border: 1px solid #1565c0;
+  color: #1565c0;
+  background: #fff;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
