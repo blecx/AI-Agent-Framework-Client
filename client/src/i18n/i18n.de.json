@@ -253,10 +253,26 @@
       "exit": "Beenden"
     },
     "state": {
+      "idle": "Bereit zum Start",
+      "prompting": "Fragen werden beantwortet…",
+      "generating": "Inhalt wird generiert…",
+      "reviewing": "Überprüfen & verfeinern",
+      "paused": "Pausiert",
+      "complete": "Abgeschlossen",
       "blocked": {
         "label": "Blockiert",
         "helper": "Du kannst pausieren und später fortsetzen. Der aktuelle Stand bleibt erhalten."
       }
+    },
+    "prompt": {
+      "title": "Geführte Eingabe",
+      "question": "Frage {{current}} von {{total}}",
+      "placeholder": "Antwort eingeben...",
+      "submit": "Senden"
+    },
+    "draft": {
+      "title": "Entwurfsvorschau",
+      "empty": "Noch kein Entwurf. Beantworte die Fragen, um Inhalte zu generieren."
     }
   },
   "art": {

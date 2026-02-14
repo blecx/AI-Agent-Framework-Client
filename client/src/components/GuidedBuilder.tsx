@@ -147,6 +147,7 @@ export default function GuidedBuilder() {
         )}
         {currentStep === 'artifacts' && (
           <ArtifactsStep
+            projectKey={state.projectData.key}
             selectedArtifacts={state.selectedArtifacts}
             onChange={(selectedArtifacts) =>
               setState((prev) => ({ ...prev, selectedArtifacts }))

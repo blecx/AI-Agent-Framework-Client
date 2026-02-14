@@ -1,0 +1,53 @@
+.assisted-prompt {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.assisted-prompt h3,
+.assisted-prompt p {
+  margin: 0;
+}
+
+.assisted-prompt-question {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+  padding: 0.75rem;
+  font-weight: 600;
+}
+
+.assisted-prompt-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.assisted-prompt-input-row input {
+  flex: 1;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+}
+
+.assisted-prompt-history {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.assisted-prompt-history li {
+  border-left: 3px solid #4f46e5;
+  padding-left: 0.6rem;
+}
+
+.assisted-prompt-history p {
+  margin-top: 0.2rem;
+  color: #4b5563;
+}
+
+@media (max-width: 768px) {
+  .assisted-prompt-input-row {
+    flex-direction: column;
+  }
+}

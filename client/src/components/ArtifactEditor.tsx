@@ -343,6 +343,18 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
 
         <div className="form-actions">
           <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => {
+              const artifactType = template.artifact_type || 'charter';
+              window.location.assign(
+                `/projects/${_projectKey}/assisted-creation?artifactType=${artifactType}`,
+              );
+            }}
+          >
+            {t('art.action.improveAi')}
+          </button>
+          <button
             type="submit"
             className="btn-primary"
             disabled={!isFormValid || isSaving}

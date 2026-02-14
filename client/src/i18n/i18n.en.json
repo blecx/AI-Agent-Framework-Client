@@ -253,10 +253,26 @@
       "exit": "Exit"
     },
     "state": {
+      "idle": "Ready to start",
+      "prompting": "Answering questions…",
+      "generating": "Generating content…",
+      "reviewing": "Review & refine",
+      "paused": "Paused",
+      "complete": "Complete",
       "blocked": {
         "label": "Blocked",
         "helper": "You can pause and continue later. Your progress is saved."
       }
+    },
+    "prompt": {
+      "title": "Guided Prompting",
+      "question": "Question {{current}} of {{total}}",
+      "placeholder": "Type your answer...",
+      "submit": "Submit"
+    },
+    "draft": {
+      "title": "Draft Preview",
+      "empty": "No draft yet. Answer the prompts to generate content."
     }
   },
   "art": {
