@@ -8,6 +8,26 @@ import { describe, it, expect } from "vitest";
 import enTranslations from "./i18n.en.json";
 import deTranslations from "./i18n.de.json";
 
+const hasTranslationPath = (
+  obj: Record<string, unknown>,
+  path: string,
+): boolean => {
+  const value = path
+    .split(".")
+    .reduce<unknown>((current, key) => {
+      if (
+        typeof current === "object" &&
+        current !== null &&
+        key in (current as Record<string, unknown>)
+      ) {
+        return (current as Record<string, unknown>)[key];
+      }
+      return undefined;
+    }, obj);
+
+  return typeof value === "string";
+};
+
 describe("i18n Translation Catalogs", () => {
   describe("English (en) translations", () => {
     it("should have valid JSON structure", () => {
@@ -100,6 +120,30 @@ describe("i18n Translation Catalogs", () => {
 
       checkNoEmpty(enTranslations);
       checkNoEmpty(deTranslations);
+    });
+
+    it("should include project-scoped feature keys in both locales", () => {
+      const requiredProjectScopedKeys = [
+        "projectView.tabs.overview",
+        "projectView.tabs.proposeChanges",
+        "projectView.tabs.applyProposals",
+        "projectView.tabs.commands",
+        "projectView.tabs.artifacts",
+        "projectView.tabs.audit",
+        "nav.readinessBuilder",
+        "raid.list.itemCount",
+        "rd.title",
+        "sync.title",
+      ];
+
+      requiredProjectScopedKeys.forEach((key) => {
+        expect(hasTranslationPath(enTranslations as Record<string, unknown>, key)).toBe(
+          true,
+        );
+        expect(hasTranslationPath(deTranslations as Record<string, unknown>, key)).toBe(
+          true,
+        );
+      });
     });
   });
 });
