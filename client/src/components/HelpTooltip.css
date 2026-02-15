@@ -1,0 +1,85 @@
+.help-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.help-tooltip__trigger {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  border: none;
+  background: #0284c7;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.65rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.35rem;
+}
+
+.help-tooltip__trigger:focus-visible,
+.help-tooltip__close:focus-visible,
+.help-tooltip__link:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.help-tooltip__panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 18rem;
+  max-width: 24rem;
+  z-index: 1200;
+  background: #fff;
+  border: 1px solid #dbe1ea;
+  border-radius: 0.6rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  padding: 0.75rem;
+}
+
+.help-tooltip__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.help-tooltip__header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #1f2937;
+}
+
+.help-tooltip__close {
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.help-tooltip__content {
+  margin: 0.5rem 0 0;
+  font-size: 0.86rem;
+  color: #374151;
+  line-height: 1.4;
+}
+
+.help-tooltip__link {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  color: #1d4ed8;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.help-tooltip__link:hover {
+  text-decoration: underline;
+}

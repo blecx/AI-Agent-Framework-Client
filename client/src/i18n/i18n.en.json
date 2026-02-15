@@ -33,8 +33,137 @@
     "advancedTools": "Advanced Tools"
   },
   "help": {
-    "concept": {
-      "guidedCoAuthoring": "Guided Co-Authoring"
+    "title": "Help & Documentation",
+    "subtitle": "Find guidance for workflows, ISO 21500 concepts, and guided co-authoring.",
+    "actions": {
+      "show": "Show help",
+      "close": "Close help",
+      "learnMore": "Learn more",
+      "backToIndex": "Back to Help Index"
+    },
+    "search": {
+      "label": "Search help",
+      "placeholder": "Search help topics..."
+    },
+    "categories": {
+      "getting-started": "Getting Started",
+      "workflows": "Workflows",
+      "concepts": "Concepts",
+      "reference": "Reference"
+    },
+    "notFound": {
+      "title": "Topic not found",
+      "description": "This help topic does not exist yet."
+    },
+    "docs": {
+      "gettingStarted": "Getting Started",
+      "keyConcepts": "Key Concepts",
+      "guided-builder": {
+        "steps": [
+          "Open Guided Builder from the primary navigation entry.",
+          "Complete project setup and choose artifacts.",
+          "Review and launch the generated workspace."
+        ],
+        "details": "Guided Builder keeps artifact creation aligned with ISO 21500 structure through guided phases and review checkpoints."
+      },
+      "assisted-creation": {
+        "steps": [
+          "Start Assisted Creation from your project workspace.",
+          "Answer prompts and refine generated draft content.",
+          "Save a draft or snapshot and continue later if needed."
+        ],
+        "details": "Assisted Creation focuses on co-authoring artifacts with AI while preserving user control and review visibility."
+      },
+      "readiness-builder": {
+        "steps": [
+          "Open readiness checks from the project workflow area.",
+          "Review pass/warn/fail outcomes and suggested actions.",
+          "Address gaps before proposal review and apply phases."
+        ],
+        "details": "Readiness Builder verifies required governance and documentation signals before advancing critical workflow milestones."
+      },
+      "workflows": {
+        "steps": [
+          "Create and plan work in Guided Builder.",
+          "Generate/refine content in Assisted Creation.",
+          "Validate readiness, then move through proposal review."
+        ],
+        "details": "Workflow stages are designed to support transparent, auditable co-authoring from planning through approval."
+      },
+      "first-steps": {
+        "steps": [
+          "Create or open a project from the Projects view.",
+          "Use Guided Builder to scaffold core artifacts.",
+          "Run readiness checks and iterate with proposals."
+        ],
+        "details": "First-time users can follow this sequence to move from project setup to governed delivery quickly."
+      }
+    },
+    "topics": {
+      "firstSteps": {
+        "title": "First Steps with AI Project Manager",
+        "summary": "Quick onboarding guide for new users.",
+        "content": "Learn the essentials of setting up projects, generating artifacts, and moving through governed review steps."
+      },
+      "iso21500": {
+        "title": "Understanding ISO 21500",
+        "summary": "Foundations for project management concepts.",
+        "content": "ISO 21500 provides high-level guidance for project governance, planning, delivery, and control."
+      },
+      "gb": {
+        "title": "Guided Builder",
+        "summary": "Step-by-step project creation.",
+        "content": "Guided Builder helps you create project scaffolding and core artifacts with structured workflow checkpoints."
+      },
+      "ac": {
+        "title": "Assisted Creation",
+        "summary": "AI-assisted artifact drafting.",
+        "content": "Assisted Creation combines prompts, draft generation, and iterative editing to speed up authoring while preserving review control."
+      },
+      "rd": {
+        "title": "Readiness Builder",
+        "summary": "Project readiness assessment.",
+        "content": "Readiness Builder evaluates governance and artifact completeness so teams can identify and close delivery gaps early."
+      },
+      "workflows": {
+        "title": "Workflow Stages",
+        "summary": "How major workflows fit together.",
+        "content": "The platform workflow links guided setup, co-authoring, readiness checks, and proposal review into one traceable delivery model."
+      },
+      "projects": {
+        "title": "Projects",
+        "summary": "Top-level container for work.",
+        "content": "Projects organize artifacts, workflows, proposals, and audit history for a specific initiative."
+      },
+      "artifacts": {
+        "title": "Artifacts",
+        "summary": "Structured ISO 21500 deliverables.",
+        "content": "Artifacts represent key project outputs such as charter, WBS, RAID, and schedules, with lifecycle states and review gates."
+      },
+      "raid": {
+        "title": "RAID Log",
+        "summary": "Risk and issue visibility.",
+        "content": "RAID tracks risks, assumptions, issues, and dependencies to support proactive governance decisions."
+      },
+      "guidedCoAuthoring": {
+        "title": "Guided Co-Authoring",
+        "summary": "Human + AI collaboration model.",
+        "content": "Guided co-authoring combines AI speed with human review checkpoints to maintain quality and auditability."
+      }
+    },
+    "formFields": {
+      "name": {
+        "title": "Project/Artifact Name",
+        "content": "Use clear, domain-relevant names to improve discoverability across workflows and reviews."
+      },
+      "description": {
+        "title": "Description",
+        "content": "Capture scope, intent, and expected outcomes so collaborators can review changes with context."
+      },
+      "artifactType": {
+        "title": "Artifact Type",
+        "content": "Artifact type determines expected structure and governance checks used during creation and review."
+      }
     }
   },
   "a11y": {

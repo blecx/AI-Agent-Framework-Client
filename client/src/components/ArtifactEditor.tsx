@@ -12,6 +12,7 @@ import { useUnsavedChanges } from "../hooks/useUnsavedChanges";
 import { FormSkeleton } from "./LoadingSkeleton";
 import { useToast } from "../hooks/useToast";
 import ArtifactStateBadge from "./ArtifactStateBadge";
+import HelpTooltip from "./HelpTooltip";
 import "./ArtifactEditor.css";
 
 export interface ArtifactEditorProps {
@@ -250,6 +251,36 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
     }
   };
 
+  const getFieldHelpKeys = (fieldName: string) => {
+    const keyMap: Record<
+      string,
+      { titleKey: string; contentKey: string; learnMorePath: string }
+    > = {
+      name: {
+        titleKey: "help.formFields.name.title",
+        contentKey: "help.formFields.name.content",
+        learnMorePath: "/help/projects",
+      },
+      description: {
+        titleKey: "help.formFields.description.title",
+        contentKey: "help.formFields.description.content",
+        learnMorePath: "/help/iso21500",
+      },
+      artifactType: {
+        titleKey: "help.formFields.artifactType.title",
+        contentKey: "help.formFields.artifactType.content",
+        learnMorePath: "/help/artifacts",
+      },
+      type: {
+        titleKey: "help.formFields.artifactType.title",
+        contentKey: "help.formFields.artifactType.content",
+        learnMorePath: "/help/artifacts",
+      },
+    };
+
+    return keyMap[fieldName];
+  };
+
   const renderField = (
     fieldName: string,
     fieldSchema: JSONSchemaProperty,
@@ -423,11 +454,19 @@ export const ArtifactEditor: React.FC<ArtifactEditorProps> = ({
             const isRequired = template.schema.required?.includes(fieldName);
             const label = fieldSchema.title || fieldName;
             const fieldId = `field-${fieldName}`;
+            const helpKeys = getFieldHelpKeys(fieldName);
 
             return (
               <div key={fieldName} className="form-field">
                 <label htmlFor={fieldId}>
                   {label}
+                  {helpKeys && (
+                    <HelpTooltip
+                      titleKey={helpKeys.titleKey}
+                      contentKey={helpKeys.contentKey}
+                      learnMorePath={helpKeys.learnMorePath}
+                    />
+                  )}
                   {isRequired && (
                     <span
                       className="required"

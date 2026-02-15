@@ -1,0 +1,100 @@
+.help-page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2rem;
+}
+
+.help-page__header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: #111827;
+}
+
+.help-page__header p {
+  margin: 0.4rem 0 1rem;
+  color: #4b5563;
+}
+
+.help-page__search {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+}
+
+.help-page__search span {
+  font-weight: 600;
+  color: #374151;
+}
+
+.help-page__search input {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
+}
+
+.help-page__search input:focus-visible,
+.help-page a:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.help-page__category {
+  margin: 1rem 0;
+}
+
+.help-page__category h2 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.help-page__category ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.help-page__category li a {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.6rem;
+  color: #0f172a;
+  text-decoration: none;
+  background: #fff;
+}
+
+.help-page__category li a:hover {
+  background: #f8fafc;
+}
+
+.help-page__category li a span {
+  color: #475569;
+  font-size: 0.86rem;
+}
+
+.help-topic-page {
+  line-height: 1.5;
+}
+
+.help-topic-page__back {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #1d4ed8;
+  text-decoration: none;
+}
+
+.help-topic-page h2 {
+  margin-top: 1.15rem;
+  font-size: 1.05rem;
+  color: #1f2937;
+}
+
+.help-topic-page ol {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+}

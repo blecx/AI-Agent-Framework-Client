@@ -45,7 +45,8 @@ describe('AppNavigation', () => {
     );
 
     expect(screen.getByRole('navigation', { name: 'Main navigation' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Guided Builder/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Guided Builder' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Help is available for this feature: Guided Builder/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Projects/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Create/i })).toBeInTheDocument();
   });
@@ -57,7 +58,7 @@ describe('AppNavigation', () => {
       </MemoryRouter>,
     );
 
-    const guidedBuilderLink = screen.getByRole('link', { name: /Guided Builder/i });
+    const guidedBuilderLink = screen.getByRole('link', { name: 'Guided Builder' });
     expect(guidedBuilderLink.className).toContain('app-nav__item--active');
   });
 

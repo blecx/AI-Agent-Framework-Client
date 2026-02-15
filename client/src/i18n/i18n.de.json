@@ -33,8 +33,137 @@
     "advancedTools": "Advanced Tools"
   },
   "help": {
-    "concept": {
-      "guidedCoAuthoring": "Guided Co-Authoring"
+    "title": "Hilfe & Dokumentation",
+    "subtitle": "Anleitungen für Workflows, ISO-21500-Konzepte und Guided Co-Authoring.",
+    "actions": {
+      "show": "Hilfe anzeigen",
+      "close": "Hilfe schließen",
+      "learnMore": "Mehr erfahren",
+      "backToIndex": "Zurück zur Hilfeübersicht"
+    },
+    "search": {
+      "label": "Hilfe durchsuchen",
+      "placeholder": "Hilfethemen durchsuchen..."
+    },
+    "categories": {
+      "getting-started": "Erste Schritte",
+      "workflows": "Workflows",
+      "concepts": "Konzepte",
+      "reference": "Referenz"
+    },
+    "notFound": {
+      "title": "Thema nicht gefunden",
+      "description": "Dieses Hilfethema ist noch nicht vorhanden."
+    },
+    "docs": {
+      "gettingStarted": "Erste Schritte",
+      "keyConcepts": "Wichtige Konzepte",
+      "guided-builder": {
+        "steps": [
+          "Guided Builder über den primären Navigationseintrag öffnen.",
+          "Projektsetup abschließen und Artefakte auswählen.",
+          "Erstellten Workspace prüfen und starten."
+        ],
+        "details": "Der Guided Builder hält die Artefakterstellung durch geführte Phasen und Review-Checkpoints an der ISO-21500-Struktur ausgerichtet."
+      },
+      "assisted-creation": {
+        "steps": [
+          "Assisted Creation im Projekt-Workspace starten.",
+          "Prompts beantworten und generierte Entwürfe verfeinern.",
+          "Entwurf oder Snapshot speichern und später fortsetzen."
+        ],
+        "details": "Assisted Creation fokussiert sich auf Co-Authoring mit KI bei gleichzeitiger Nutzerkontrolle und Review-Transparenz."
+      },
+      "readiness-builder": {
+        "steps": [
+          "Readiness-Checks im Workflow-Bereich des Projekts öffnen.",
+          "Pass/Warn/Fail-Ergebnisse und nächste Schritte prüfen.",
+          "Lücken schließen, bevor Review- und Apply-Phasen starten."
+        ],
+        "details": "Der Readiness Builder prüft erforderliche Governance- und Dokumentationssignale vor kritischen Meilensteinen."
+      },
+      "workflows": {
+        "steps": [
+          "Arbeit im Guided Builder planen und initialisieren.",
+          "Inhalte in Assisted Creation erzeugen und verfeinern.",
+          "Readiness prüfen und anschließend Proposal-Review durchlaufen."
+        ],
+        "details": "Workflow-Stufen unterstützen transparentes, nachvollziehbares Co-Authoring von Planung bis Freigabe."
+      },
+      "first-steps": {
+        "steps": [
+          "Projekt in der Projektübersicht erstellen oder öffnen.",
+          "Mit Guided Builder zentrale Artefakte vorbereiten.",
+          "Readiness prüfen und mit Proposals iterieren."
+        ],
+        "details": "Neue Nutzer können mit dieser Abfolge schnell von Setup zu kontrollierter Lieferung gelangen."
+      }
+    },
+    "topics": {
+      "firstSteps": {
+        "title": "Erste Schritte mit AI Project Manager",
+        "summary": "Schneller Einstieg für neue Nutzer.",
+        "content": "Lernen Sie die Grundlagen für Projektsetup, Artefakterstellung und gesteuerte Reviewschritte."
+      },
+      "iso21500": {
+        "title": "ISO 21500 verstehen",
+        "summary": "Grundlagen zentraler Projektmanagement-Konzepte.",
+        "content": "ISO 21500 liefert übergeordnete Leitlinien für Projekt-Governance, Planung, Lieferung und Steuerung."
+      },
+      "gb": {
+        "title": "Guided Builder",
+        "summary": "Schrittweise Projekterstellung.",
+        "content": "Der Guided Builder unterstützt beim Projektgerüst und zentralen Artefakten mit strukturierten Workflow-Checkpoints."
+      },
+      "ac": {
+        "title": "Assisted Creation",
+        "summary": "KI-gestützte Artefakterstellung.",
+        "content": "Assisted Creation kombiniert Prompts, Entwurfsgenerierung und iterative Bearbeitung für schnelleres Authoring mit Review-Kontrolle."
+      },
+      "rd": {
+        "title": "Readiness Builder",
+        "summary": "Bewertung der Projekt-Readiness.",
+        "content": "Der Readiness Builder bewertet Governance und Artefaktvollständigkeit, damit Lieferlücken früh erkannt werden."
+      },
+      "workflows": {
+        "title": "Workflow-Stufen",
+        "summary": "Zusammenspiel der wichtigsten Workflows.",
+        "content": "Der Plattform-Workflow verbindet Guided Setup, Co-Authoring, Readiness-Checks und Proposal-Review zu einem nachvollziehbaren Liefermodell."
+      },
+      "projects": {
+        "title": "Projekte",
+        "summary": "Oberste Arbeitseinheit.",
+        "content": "Projekte bündeln Artefakte, Workflows, Proposals und Audit-Historie für eine Initiative."
+      },
+      "artifacts": {
+        "title": "Artefakte",
+        "summary": "Strukturierte ISO-21500-Lieferobjekte.",
+        "content": "Artefakte repräsentieren zentrale Projektergebnisse wie Auftrag, PSP, RAID und Terminpläne mit Lifecycle-Status und Review-Gates."
+      },
+      "raid": {
+        "title": "RAID-Log",
+        "summary": "Sichtbarkeit von Risiken und Issues.",
+        "content": "RAID erfasst Risiken, Annahmen, Probleme und Abhängigkeiten zur proaktiven Governance-Steuerung."
+      },
+      "guidedCoAuthoring": {
+        "title": "Guided Co-Authoring",
+        "summary": "Zusammenarbeit von Mensch und KI.",
+        "content": "Guided Co-Authoring verbindet KI-Geschwindigkeit mit menschlichen Review-Checkpoints für Qualität und Nachvollziehbarkeit."
+      }
+    },
+    "formFields": {
+      "name": {
+        "title": "Projekt-/Artefaktname",
+        "content": "Verwenden Sie klare, domänenspezifische Namen für bessere Auffindbarkeit in Workflows und Reviews."
+      },
+      "description": {
+        "title": "Beschreibung",
+        "content": "Beschreiben Sie Umfang, Ziel und erwartete Ergebnisse, damit Reviews im richtigen Kontext erfolgen können."
+      },
+      "artifactType": {
+        "title": "Artefakttyp",
+        "content": "Der Artefakttyp bestimmt Struktur- und Governance-Prüfungen während Erstellung und Review."
+      }
     }
   },
   "a11y": {

@@ -14,6 +14,7 @@ interface NavItem {
   primary?: boolean;
   badgeKey?: string;
   helpAvailable?: boolean;
+  helpPath?: string;
 }
 
 interface NavSection {
@@ -49,6 +50,7 @@ export default function AppNavigation({ connectionState }: AppNavigationProps) {
             icon: '🚀',
             primary: true,
             helpAvailable: true,
+            helpPath: '/help/guided-builder',
           },
         ],
       },
@@ -75,6 +77,7 @@ export default function AppNavigation({ connectionState }: AppNavigationProps) {
             icon: '⚡',
             badgeKey: 'nav.badges.power',
             helpAvailable: true,
+            helpPath: '/help/assisted-creation',
           },
           {
             key: 'commands',
@@ -82,6 +85,7 @@ export default function AppNavigation({ connectionState }: AppNavigationProps) {
             path: '/commands',
             icon: '🧠',
             helpAvailable: true,
+            helpPath: '/help/workflows',
           },
         ],
       },
@@ -113,6 +117,7 @@ export default function AppNavigation({ connectionState }: AppNavigationProps) {
             path: '/projects',
             icon: '📋',
             helpAvailable: true,
+            helpPath: '/help/readiness-builder',
           },
         ],
       },
@@ -196,26 +201,37 @@ export default function AppNavigation({ connectionState }: AppNavigationProps) {
                 {(!hasHeader || expanded) && (
                   <div className="app-nav__items">
                     {section.items.map((item) => (
-                      <NavLink
-                        key={item.key}
-                        to={item.path}
-                        className={({ isActive }) =>
-                          [
-                            'app-nav__item',
-                            item.primary ? 'app-nav__item--primary' : 'app-nav__item--secondary',
-                            isActive ? 'app-nav__item--active' : '',
-                          ]
-                            .filter(Boolean)
-                            .join(' ')
-                        }
-                        onClick={closeMobile}
-                        data-nav-focusable="true"
-                      >
-                        {item.icon && <span className="app-nav__icon" aria-hidden="true">{item.icon}</span>}
-                        <span className="app-nav__label">{t(item.labelKey)}</span>
-                        {item.badgeKey && <span className="app-nav__badge">{t(item.badgeKey)}</span>}
-                        {item.helpAvailable && <span className="app-nav__help" aria-label={t('nav.helpAvailable')}>?</span>}
-                      </NavLink>
+                      <div key={item.key} className="app-nav__item-row">
+                        <NavLink
+                          to={item.path}
+                          className={({ isActive }) =>
+                            [
+                              'app-nav__item',
+                              item.primary ? 'app-nav__item--primary' : 'app-nav__item--secondary',
+                              isActive ? 'app-nav__item--active' : '',
+                            ]
+                              .filter(Boolean)
+                              .join(' ')
+                          }
+                          onClick={closeMobile}
+                          data-nav-focusable="true"
+                        >
+                          {item.icon && <span className="app-nav__icon" aria-hidden="true">{item.icon}</span>}
+                          <span className="app-nav__label">{t(item.labelKey)}</span>
+                          {item.badgeKey && <span className="app-nav__badge">{t(item.badgeKey)}</span>}
+                        </NavLink>
+                        {item.helpAvailable && item.helpPath && (
+                          <NavLink
+                            to={item.helpPath}
+                            className="app-nav__help-link"
+                            aria-label={`${t('nav.helpAvailable')}: ${t(item.labelKey)}`}
+                            onClick={closeMobile}
+                            data-nav-focusable="true"
+                          >
+                            <span className="app-nav__help" aria-hidden="true">?</span>
+                          </NavLink>
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}
