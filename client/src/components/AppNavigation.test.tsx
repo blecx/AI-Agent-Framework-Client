@@ -16,15 +16,9 @@ vi.mock('react-i18next', () => ({
         'nav.sections.projects': 'Projects',
         'nav.sections.create': 'Create',
         'nav.sections.manage': 'Manage',
-        'nav.sections.review': 'Review',
-        'nav.hints.assistedCreation': 'Open a project to start',
-        'nav.hints.readinessBuilder': 'Open a project to assess readiness',
-        'nav.assistedCreation': 'Assisted Creation',
         'nav.commands': 'Commands',
         'nav.apiTester': 'API Tester',
         'nav.uiLibrary': 'UI Library',
-        'nav.readinessBuilder': 'Readiness Builder',
-        'nav.badges.power': 'Pro',
         'nav.helpAvailable': 'Help is available for this feature',
       })[key] ?? key,
   }),
@@ -83,19 +77,16 @@ describe('AppNavigation', () => {
     expect(createSectionButton).toHaveAttribute('aria-expanded', 'false');
   });
 
-  it('shows explicit hints for project-scoped nav entries that route to projects', () => {
+  it('does not expose duplicate project-scoped shortcuts in global navigation', () => {
     render(
       <MemoryRouter initialEntries={['/projects']}>
         <AppNavigation connectionState="online" />
       </MemoryRouter>,
     );
 
-    const assistedCreationLink = screen.getByRole('link', { name: 'Assisted Creation Pro' });
-    expect(assistedCreationLink).toHaveAttribute('href', '/projects');
-    expect(screen.getByText('Open a project to start')).toBeInTheDocument();
-
-    const readinessBuilderLink = screen.getByRole('link', { name: 'Readiness Builder' });
-    expect(readinessBuilderLink).toHaveAttribute('href', '/projects');
-    expect(screen.getByText('Open a project to assess readiness')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Assisted Creation/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Readiness Builder/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/Open a project to start/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Open a project to assess readiness/i)).not.toBeInTheDocument();
   });
 });
