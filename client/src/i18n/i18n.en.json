@@ -9,22 +9,13 @@
     "openMenu": "Open navigation menu",
     "closeMenu": "Close navigation menu",
     "helpAvailable": "Help is available for this feature",
-    "assistedCreation": "Assisted Creation",
     "commands": "Commands",
     "apiTester": "API Tester",
     "uiLibrary": "UI Library",
     "sections": {
       "projects": "Projects",
       "create": "Create",
-      "manage": "Manage",
-      "review": "Review"
-    },
-    "hints": {
-      "assistedCreation": "Open a project to start",
-      "readinessBuilder": "Open a project to assess readiness"
-    },
-    "badges": {
-      "power": "Pro"
+      "manage": "Manage"
     },
     "projects": "Projects",
     "guidedBuilder": "Guided Builder",

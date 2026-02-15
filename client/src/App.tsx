@@ -2,6 +2,7 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
+  Navigate,
   useParams,
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -74,9 +75,7 @@ function App() {
                           <Route
                             path="/"
                             element={
-                              <ErrorBoundary name="ProjectList">
-                                <ProjectList />
-                              </ErrorBoundary>
+                              <Navigate to="/projects" replace />
                             }
                           />
                           <Route
