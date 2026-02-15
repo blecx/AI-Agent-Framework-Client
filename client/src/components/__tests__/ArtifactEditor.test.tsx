@@ -11,6 +11,19 @@ import { templateApiClient } from '../../services/TemplateApiClient';
 import i18n from '../../i18n/config';
 import type { Template } from '../../types/template';
 
+const mockNavigate = vi.fn();
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>(
+    'react-router-dom'
+  );
+
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
 // Mock the templateApiClient
 vi.mock('../../services/TemplateApiClient', () => ({
   templateApiClient: {
@@ -81,6 +94,7 @@ describe('ArtifactEditor', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    mockNavigate.mockReset();
     await i18n.changeLanguage('en');
   });
 
@@ -467,6 +481,24 @@ describe('ArtifactEditor', () => {
       title: 'Exportable Project',
       purpose: 'Export this artifact',
     });
+  });
+
+  it('uses router navigation for improve with AI without hard reload', async () => {
+    vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
+    const pathnameBefore = window.location.pathname;
+
+    renderWithI18n(<ArtifactEditor templateId="pmp-01" projectKey="TEST" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Project Management Plan')).toBeInTheDocument();
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /improve with ai/i }));
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/projects/TEST/assisted-creation?artifactType=pmp'
+    );
+    expect(window.location.pathname).toBe(pathnameBefore);
   });
 
 });
