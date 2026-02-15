@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run --config vitest.config.ts",
-    "test:coverage": "node --max-old-space-size=4096 ./node_modules/vitest/vitest.mjs run --config vitest.config.ts --coverage --pool=forks --poolOptions.forks.maxForks=1",
+    "test:coverage": "node --max-old-space-size=4096 ./node_modules/vitest/vitest.mjs run --config vitest.config.ts --coverage --pool=forks --poolOptions.forks.minForks=1 --poolOptions.forks.maxForks=1",
     "test:api": "node scripts/api-smoke.mjs",
     "test:watch": "vitest --config vitest.config.ts",
     "test:e2e": "playwright test",
