@@ -419,4 +419,54 @@ describe('ArtifactEditor', () => {
       expect(screen.getByText('In Review')).toBeInTheDocument();
     });
   });
+
+  it('calls onProposeChange in applied state', async () => {
+    vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
+    const onProposeChange = vi.fn();
+
+    renderWithI18n(
+      <ArtifactEditor
+        templateId="pmp-01"
+        projectKey="TEST"
+        artifactState="applied"
+        onProposeChange={onProposeChange}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Applied')).toBeInTheDocument();
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /propose change/i }));
+
+    expect(onProposeChange).toHaveBeenCalledWith({});
+  });
+
+  it('calls onExport with current form data', async () => {
+    vi.mocked(templateApiClient.getTemplate).mockResolvedValue(mockTemplate);
+    const onExport = vi.fn();
+
+    renderWithI18n(
+      <ArtifactEditor
+        templateId="pmp-01"
+        projectKey="TEST"
+        onExport={onExport}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Project Management Plan')).toBeInTheDocument();
+    });
+
+    await userEvent.type(screen.getByLabelText(/Project Title/), 'Exportable Project');
+    await userEvent.type(screen.getByLabelText(/Purpose/), 'Export this artifact');
+
+    await userEvent.click(screen.getByRole('button', { name: /export/i }));
+
+    expect(onExport).toHaveBeenCalledWith({
+      title: 'Exportable Project',
+      purpose: 'Export this artifact',
+    });
+  });
+
 });
