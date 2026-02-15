@@ -4,6 +4,24 @@
     "locale": "en-US"
   },
   "nav": {
+    "brand": "AI Agent Framework",
+    "primaryAria": "Main navigation",
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close navigation menu",
+    "helpAvailable": "Help is available for this feature",
+    "assistedCreation": "Assisted Creation",
+    "commands": "Commands",
+    "apiTester": "API Tester",
+    "uiLibrary": "UI Library",
+    "sections": {
+      "projects": "Projects",
+      "create": "Create",
+      "manage": "Manage",
+      "review": "Review"
+    },
+    "badges": {
+      "power": "Pro"
+    },
     "projects": "Projects",
     "guidedBuilder": "Guided Builder",
     "artifactBuilder": "Artifact Builder",

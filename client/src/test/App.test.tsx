@@ -12,7 +12,7 @@ vi.mock('../hooks/useConnection', () => ({
 describe('App', () => {
   it('renders without crashing', () => {
     render(<App />);
-    expect(screen.getByText(/AI Agent Framework/i)).toBeInTheDocument();
+    expect(screen.getByText(/nav\.brand/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /a11y\.skipToContent/i })).toBeInTheDocument();
   });
 });
