@@ -1,4 +1,5 @@
 import type { TFunction } from "i18next";
+import { useNavigate } from "react-router-dom";
 
 interface ArtifactEditorActionsProps {
   canEdit: boolean;
@@ -29,6 +30,8 @@ export const ArtifactEditorActions: React.FC<ArtifactEditorActionsProps> = ({
   artifactType,
   t,
 }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="form-actions">
       {canEdit && (
@@ -36,7 +39,7 @@ export const ArtifactEditorActions: React.FC<ArtifactEditorActionsProps> = ({
           type="button"
           className="btn-secondary"
           onClick={() => {
-            window.location.assign(
+            navigate(
               `/projects/${projectKey}/assisted-creation?artifactType=${artifactType}`,
             );
           }}
