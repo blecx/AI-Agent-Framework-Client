@@ -22,6 +22,8 @@ import SyncPanel from './components/SyncPanel';
 import { useConnection } from './hooks/useConnection';
 import AssistedCreation from './components/AssistedCreation';
 import SkipToContent from './components/SkipToContent';
+import HelpPage from './components/help/HelpPage';
+import HelpTopicPage from './components/help/HelpTopicPage';
 import { ProjectsStateProvider } from './state/projectsState';
 import { RaidStateProvider } from './state/raidState';
 import { UiPreferencesProvider } from './state/uiPreferences';
@@ -178,6 +180,22 @@ function App() {
                             element={
                               <ErrorBoundary name="UiLibraryDemo">
                                 <UiLibraryDemo />
+                              </ErrorBoundary>
+                            }
+                          />
+                          <Route
+                            path="/help"
+                            element={
+                              <ErrorBoundary name="HelpPage">
+                                <HelpPage />
+                              </ErrorBoundary>
+                            }
+                          />
+                          <Route
+                            path="/help/:topicId"
+                            element={
+                              <ErrorBoundary name="HelpTopicPage">
+                                <HelpTopicPage />
                               </ErrorBoundary>
                             }
                           />

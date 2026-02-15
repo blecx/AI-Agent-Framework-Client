@@ -66,10 +66,17 @@
   gap: 0.25rem;
 }
 
+.app-nav__item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .app-nav__item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex: 1;
   text-decoration: none;
   border-radius: 0.5rem;
   padding: 0.55rem 0.6rem;
@@ -137,6 +144,22 @@
   line-height: 1rem;
   text-align: center;
   font-weight: 700;
+}
+
+.app-nav__help-link {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.app-nav__help-link:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
 }
 
 .app-nav__footer {
