@@ -293,12 +293,22 @@ export default function ProjectView() {
           <ArtifactList
             projectKey={projectKey}
             onCreateNew={() => {
-              // TODO: Open template selector modal
-              console.log("Create new artifact");
+              setActiveTab("propose");
+              navigate(`/projects/${projectKey}/propose`);
             }}
             onSelectArtifact={(artifact) => {
-              // TODO: Open ArtifactEditor modal/view
-              console.log("Selected artifact:", artifact);
+              const apiBaseUrl =
+                import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+              const encodedPath = artifact.path
+                .split("/")
+                .map((segment) => encodeURIComponent(segment))
+                .join("/");
+
+              window.open(
+                `${apiBaseUrl}/api/v1/projects/${projectKey}/artifacts/${encodedPath}`,
+                "_blank",
+                "noopener,noreferrer",
+              );
             }}
           />
         )}
