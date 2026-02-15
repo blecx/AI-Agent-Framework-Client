@@ -124,6 +124,23 @@
   flex: 1;
 }
 
+.app-nav__label-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.app-nav__hint {
+  font-size: 0.72rem;
+  color: #6b7280;
+  line-height: 1.2;
+}
+
+.app-nav__item--primary .app-nav__hint {
+  color: rgba(255, 255, 255, 0.85);
+}
+
 .app-nav__badge {
   font-size: 0.65rem;
   line-height: 1;

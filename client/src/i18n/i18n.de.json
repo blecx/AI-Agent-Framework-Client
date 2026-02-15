@@ -19,6 +19,10 @@
       "manage": "Verwalten",
       "review": "Review"
     },
+    "hints": {
+      "assistedCreation": "Projekt öffnen, um zu starten",
+      "readinessBuilder": "Projekt öffnen, um die Readiness zu prüfen"
+    },
     "badges": {
       "power": "Pro"
     },
