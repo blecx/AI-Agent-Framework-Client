@@ -19,6 +19,10 @@
       "manage": "Manage",
       "review": "Review"
     },
+    "hints": {
+      "assistedCreation": "Open a project to start",
+      "readinessBuilder": "Open a project to assess readiness"
+    },
     "badges": {
       "power": "Pro"
     },

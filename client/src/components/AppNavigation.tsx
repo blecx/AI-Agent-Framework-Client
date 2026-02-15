@@ -10,6 +10,7 @@ interface NavItem {
   key: string;
   labelKey: string;
   path: string;
+  hintKey?: string;
   icon?: string;
   primary?: boolean;
   badgeKey?: string;
@@ -74,6 +75,7 @@ export default function AppNavigation({ connectionState }: AppNavigationProps) {
             key: 'assisted-creation',
             labelKey: 'nav.assistedCreation',
             path: '/projects',
+            hintKey: 'nav.hints.assistedCreation',
             icon: '⚡',
             badgeKey: 'nav.badges.power',
             helpAvailable: true,
@@ -115,6 +117,7 @@ export default function AppNavigation({ connectionState }: AppNavigationProps) {
             key: 'readiness-builder',
             labelKey: 'nav.readinessBuilder',
             path: '/projects',
+            hintKey: 'nav.hints.readinessBuilder',
             icon: '📋',
             helpAvailable: true,
             helpPath: '/help/readiness-builder',
@@ -217,7 +220,10 @@ export default function AppNavigation({ connectionState }: AppNavigationProps) {
                           data-nav-focusable="true"
                         >
                           {item.icon && <span className="app-nav__icon" aria-hidden="true">{item.icon}</span>}
-                          <span className="app-nav__label">{t(item.labelKey)}</span>
+                          <span className="app-nav__label-group">
+                            <span className="app-nav__label">{t(item.labelKey)}</span>
+                            {item.hintKey && <span className="app-nav__hint" aria-hidden="true">{t(item.hintKey)}</span>}
+                          </span>
                           {item.badgeKey && <span className="app-nav__badge">{t(item.badgeKey)}</span>}
                         </NavLink>
                         {item.helpAvailable && item.helpPath && (

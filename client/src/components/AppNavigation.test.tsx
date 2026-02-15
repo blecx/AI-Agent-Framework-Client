@@ -17,6 +17,8 @@ vi.mock('react-i18next', () => ({
         'nav.sections.create': 'Create',
         'nav.sections.manage': 'Manage',
         'nav.sections.review': 'Review',
+        'nav.hints.assistedCreation': 'Open a project to start',
+        'nav.hints.readinessBuilder': 'Open a project to assess readiness',
         'nav.assistedCreation': 'Assisted Creation',
         'nav.commands': 'Commands',
         'nav.apiTester': 'API Tester',
@@ -79,5 +81,21 @@ describe('AppNavigation', () => {
     expect(createSectionButton).toHaveAttribute('aria-expanded', 'true');
     fireEvent.click(createSectionButton);
     expect(createSectionButton).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('shows explicit hints for project-scoped nav entries that route to projects', () => {
+    render(
+      <MemoryRouter initialEntries={['/projects']}>
+        <AppNavigation connectionState="online" />
+      </MemoryRouter>,
+    );
+
+    const assistedCreationLink = screen.getByRole('link', { name: 'Assisted Creation Pro' });
+    expect(assistedCreationLink).toHaveAttribute('href', '/projects');
+    expect(screen.getByText('Open a project to start')).toBeInTheDocument();
+
+    const readinessBuilderLink = screen.getByRole('link', { name: 'Readiness Builder' });
+    expect(readinessBuilderLink).toHaveAttribute('href', '/projects');
+    expect(screen.getByText('Open a project to assess readiness')).toBeInTheDocument();
   });
 });
