@@ -323,6 +323,7 @@
   "raid": {
     "list": {
       "title": "RAID-Register",
+      "itemCount": "{{count}} Einträge",
       "itemCount_one": "{{count}} Eintrag",
       "itemCount_other": "{{count}} Einträge",
       "actions": {
