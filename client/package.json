@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run --config vitest.config.ts",
-    "test:coverage": "node --max-old-space-size=4096 ./node_modules/vitest/vitest.mjs run --config vitest.config.ts --coverage --pool=threads --poolOptions.threads.minThreads=1 --poolOptions.threads.maxThreads=1",
+    "test:coverage": "node --max-old-space-size=4096 ./node_modules/vitest/vitest.mjs run --config vitest.config.ts --coverage --pool=threads --poolOptions.threads.minThreads=1 --poolOptions.threads.maxThreads=1 --poolOptions.threads.memoryLimit=4096",
     "test:api": "node scripts/api-smoke.mjs",
     "test:watch": "vitest --config vitest.config.ts",
     "test:e2e": "playwright test",
