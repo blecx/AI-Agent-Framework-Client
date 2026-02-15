@@ -27,6 +27,7 @@ import type {
 import { notify } from '../notifications/notificationBus';
 import { ProjectApiClient } from './ProjectApiClient';
 import { isApiError } from './errors';
+import { RaidApiClient } from './RaidApiClient';
 
 type ApiClientRequestConfig = AxiosRequestConfig & {
   suppressErrorToast?: boolean;
@@ -75,6 +76,7 @@ class ApiClient {
   private maxRetries = 3;
   private retryDelay = 1000;
   private projectClient: ProjectApiClient;
+  private raidClient: RaidApiClient;
 
   constructor() {
     this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
@@ -82,6 +84,7 @@ class ApiClient {
 
     // Initialize ProjectApiClient for type-safe project operations
     this.projectClient = new ProjectApiClient(this.baseUrl, this.apiKey);
+    this.raidClient = new RaidApiClient(this.baseUrl, this.apiKey);
 
     this.client = axios.create({
       baseURL: this.baseUrl,
@@ -136,6 +139,18 @@ class ApiClient {
     return false;
   }
 
+  private getDomainClientErrorMessage(error: unknown, fallback: string): string {
+    if (isApiError(error)) {
+      return error.message;
+    }
+
+    if (error instanceof Error && error.message.trim().length > 0) {
+      return error.message;
+    }
+
+    return fallback;
+  }
+
   /**
    * Update the base URL
    */
@@ -144,6 +159,7 @@ class ApiClient {
     this.client.defaults.baseURL = url;
     // Update ProjectApiClient instance with new base URL
     this.projectClient = new ProjectApiClient(url, this.apiKey);
+    this.raidClient = new RaidApiClient(url, this.apiKey);
   }
 
   /**
@@ -154,6 +170,7 @@ class ApiClient {
     this.client.defaults.headers.common['Authorization'] = `Bearer ${key}`;
     // Update ProjectApiClient instance with new API key
     this.projectClient = new ProjectApiClient(this.baseUrl, key);
+    this.raidClient = new RaidApiClient(this.baseUrl, key);
   }
 
   /**
@@ -179,7 +196,7 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: isApiError(error) ? error.message : (error instanceof Error ? error.message : 'Failed to list projects'),
+        error: this.getDomainClientErrorMessage(error, 'Failed to list projects'),
       };
     }
   }
@@ -197,7 +214,7 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: isApiError(error) ? error.message : (error instanceof Error ? error.message : 'Failed to get project'),
+        error: this.getDomainClientErrorMessage(error, 'Failed to get project'),
       };
     }
   }
@@ -219,7 +236,7 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: isApiError(error) ? error.message : (error instanceof Error ? error.message : 'Failed to create project'),
+        error: this.getDomainClientErrorMessage(error, 'Failed to create project'),
       };
     }
   }
@@ -243,7 +260,7 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: isApiError(error) ? error.message : (error instanceof Error ? error.message : 'Failed to update project'),
+        error: this.getDomainClientErrorMessage(error, 'Failed to update project'),
       };
     }
   }
@@ -260,7 +277,7 @@ class ApiClient {
     } catch (error) {
       return {
         success: false,
-        error: isApiError(error) ? error.message : (error instanceof Error ? error.message : 'Failed to delete project'),
+        error: this.getDomainClientErrorMessage(error, 'Failed to delete project'),
       };
     }
   }
@@ -508,22 +525,12 @@ class ApiClient {
     },
   ): Promise<ApiResponse<RAIDItemList>> {
     try {
-      const params = new URLSearchParams();
-      if (filters?.type) params.append('type', filters.type);
-      if (filters?.status) params.append('status', filters.status);
-      if (filters?.owner) params.append('owner', filters.owner);
-      if (filters?.priority) params.append('priority', filters.priority);
-
-      const queryString = params.toString();
-      const url = `/projects/${projectKey}/raid${queryString ? `?${queryString}` : ''}`;
-
-      const response = await this.client.get<RAIDItemList>(url);
-      return { success: true, data: response.data };
+      const data = await this.raidClient.listRAIDItems(projectKey, filters);
+      return { success: true, data };
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'Failed to list RAID items',
+        error: this.getDomainClientErrorMessage(error, 'Failed to list RAID items'),
       };
     }
   }
@@ -537,15 +544,12 @@ class ApiClient {
     raidId: string,
   ): Promise<ApiResponse<RAIDItem>> {
     try {
-      const response = await this.client.get<RAIDItem>(
-        `/projects/${projectKey}/raid/${raidId}`,
-      );
-      return { success: true, data: response.data };
+      const data = await this.raidClient.getRAIDItem(projectKey, raidId);
+      return { success: true, data };
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'Failed to get RAID item',
+        error: this.getDomainClientErrorMessage(error, 'Failed to get RAID item'),
       };
     }
   }
@@ -559,16 +563,12 @@ class ApiClient {
     data: RAIDItemCreate,
   ): Promise<ApiResponse<RAIDItem>> {
     try {
-      const response = await this.client.post<RAIDItem>(
-        `/projects/${projectKey}/raid`,
-        data,
-      );
-      return { success: true, data: response.data };
+      const created = await this.raidClient.createRAIDItem(projectKey, data);
+      return { success: true, data: created };
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'Failed to create RAID item',
+        error: this.getDomainClientErrorMessage(error, 'Failed to create RAID item'),
       };
     }
   }
@@ -583,16 +583,12 @@ class ApiClient {
     data: RAIDItemUpdate,
   ): Promise<ApiResponse<RAIDItem>> {
     try {
-      const response = await this.client.put<RAIDItem>(
-        `/projects/${projectKey}/raid/${raidId}`,
-        data,
-      );
-      return { success: true, data: response.data };
+      const updated = await this.raidClient.updateRAIDItem(projectKey, raidId, data);
+      return { success: true, data: updated };
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'Failed to update RAID item',
+        error: this.getDomainClientErrorMessage(error, 'Failed to update RAID item'),
       };
     }
   }
@@ -606,15 +602,12 @@ class ApiClient {
     raidId: string,
   ): Promise<ApiResponse<{ message: string }>> {
     try {
-      const response = await this.client.delete<{ message: string }>(
-        `/projects/${projectKey}/raid/${raidId}`,
-      );
-      return { success: true, data: response.data };
+      const data = await this.raidClient.deleteRAIDItem(projectKey, raidId);
+      return { success: true, data };
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'Failed to delete RAID item',
+        error: this.getDomainClientErrorMessage(error, 'Failed to delete RAID item'),
       };
     }
   }

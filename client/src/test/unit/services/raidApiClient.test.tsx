@@ -1,17 +1,31 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiClient } from '../../../services/apiClient';
+import { ApiError } from '../../../services/errors';
 import type {
   RAIDItem,
   RAIDItemCreate,
-  RAIDItemUpdate,
   RAIDItemList,
-  RAIDType,
-  RAIDStatus,
-  RAIDPriority,
+  RAIDItemUpdate,
 } from '../../../types';
 
-describe('RAID API Service', () => {
-  const mockProjectKey = 'TEST_PROJECT';
+type RaidClientPort = {
+  listRAIDItems: (projectKey: string, filters?: object) => Promise<RAIDItemList>;
+  getRAIDItem: (projectKey: string, raidId: string) => Promise<RAIDItem>;
+  createRAIDItem: (projectKey: string, data: RAIDItemCreate) => Promise<RAIDItem>;
+  updateRAIDItem: (
+    projectKey: string,
+    raidId: string,
+    data: RAIDItemUpdate,
+  ) => Promise<RAIDItem>;
+  deleteRAIDItem: (projectKey: string, raidId: string) => Promise<{ message: string }>;
+};
+
+function getRaidClientPort(): RaidClientPort {
+  return (apiClient as unknown as { raidClient: RaidClientPort }).raidClient;
+}
+
+describe('apiClient RAID compatibility delegation', () => {
+  const projectKey = 'TEST_PROJECT';
   const mockRAIDItem: RAIDItem = {
     id: 'raid-001',
     type: 'risk',
@@ -34,222 +48,85 @@ describe('RAID API Service', () => {
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
-  describe('listRAIDItems', () => {
-    it('should list RAID items without filters', async () => {
-      const mockResponse: RAIDItemList = {
-        items: [mockRAIDItem],
-        total: 1,
-        filtered_by: null,
-      };
+  it('delegates listRAIDItems and keeps ApiResponse compatibility', async () => {
+    const response: RAIDItemList = { items: [mockRAIDItem], total: 1, filtered_by: null };
+    const spy = vi
+      .spyOn(getRaidClientPort(), 'listRAIDItems')
+      .mockResolvedValue(response);
 
-      vi.spyOn(apiClient['client'], 'get').mockResolvedValue({
-        data: mockResponse,
-      });
+    const result = await apiClient.listRAIDItems(projectKey);
 
-      const result = await apiClient.listRAIDItems(mockProjectKey);
+    expect(spy).toHaveBeenCalledWith(projectKey, undefined);
+    expect(result).toEqual({ success: true, data: response });
+  });
 
-      expect(result.success).toBe(true);
-      expect(result.data).toEqual(mockResponse);
-      expect(apiClient['client'].get).toHaveBeenCalledWith(
-        `/projects/${mockProjectKey}/raid`,
-      );
+  it('delegates get/create/update/delete RAID item operations', async () => {
+    const createData: RAIDItemCreate = {
+      type: 'risk',
+      title: 'New Risk',
+      description: 'New description',
+      owner: 'test-user',
+      priority: 'high',
+    };
+    const updateData: RAIDItemUpdate = { title: 'Updated', status: 'in_progress' };
+    const deleted = { message: 'RAID item deleted successfully' };
+
+    const raidClient = getRaidClientPort();
+    vi.spyOn(raidClient, 'getRAIDItem').mockResolvedValue(mockRAIDItem);
+    vi.spyOn(raidClient, 'createRAIDItem').mockResolvedValue(mockRAIDItem);
+    vi.spyOn(raidClient, 'updateRAIDItem').mockResolvedValue({
+      ...mockRAIDItem,
+      ...updateData,
     });
+    vi.spyOn(raidClient, 'deleteRAIDItem').mockResolvedValue(deleted);
 
-    it('should list RAID items with filters', async () => {
-      const filters: {
-        type?: RAIDType;
-        status?: RAIDStatus;
-        owner?: string;
-        priority?: RAIDPriority;
-      } = {
-        type: 'risk',
-        status: 'open',
-        owner: 'test-user',
-        priority: 'high',
-      };
-
-      const mockResponse: RAIDItemList = {
-        items: [mockRAIDItem],
-        total: 1,
-        filtered_by: {
-          type: 'risk',
-          status: 'open',
-          owner: 'test-user',
-          priority: 'high',
-        },
-      };
-
-      vi.spyOn(apiClient['client'], 'get').mockResolvedValue({
-        data: mockResponse,
-      });
-
-      const result = await apiClient.listRAIDItems(mockProjectKey, filters);
-
-      expect(result.success).toBe(true);
-      expect(result.data).toEqual(mockResponse);
-      expect(apiClient['client'].get).toHaveBeenCalledWith(
-        `/projects/${mockProjectKey}/raid?type=risk&status=open&owner=test-user&priority=high`,
-      );
+    await expect(apiClient.getRAIDItem(projectKey, 'raid-001')).resolves.toEqual({
+      success: true,
+      data: mockRAIDItem,
     });
-
-    it('should handle errors when listing RAID items', async () => {
-      vi.spyOn(apiClient['client'], 'get').mockRejectedValue(
-        new Error('Network error'),
-      );
-
-      const result = await apiClient.listRAIDItems(mockProjectKey);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Network error');
+    await expect(apiClient.createRAIDItem(projectKey, createData)).resolves.toEqual({
+      success: true,
+      data: mockRAIDItem,
+    });
+    await expect(
+      apiClient.updateRAIDItem(projectKey, 'raid-001', updateData),
+    ).resolves.toEqual({
+      success: true,
+      data: { ...mockRAIDItem, ...updateData },
+    });
+    await expect(apiClient.deleteRAIDItem(projectKey, 'raid-001')).resolves.toEqual({
+      success: true,
+      data: deleted,
     });
   });
 
-  describe('getRAIDItem', () => {
-    it('should get a specific RAID item', async () => {
-      vi.spyOn(apiClient['client'], 'get').mockResolvedValue({
-        data: mockRAIDItem,
-      });
+  it('maps delegated ApiError into stable message contract', async () => {
+    vi.spyOn(getRaidClientPort(), 'getRAIDItem').mockRejectedValue(
+      new ApiError({
+        type: 'not_found',
+        message: 'RAID item does not exist',
+        statusCode: 404,
+        retryable: false,
+      }),
+    );
 
-      const result = await apiClient.getRAIDItem(mockProjectKey, 'raid-001');
+    const result = await apiClient.getRAIDItem(projectKey, 'missing');
 
-      expect(result.success).toBe(true);
-      expect(result.data).toEqual(mockRAIDItem);
-      expect(apiClient['client'].get).toHaveBeenCalledWith(
-        `/projects/${mockProjectKey}/raid/raid-001`,
-      );
-    });
-
-    it('should handle errors when getting RAID item', async () => {
-      vi.spyOn(apiClient['client'], 'get').mockRejectedValue(
-        new Error('RAID item not found'),
-      );
-
-      const result = await apiClient.getRAIDItem(mockProjectKey, 'raid-999');
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('RAID item not found');
-    });
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('RAID item does not exist');
   });
 
-  describe('createRAIDItem', () => {
-    it('should create a new RAID item', async () => {
-      const createData: RAIDItemCreate = {
-        type: 'risk',
-        title: 'New Risk',
-        description: 'New description',
-        owner: 'test-user',
-        priority: 'high',
-      };
+  it('maps unknown delegated failures to Error.message for consistency', async () => {
+    vi.spyOn(getRaidClientPort(), 'deleteRAIDItem').mockRejectedValue(
+      new Error('Delete failed'),
+    );
 
-      vi.spyOn(apiClient['client'], 'post').mockResolvedValue({
-        data: mockRAIDItem,
-      });
+    const result = await apiClient.deleteRAIDItem(projectKey, 'raid-001');
 
-      const result = await apiClient.createRAIDItem(mockProjectKey, createData);
-
-      expect(result.success).toBe(true);
-      expect(result.data).toEqual(mockRAIDItem);
-      expect(apiClient['client'].post).toHaveBeenCalledWith(
-        `/projects/${mockProjectKey}/raid`,
-        createData,
-      );
-    });
-
-    it('should handle errors when creating RAID item', async () => {
-      const createData: RAIDItemCreate = {
-        type: 'risk',
-        title: 'New Risk',
-        description: 'New description',
-        owner: 'test-user',
-      };
-
-      vi.spyOn(apiClient['client'], 'post').mockRejectedValue(
-        new Error('Validation error'),
-      );
-
-      const result = await apiClient.createRAIDItem(mockProjectKey, createData);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Validation error');
-    });
-  });
-
-  describe('updateRAIDItem', () => {
-    it('should update an existing RAID item', async () => {
-      const updateData: RAIDItemUpdate = {
-        title: 'Updated Risk',
-        status: 'in_progress',
-      };
-
-      const updatedItem = { ...mockRAIDItem, ...updateData };
-
-      vi.spyOn(apiClient['client'], 'put').mockResolvedValue({
-        data: updatedItem,
-      });
-
-      const result = await apiClient.updateRAIDItem(
-        mockProjectKey,
-        'raid-001',
-        updateData,
-      );
-
-      expect(result.success).toBe(true);
-      expect(result.data).toEqual(updatedItem);
-      expect(apiClient['client'].put).toHaveBeenCalledWith(
-        `/projects/${mockProjectKey}/raid/raid-001`,
-        updateData,
-      );
-    });
-
-    it('should handle errors when updating RAID item', async () => {
-      const updateData: RAIDItemUpdate = {
-        status: 'closed',
-      };
-
-      vi.spyOn(apiClient['client'], 'put').mockRejectedValue(
-        new Error('Update failed'),
-      );
-
-      const result = await apiClient.updateRAIDItem(
-        mockProjectKey,
-        'raid-001',
-        updateData,
-      );
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Update failed');
-    });
-  });
-
-  describe('deleteRAIDItem', () => {
-    it('should delete a RAID item', async () => {
-      const mockDeleteResponse = { message: 'RAID item deleted successfully' };
-
-      vi.spyOn(apiClient['client'], 'delete').mockResolvedValue({
-        data: mockDeleteResponse,
-      });
-
-      const result = await apiClient.deleteRAIDItem(mockProjectKey, 'raid-001');
-
-      expect(result.success).toBe(true);
-      expect(result.data).toEqual(mockDeleteResponse);
-      expect(apiClient['client'].delete).toHaveBeenCalledWith(
-        `/projects/${mockProjectKey}/raid/raid-001`,
-      );
-    });
-
-    it('should handle errors when deleting RAID item', async () => {
-      vi.spyOn(apiClient['client'], 'delete').mockRejectedValue(
-        new Error('Delete failed'),
-      );
-
-      const result = await apiClient.deleteRAIDItem(mockProjectKey, 'raid-001');
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Delete failed');
-    });
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('Delete failed');
   });
 });
