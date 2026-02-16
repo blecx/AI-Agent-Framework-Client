@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import { beforeAll, vi } from 'vitest';
 
 const SUPPRESSED_MESSAGES = [
 	'React Router Future Flag Warning',
