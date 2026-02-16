@@ -18,6 +18,10 @@ describe('i18next Configuration', () => {
       expect(i18n.isInitialized).toBe(true);
     });
 
+    it('should disable debug logging in test mode', () => {
+      expect(i18n.options.debug).toBe(false);
+    });
+
     it('should have English as fallback language', () => {
       const fallback = i18n.options.fallbackLng;
       expect(fallback).toBeDefined();
