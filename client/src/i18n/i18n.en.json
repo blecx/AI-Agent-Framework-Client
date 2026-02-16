@@ -453,6 +453,26 @@
     "list": {
       "title": "Artifacts",
       "loading": "Loading artifacts...",
+      "columns": {
+        "status": "Status",
+        "name": "Name",
+        "type": "Type",
+        "path": "Path",
+        "lastModified": "Last Modified"
+      },
+      "groups": {
+        "aria": "Artifact explorer groups",
+        "root": "Root"
+      },
+      "search": {
+        "placeholder": "Search by artifact name or path...",
+        "aria": "Search artifacts by name or path",
+        "clear": "Clear search",
+        "noResults": {
+          "title": "No artifacts match your search",
+          "description": "Try a different name/path or clear the filter."
+        }
+      },
       "empty": {
         "title": "No artifacts yet",
         "description": "Create your first artifact to get started."

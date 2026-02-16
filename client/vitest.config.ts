@@ -18,11 +18,15 @@ export default defineConfig({
     ],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov'],
+      // Keep CI coverage lightweight to avoid worker OOM on large suites.
+      reporter: ['text', 'json'],
       exclude: [
         '**/node_modules/**',
         '**/dist/**',
         '**/e2e/**',
+        '**/playwright-report/**',
+        '**/test-results/**',
+        '**/.playwright/**',
         '**/*.config.*',
         '**/test/**',
         '**/scripts/**',

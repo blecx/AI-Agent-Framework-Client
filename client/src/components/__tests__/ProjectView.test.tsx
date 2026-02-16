@@ -25,7 +25,31 @@ vi.mock("../ProjectCommandPanel", () => ({
   default: () => <div>CommandPanel</div>,
 }));
 vi.mock("../ArtifactList", () => ({
-  ArtifactList: () => <div>ArtifactList</div>,
+  ArtifactList: ({
+    onCreateNew,
+    onSelectArtifact,
+  }: {
+    onCreateNew?: () => void;
+    onSelectArtifact?: (artifact: { path: string; name: string }) => void;
+  }) => (
+    <div>
+      <div>ArtifactList</div>
+      <button type="button" onClick={() => onCreateNew?.()}>
+        TriggerCreate
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          onSelectArtifact?.({
+            path: "artifacts/charter.md",
+            name: "charter.md",
+          })
+        }
+      >
+        TriggerSelect
+      </button>
+    </div>
+  ),
 }));
 vi.mock("../AuditViewer", () => ({
   AuditViewer: () => <div>AuditViewer</div>,
@@ -80,6 +104,8 @@ function renderWithProviders(
         <MemoryRouter initialEntries={[route]}>
           <Routes>
             <Route path="/projects/:projectKey" element={ui} />
+            <Route path="/projects/:projectKey/propose" element={ui} />
+            <Route path="/projects/:projectKey/artifacts" element={ui} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
@@ -274,6 +300,50 @@ describe("ProjectView", () => {
 
     expect(artifactsTab).toHaveClass("active");
     expect(screen.getByText("ArtifactList")).toBeInTheDocument();
+  });
+
+  it("navigates to propose tab when artifact create CTA is triggered", async () => {
+    mockGetProject.mockResolvedValue({ success: true, data: mockProject });
+    mockGetAuditResults.mockResolvedValue(mockAuditData);
+
+    const user = userEvent.setup();
+    renderWithProviders(<ProjectView />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Test Project")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: /Artifacts/i }));
+    await user.click(screen.getByRole("button", { name: "TriggerCreate" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("ProposePanel")).toBeInTheDocument();
+    });
+  });
+
+  it("opens selected artifact in a new tab", async () => {
+    mockGetProject.mockResolvedValue({ success: true, data: mockProject });
+    mockGetAuditResults.mockResolvedValue(mockAuditData);
+
+    const user = userEvent.setup();
+    const openSpy = vi
+      .spyOn(window, "open")
+      .mockImplementation(() => null as unknown as Window);
+
+    renderWithProviders(<ProjectView />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Test Project")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: /Artifacts/i }));
+    await user.click(screen.getByRole("button", { name: "TriggerSelect" }));
+
+    expect(openSpy).toHaveBeenCalledWith(
+      "http://localhost:8000/api/v1/projects/TEST-123/artifacts/artifacts/charter.md",
+      "_blank",
+      "noopener,noreferrer",
+    );
   });
 
   it("switches to audit tab when clicked", async () => {

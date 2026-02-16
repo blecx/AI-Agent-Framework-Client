@@ -453,6 +453,26 @@
     "list": {
       "title": "Artefakte",
       "loading": "Artefakte werden geladen...",
+      "columns": {
+        "status": "Status",
+        "name": "Name",
+        "type": "Typ",
+        "path": "Pfad",
+        "lastModified": "Zuletzt geändert"
+      },
+      "groups": {
+        "aria": "Artefakt-Explorer-Gruppen",
+        "root": "Wurzel"
+      },
+      "search": {
+        "placeholder": "Nach Artefaktname oder Pfad suchen...",
+        "aria": "Artefakte nach Name oder Pfad suchen",
+        "clear": "Suche löschen",
+        "noResults": {
+          "title": "Keine Artefakte passen zur Suche",
+          "description": "Versuche einen anderen Namen/Pfad oder lösche den Filter."
+        }
+      },
       "empty": {
         "title": "Noch keine Artefakte",
         "description": "Erstellen Sie Ihr erstes Artefakt, um zu beginnen."
