@@ -7,9 +7,10 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test": "npm --prefix client run test",
+    "test:ui": "npm --prefix client run test:watch",
+    "test:coverage": "npm --prefix client run test:coverage",
+    "test:legacy": "vitest"
   },
   "keywords": [],
   "author": "",
