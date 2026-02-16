@@ -17,6 +17,14 @@
       "create": "Create",
       "manage": "Manage"
     },
+    "header": {
+      "apiStatusLabel": "API status: {{state}}",
+      "openApiDocs": "API Docs",
+      "refreshStatus": "Refresh",
+      "refreshInfo": "Auto-refresh every {{seconds}}s",
+      "settings": "Settings",
+      "settingsSoon": "Settings will be available in a future release"
+    },
     "projects": "Projects",
     "guidedBuilder": "Guided Builder",
     "artifactBuilder": "Artifact Builder",

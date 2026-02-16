@@ -65,7 +65,10 @@ function App() {
                   <Router>
                     <div className="App">
                       <SkipToContent />
-                      <AppNavigation connectionState={connectionState} />
+                      <AppNavigation
+                        connectionState={connectionState}
+                        onRetryConnection={retryConnection}
+                      />
                       <ConnectionBanner
                         state={connectionState}
                         onRetry={retryConnection}

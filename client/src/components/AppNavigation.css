@@ -22,6 +22,87 @@
   color: #111827;
 }
 
+.app-nav__api-controls {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #eef2f7;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.app-nav__api-status {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  color: #374151;
+}
+
+.app-nav__api-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 9999px;
+  background: #16a34a;
+  flex-shrink: 0;
+}
+
+.app-nav__api-dot--online {
+  background: #16a34a;
+}
+
+.app-nav__api-dot--offline {
+  background: #6b7280;
+}
+
+.app-nav__api-dot--reconnecting {
+  background: #f59e0b;
+}
+
+.app-nav__api-dot--degraded {
+  background: #dc2626;
+}
+
+.app-nav__api-refresh-note {
+  margin: 0;
+  font-size: 0.74rem;
+  color: #6b7280;
+}
+
+.app-nav__api-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.app-nav__api-link,
+.app-nav__api-refresh,
+.app-nav__api-settings {
+  border: 1px solid #d1d5db;
+  border-radius: 0.45rem;
+  background: #ffffff;
+  color: #1f2937;
+  font-size: 0.75rem;
+  padding: 0.28rem 0.5rem;
+  text-decoration: none;
+}
+
+.app-nav__api-link:hover,
+.app-nav__api-refresh:hover {
+  background: #f3f4f6;
+}
+
+.app-nav__api-refresh,
+.app-nav__api-settings {
+  cursor: pointer;
+}
+
+.app-nav__api-settings:disabled,
+.app-nav__api-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .app-nav__sections {
   flex: 1;
   overflow-y: auto;

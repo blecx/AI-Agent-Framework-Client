@@ -24,9 +24,13 @@ interface NavSection {
 
 interface AppNavigationProps {
   connectionState: ConnectionState;
+  onRetryConnection?: () => void;
 }
 
-export default function AppNavigation({ connectionState }: AppNavigationProps) {
+export default function AppNavigation({
+  connectionState,
+  onRetryConnection,
+}: AppNavigationProps) {
   const { t } = useTranslation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -34,6 +38,18 @@ export default function AppNavigation({ connectionState }: AppNavigationProps) {
     create: true,
     manage: true,
   });
+
+  const healthCheckIntervalMs = parseInt(
+    import.meta.env.VITE_HEALTH_CHECK_INTERVAL || '30000',
+    10,
+  );
+  const healthCheckIntervalSeconds = Math.max(
+    1,
+    Math.round(healthCheckIntervalMs / 1000),
+  );
+  const apiDocsUrl = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/docs`;
+  const showSettingsPlaceholder =
+    import.meta.env.VITE_ENABLE_SETTINGS_PLACEHOLDER === 'true';
 
   const sections: NavSection[] = useMemo(
     () => [
@@ -151,6 +167,43 @@ export default function AppNavigation({ connectionState }: AppNavigationProps) {
       <nav id="app-navigation" className={`app-nav ${isMobileOpen ? 'app-nav--mobile-open' : ''}`} aria-label={t('nav.primaryAria')} onKeyDown={onArrowNavigate}>
         <div className="app-nav__brand">
           <h1>{t('nav.brand')}</h1>
+          <div className="app-nav__api-controls">
+            <div className="app-nav__api-status" role="status" aria-live="polite">
+              <span className={`app-nav__api-dot app-nav__api-dot--${connectionState}`} aria-hidden="true" />
+              <span>{t('nav.header.apiStatusLabel', { state: t(`conn.state.${connectionState}`) })}</span>
+            </div>
+            <p className="app-nav__api-refresh-note">
+              {t('nav.header.refreshInfo', { seconds: healthCheckIntervalSeconds })}
+            </p>
+            <div className="app-nav__api-actions">
+              <a
+                className="app-nav__api-link"
+                href={apiDocsUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('nav.header.openApiDocs')}
+              </a>
+              <button
+                type="button"
+                className="app-nav__api-refresh"
+                onClick={onRetryConnection}
+                disabled={!onRetryConnection}
+              >
+                {t('nav.header.refreshStatus')}
+              </button>
+              {showSettingsPlaceholder && (
+                <button
+                  type="button"
+                  className="app-nav__api-settings"
+                  disabled
+                  title={t('nav.header.settingsSoon')}
+                >
+                  {t('nav.header.settings')}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="app-nav__sections">
@@ -217,8 +270,8 @@ export default function AppNavigation({ connectionState }: AppNavigationProps) {
         </div>
 
         <div className="app-nav__footer">
-          <ConnectionStatus state={connectionState} />
           <LanguageSwitcher />
+          <ConnectionStatus state={connectionState} />
         </div>
       </nav>
     </>
