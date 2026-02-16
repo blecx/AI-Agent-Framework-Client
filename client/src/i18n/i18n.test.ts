@@ -12,18 +12,16 @@ const hasTranslationPath = (
   obj: Record<string, unknown>,
   path: string,
 ): boolean => {
-  const value = path
-    .split(".")
-    .reduce<unknown>((current, key) => {
-      if (
-        typeof current === "object" &&
-        current !== null &&
-        key in (current as Record<string, unknown>)
-      ) {
-        return (current as Record<string, unknown>)[key];
-      }
-      return undefined;
-    }, obj);
+  const value = path.split(".").reduce<unknown>((current, key) => {
+    if (
+      typeof current === "object" &&
+      current !== null &&
+      key in (current as Record<string, unknown>)
+    ) {
+      return (current as Record<string, unknown>)[key];
+    }
+    return undefined;
+  }, obj);
 
   return typeof value === "string";
 };
@@ -137,12 +135,12 @@ describe("i18n Translation Catalogs", () => {
       ];
 
       requiredProjectScopedKeys.forEach((key) => {
-        expect(hasTranslationPath(enTranslations as Record<string, unknown>, key)).toBe(
-          true,
-        );
-        expect(hasTranslationPath(deTranslations as Record<string, unknown>, key)).toBe(
-          true,
-        );
+        expect(
+          hasTranslationPath(enTranslations as Record<string, unknown>, key),
+        ).toBe(true);
+        expect(
+          hasTranslationPath(deTranslations as Record<string, unknown>, key),
+        ).toBe(true);
       });
     });
   });
