@@ -35,7 +35,7 @@ i18n
     // Supported languages
     supportedLngs: ['en', 'de'],
     // Debug mode (disable in production)
-    debug: import.meta.env.DEV,
+    debug: import.meta.env.DEV && import.meta.env.MODE !== 'test',
     // Interpolation settings
     interpolation: {
       // React already escapes by default

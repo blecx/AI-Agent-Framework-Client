@@ -373,6 +373,9 @@ AI-Agent-Framework-Client/
 
 ### Available Scripts
 
+From the repository root, `npm run test` now delegates to `client/` automatically.
+Use `npm run test:legacy` only if you explicitly need the legacy root Vitest suite.
+
 In the `client/` directory:
 
 - `npm run dev` - Start development server with hot reload (port 5173)
