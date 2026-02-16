@@ -421,6 +421,30 @@ describe("ProjectView", () => {
     expect(screen.queryByText(/Documents/i)).not.toBeInTheDocument();
   });
 
+  it("remains compatible when project has no description", async () => {
+    const projectWithoutDescription = {
+      ...mockProject,
+      description: undefined,
+    };
+
+    mockGetProject.mockResolvedValue({
+      success: true,
+      data: projectWithoutDescription,
+    });
+    mockGetAuditResults.mockResolvedValue(mockAuditData);
+
+    renderWithProviders(<ProjectView />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Test Project")).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByText("A test project description"),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText(/Project Details/i)).toBeInTheDocument();
+  });
+
   it("handles missing audit data gracefully", async () => {
     mockGetProject.mockResolvedValue({ success: true, data: mockProject });
     mockGetAuditResults.mockRejectedValue(new Error("No audit data"));
