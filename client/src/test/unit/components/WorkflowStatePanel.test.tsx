@@ -2,6 +2,34 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import WorkflowStatePanel from '../../../components/WorkflowStatePanel';
 
+const tMock = (key: string, options?: Record<string, string | number>) => {
+  const map: Record<string, string> = {
+    'wf.title': 'Workflow State',
+    'wf.loading': 'Loading workflow state...',
+    'wf.currentState': 'Current state',
+    'wf.updatedAt': 'Updated',
+    'wf.updatedBy': 'Updated by',
+    'wf.allowedTransitions': 'Allowed transitions',
+    'wf.noTransitions': 'No transitions available from this state',
+    'wf.transitioning': 'Transitioning...',
+    'wf.states.initiating': 'Initiating',
+    'wf.states.planning': 'Planning',
+    'wf.states.executing': 'Executing',
+    'wf.states.monitoring': 'Monitoring',
+    'wf.states.closing': 'Closing',
+    'wf.states.closed': 'Closed',
+    'wf.errors.missingProjectKey': 'Project key is required',
+    'wf.errors.loadFailed': 'Error loading workflow state',
+    'wf.errors.transitionFailed': 'Error transitioning workflow state',
+  };
+
+  if (key === 'wf.actions.transitionTo') {
+    return `Transition to ${options?.state}`;
+  }
+
+  return map[key] ?? key;
+};
+
 const { mockApiClient } = vi.hoisted(() => ({
   mockApiClient: {
     getWorkflowState: vi.fn(),
@@ -16,33 +44,7 @@ vi.mock('../../../services/apiClient', () => ({
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, options?: Record<string, string | number>) => {
-      const map: Record<string, string> = {
-        'wf.title': 'Workflow State',
-        'wf.loading': 'Loading workflow state...',
-        'wf.currentState': 'Current state',
-        'wf.updatedAt': 'Updated',
-        'wf.updatedBy': 'Updated by',
-        'wf.allowedTransitions': 'Allowed transitions',
-        'wf.noTransitions': 'No transitions available from this state',
-        'wf.transitioning': 'Transitioning...',
-        'wf.states.initiating': 'Initiating',
-        'wf.states.planning': 'Planning',
-        'wf.states.executing': 'Executing',
-        'wf.states.monitoring': 'Monitoring',
-        'wf.states.closing': 'Closing',
-        'wf.states.closed': 'Closed',
-        'wf.errors.missingProjectKey': 'Project key is required',
-        'wf.errors.loadFailed': 'Error loading workflow state',
-        'wf.errors.transitionFailed': 'Error transitioning workflow state',
-      };
-
-      if (key === 'wf.actions.transitionTo') {
-        return `Transition to ${options?.state}`;
-      }
-
-      return map[key] ?? key;
-    },
+    t: tMock,
   }),
 }));
 
