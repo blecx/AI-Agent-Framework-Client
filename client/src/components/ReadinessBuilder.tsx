@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import ReadinessPanel from "./ReadinessPanel";
 import ReadinessChecks from "./ReadinessChecks";
+import WorkflowStatePanel from "./WorkflowStatePanel";
 import { mockReadinessService } from "../services/mockReadinessService";
 import type { ProjectReadiness } from "../types/readiness";
 import "./ReadinessBuilder.css";
@@ -71,6 +72,7 @@ export default function ReadinessBuilder({
   return (
     <div className="readiness-builder">
       <h2>{t("rd.title")}</h2>
+      <WorkflowStatePanel projectKey={projectKey} />
       <ReadinessPanel readiness={data} />
       <ReadinessChecks checks={data.checks} />
     </div>

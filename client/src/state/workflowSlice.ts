@@ -1,14 +1,11 @@
 import type { AsyncSlice } from './types';
 import { createAsyncSlice } from './types';
+import type { WorkflowState as BackendWorkflowState } from '../types/workflow';
 
-export const WORKFLOW_STATES = {
-  PLANNING: 'PLANNING',
-  EXECUTING: 'EXECUTING',
-  CLOSED: 'CLOSED',
-} as const;
-
-export type WorkflowStateEnum =
-  (typeof WORKFLOW_STATES)[keyof typeof WORKFLOW_STATES];
+/**
+ * Mirror backend workflow enum semantics (lower_snake_case, full ISO lifecycle).
+ */
+export type WorkflowStateEnum = BackendWorkflowState;
 
 export interface WorkflowState {
   projectKey: string;

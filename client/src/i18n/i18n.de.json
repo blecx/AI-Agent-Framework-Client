@@ -622,6 +622,32 @@
       "showGaps": "Lücken anzeigen"
     }
   },
+  "wf": {
+    "title": "Workflow-Status",
+    "loading": "Workflow-Status wird geladen...",
+    "currentState": "Aktueller Status",
+    "updatedAt": "Aktualisiert",
+    "updatedBy": "Aktualisiert von",
+    "allowedTransitions": "Erlaubte Übergänge",
+    "noTransitions": "Keine Übergänge aus diesem Status verfügbar",
+    "transitioning": "Übergang läuft...",
+    "states": {
+      "initiating": "Initialisierung",
+      "planning": "Planung",
+      "executing": "Ausführung",
+      "monitoring": "Überwachung",
+      "closing": "Abschluss",
+      "closed": "Geschlossen"
+    },
+    "actions": {
+      "transitionTo": "Zu {{state}} wechseln"
+    },
+    "errors": {
+      "missingProjectKey": "Projekt-Schlüssel ist erforderlich",
+      "loadFailed": "Fehler beim Laden des Workflow-Status",
+      "transitionFailed": "Fehler beim Workflow-Übergang"
+    }
+  },
   "sync": {
     "title": "Sync",
     "state": {
