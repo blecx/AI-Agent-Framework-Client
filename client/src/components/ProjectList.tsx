@@ -47,11 +47,26 @@ export default function ProjectList() {
       name: string;
       description?: string;
     }) => {
+      const normalizedDescription = project.description?.trim() || undefined;
+
       const response = await apiClient.createProject(
         project.key,
         project.name,
-        project.description,
+        normalizedDescription,
       );
+
+      // Graceful fallback for older backend contracts without description support.
+      if (!response.success && normalizedDescription) {
+        const compatibilityResponse = await apiClient.createProject(
+          project.key,
+          project.name,
+        );
+
+        if (compatibilityResponse.success) {
+          return compatibilityResponse.data;
+        }
+      }
+
       if (!response.success) {
         throw new Error(response.error || t("projects.list.errors.create"));
       }
