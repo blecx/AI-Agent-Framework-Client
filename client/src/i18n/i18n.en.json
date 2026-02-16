@@ -622,6 +622,32 @@
       "showGaps": "View gaps"
     }
   },
+  "wf": {
+    "title": "Workflow State",
+    "loading": "Loading workflow state...",
+    "currentState": "Current state",
+    "updatedAt": "Updated",
+    "updatedBy": "Updated by",
+    "allowedTransitions": "Allowed transitions",
+    "noTransitions": "No transitions available from this state",
+    "transitioning": "Transitioning...",
+    "states": {
+      "initiating": "Initiating",
+      "planning": "Planning",
+      "executing": "Executing",
+      "monitoring": "Monitoring",
+      "closing": "Closing",
+      "closed": "Closed"
+    },
+    "actions": {
+      "transitionTo": "Transition to {{state}}"
+    },
+    "errors": {
+      "missingProjectKey": "Project key is required",
+      "loadFailed": "Error loading workflow state",
+      "transitionFailed": "Error transitioning workflow state"
+    }
+  },
   "sync": {
     "title": "Sync",
     "state": {

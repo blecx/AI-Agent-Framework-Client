@@ -3,6 +3,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import ReadinessBuilder from '../../../components/ReadinessBuilder';
 
+vi.mock('../../../components/WorkflowStatePanel', () => ({
+  default: () => <div>WorkflowStatePanel</div>,
+}));
+
 vi.mock('../../../services/mockReadinessService', () => ({
   mockReadinessService: {
     getProjectReadiness: vi.fn(async () => ({
@@ -69,6 +73,7 @@ describe('ReadinessBuilder', () => {
       expect(screen.getByText('Readiness Builder')).toBeInTheDocument();
     });
 
+    expect(screen.getByText('WorkflowStatePanel')).toBeInTheDocument();
     expect(screen.getAllByText('Warning').length).toBeGreaterThan(0);
     expect(screen.getByText('Readiness Checks')).toBeInTheDocument();
     expect(screen.getAllByText('Project Charter').length).toBeGreaterThan(0);

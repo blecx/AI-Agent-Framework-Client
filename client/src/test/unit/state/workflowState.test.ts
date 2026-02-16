@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import {
-  WORKFLOW_STATES,
   workflowReducer,
   type AllowedTransitions,
   type WorkflowSliceState,
@@ -61,8 +60,8 @@ describe('workflowState', () => {
   it('sets workflow data and success status', () => {
     const workflow: WorkflowState = {
       projectKey: 'P1',
-      currentState: WORKFLOW_STATES.PLANNING,
-      allowedTransitions: [WORKFLOW_STATES.EXECUTING],
+      currentState: 'planning',
+      allowedTransitions: ['executing'],
       updatedAt: 'now',
     };
 
@@ -72,15 +71,15 @@ describe('workflowState', () => {
     });
 
     expect(next.workflow.status).toBe('success');
-    expect(next.workflow.data?.currentState).toBe(WORKFLOW_STATES.PLANNING);
+    expect(next.workflow.data?.currentState).toBe('planning');
     expect(next.workflow.error).toBe(null);
   });
 
   it('sets allowed transitions data and success status', () => {
     const allowed: AllowedTransitions = {
       projectKey: 'P1',
-      currentState: WORKFLOW_STATES.PLANNING,
-      allowedTransitions: [WORKFLOW_STATES.EXECUTING],
+      currentState: 'planning',
+      allowedTransitions: ['executing'],
     };
 
     const next = workflowReducer(initialState, {
@@ -89,9 +88,7 @@ describe('workflowState', () => {
     });
 
     expect(next.allowedTransitions.status).toBe('success');
-    expect(next.allowedTransitions.data?.allowedTransitions).toEqual([
-      WORKFLOW_STATES.EXECUTING,
-    ]);
+    expect(next.allowedTransitions.data?.allowedTransitions).toEqual(['executing']);
     expect(next.allowedTransitions.error).toBe(null);
   });
 
@@ -101,7 +98,7 @@ describe('workflowState', () => {
         status: 'success',
         data: {
           projectKey: 'P1',
-          currentState: WORKFLOW_STATES.CLOSED,
+          currentState: 'closed',
           allowedTransitions: [],
           updatedAt: 'now',
         },
@@ -111,7 +108,7 @@ describe('workflowState', () => {
         status: 'success',
         data: {
           projectKey: 'P1',
-          currentState: WORKFLOW_STATES.CLOSED,
+          currentState: 'closed',
           allowedTransitions: [],
         },
         error: null,
