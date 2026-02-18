@@ -243,31 +243,31 @@ jobs:
         run: |
           set -euo pipefail
           echo "Checking bundle size limits..."
-          
+
           # Find the main JS bundle
           MAIN_JS=$(find dist/assets -name 'index-*.js' | head -n 1)
-          
+
           if [ -z "$MAIN_JS" ]; then
             echo "Error: Could not find main bundle"
             exit 1
           fi
-          
+
           # Get gzipped size
           GZIP_SIZE=$(gzip -c "$MAIN_JS" | wc -c)
           GZIP_SIZE_KB=$((GZIP_SIZE / 1024))
           MAX_SIZE_KB=500
-          
+
           echo "Main bundle: $(basename "$MAIN_JS")"
           echo "Gzipped size: ${GZIP_SIZE_KB} KB"
           echo "Limit: ${MAX_SIZE_KB} KB"
-          
+
           if [ "$GZIP_SIZE_KB" -gt "$MAX_SIZE_KB" ]; then
             echo "❌ Bundle size exceeds limit!"
             echo "   Current: ${GZIP_SIZE_KB} KB"
             echo "   Maximum: ${MAX_SIZE_KB} KB"
             exit 1
           fi
-          
+
           echo "✅ Bundle size check passed (${GZIP_SIZE_KB} KB < ${MAX_SIZE_KB} KB)"
 
       # Note: Console error check removed - too many false positives from React library code
@@ -463,10 +463,19 @@ jobs:
       - name: Start preview server
         working-directory: client
         run: |
-          npm run preview &
+          npm run preview -- --host 127.0.0.1 --strictPort --port 5173 &
           echo $! > preview.pid
-          sleep 5
-          curl http://localhost:5173 || echo "Preview server not ready yet"
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:5173 >/dev/null; then
+              echo "Preview server is ready"
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "Preview server failed to start within timeout"
+              exit 1
+            fi
+            sleep 2
+          done
 
       - name: Run Lighthouse CI
         working-directory: client
