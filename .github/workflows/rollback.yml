@@ -1,0 +1,59 @@
+name: Client Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Rollback target environment
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      client_image:
+        description: Full immutable Client image tag (for example ghcr.io/org/ai-agent-framework-client:sha-<sha>)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: client-rollback-${{ github.event.inputs.target }}
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    name: Rollback client
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ github.event.inputs.target }}
+    steps:
+      - name: Validate immutable image tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${{ github.event.inputs.client_image }}" == ghcr.io/*:sha-* ]]
+
+      - name: Configure SSH
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ vars.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Execute remote rollback deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh "${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}" \
+            "GHCR_USERNAME='${{ secrets.DEPLOY_GHCR_USERNAME }}' GHCR_TOKEN='${{ secrets.DEPLOY_GHCR_TOKEN }}' CLIENT_IMAGE='${{ github.event.inputs.client_image }}' bash -lc '${{ vars.DEPLOY_COMMAND }}'"
+
+      - name: Health check
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error "${{ vars.HEALTHCHECK_URL }}"
