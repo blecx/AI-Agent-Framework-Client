@@ -99,6 +99,18 @@ npm run test:api
 
 If your change touches API integration, ensure you also coordinate with the backend repo and keep `.env` files untracked (use `.env.example` / `.env.production.example`).
 
+UX packet workflow validation (for UI-affecting changes):
+
+```bash
+cd client
+
+# Dry-run check with explicit UI scope and missing packet (expected fail)
+npm run check:ux-packet:dry-run -- --ui-changed true --packet-path ../.tmp/missing-ux-packet.md --pr-body-file ../.tmp/pr-body.md
+
+# Dry-run check with packet/evidence present (expected pass)
+npm run check:ux-packet:dry-run -- --ui-changed true --packet-path ../.tmp/ux-consult-issue-216.md --pr-body-file ../.tmp/pr-body.md
+```
+
 ### Cross-Repo Coordination
 
 If your changes require backend API modifications:
