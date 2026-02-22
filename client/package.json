@@ -16,6 +16,7 @@
     "test:e2e:visual": "playwright test --grep @visual",
     "test:e2e:a11y": "playwright test --grep @accessibility",
     "test:e2e:update-snapshots": "playwright test --update-snapshots",
+    "test:ux-evidence": "node --test scripts/check-ux-evidence.test.mjs",
     "check:bundle-size": "node scripts/check-bundle-size.mjs",
     "check:docs": "node scripts/check-docs.mjs",
     "check:ux-packet": "node scripts/check-ux-packet.mjs",

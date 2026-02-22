@@ -187,6 +187,41 @@ jobs:
             }
             core.info('PR review gate passed.');
 
+      - name: UX evidence gate (UI-affecting PRs)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              core.info('No pull_request payload found; skipping.');
+              return;
+            }
+
+            const { validateUxEvidence } = await import(`${process.env.GITHUB_WORKSPACE}/client/scripts/check-ux-evidence.mjs`);
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100,
+            });
+            const changed = files.map((file) => file.filename);
+            const result = validateUxEvidence({
+              body: pr.body || '',
+              changedFiles: changed,
+            });
+
+            if (!result.ok) {
+              core.setFailed(`UX evidence gate failed:\n- ${result.errors.join('\n- ')}`);
+              return;
+            }
+
+            if (result.uiTouched) {
+              core.info('UX evidence gate passed for UI/UX-affecting changes.');
+            } else {
+              core.info('No UI/UX-affecting changes detected; UX evidence gate skipped.');
+            }
+
       - name: Repo hygiene guard (forbidden env files)
         shell: bash
         run: |
@@ -208,6 +243,10 @@ jobs:
       - name: Install dependencies
         working-directory: client
         run: npm ci
+
+      - name: Run UX evidence gate unit tests
+        working-directory: client
+        run: npm run test:ux-evidence
 
       - name: Run lint
         working-directory: client

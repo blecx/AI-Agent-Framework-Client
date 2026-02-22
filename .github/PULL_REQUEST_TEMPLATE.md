@@ -107,12 +107,15 @@ If manual testing is truly not applicable, explain why and what alternative vali
 
 ## UX / Navigation Review
 
-<!-- Required for UI-affecting changes. For non-UI PRs, explicitly state N/A. -->
+<!--
+Required only for UI/UX-affecting changes (client/src, styles, JSX/TSX).
+For non-UI changes, write: "N/A (non-UI change)".
+-->
 
 - [ ] N/A (non-UI scope)
-- [ ] blecs-ux-authority consulted and UX packet available/attached in evidence
-  - Packet path or reference: **\_\_\_\_**
-  - Navigation/responsive notes: **\_\_\_\_**
+- [ ] blecs-ux-authority consulted: pass/fail documented
+- [ ] Responsive behavior validated (desktop/tablet/mobile)
+- [ ] Navigation + keyboard/a11y checks validated
 
 ## Backward compatibility / Migration
 
