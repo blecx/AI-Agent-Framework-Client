@@ -18,6 +18,8 @@
     "test:e2e:update-snapshots": "playwright test --update-snapshots",
     "check:bundle-size": "node scripts/check-bundle-size.mjs",
     "check:docs": "node scripts/check-docs.mjs",
+    "check:ux-packet": "node scripts/check-ux-packet.mjs",
+    "check:ux-packet:dry-run": "node scripts/check-ux-packet.mjs --dry-run",
     "lighthouse:ci": "lhci autorun"
   },
   "dependencies": {

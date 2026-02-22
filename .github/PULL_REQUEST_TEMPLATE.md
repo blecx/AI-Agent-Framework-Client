@@ -105,6 +105,15 @@ If manual testing is truly not applicable, explain why and what alternative vali
   - Expected result: **\_\_\_\_**
   - Actual result / Evidence (screenshots, logs, GIF, terminal output, etc.): **\_\_\_\_**
 
+## UX / Navigation Review
+
+<!-- Required for UI-affecting changes. For non-UI PRs, explicitly state N/A. -->
+
+- [ ] N/A (non-UI scope)
+- [ ] blecs-ux-authority consulted and UX packet available/attached in evidence
+  - Packet path or reference: **\_\_\_\_**
+  - Navigation/responsive notes: **\_\_\_\_**
+
 ## Backward compatibility / Migration
 
 - [ ] No breaking changes
