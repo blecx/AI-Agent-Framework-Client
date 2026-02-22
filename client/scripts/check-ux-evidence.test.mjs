@@ -1,0 +1,57 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+
+import { validateUxEvidence } from "./check-ux-evidence.mjs";
+
+test("non-UI changes do not require UX evidence", () => {
+  const result = validateUxEvidence({
+    body: "# Summary\n",
+    changedFiles: ["client/scripts/check-docs.mjs"],
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.uiTouched, false);
+  assert.deepEqual(result.errors, []);
+});
+
+test("UI changes fail when UX section is missing", () => {
+  const result = validateUxEvidence({
+    body: "# Summary\n\n## Validation\n",
+    changedFiles: ["client/src/App.tsx"],
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.uiTouched, true);
+  assert.match(result.errors.join("\n"), /UX \/ Navigation Review/);
+});
+
+test("UI changes fail when authority checkbox is missing", () => {
+  const result = validateUxEvidence({
+    body: `# Summary
+
+## UX / Navigation Review
+- [x] Responsive behavior validated on target breakpoints.
+- [x] Keyboard navigation and a11y pass reviewed.
+`,
+    changedFiles: ["client/src/components/ProjectView.tsx"],
+  });
+
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join("\n"), /blecs-ux-authority/);
+});
+
+test("UI changes pass with complete UX evidence", () => {
+  const result = validateUxEvidence({
+    body: `# Summary
+
+## UX / Navigation Review
+- [x] blecs-ux-authority consulted: pass
+- [x] Responsive behavior validated on desktop/tablet/mobile breakpoints.
+- [x] Navigation + keyboard/a11y checks passed with evidence in manual test section.
+`,
+    changedFiles: ["client/src/components/ProjectView.tsx", "client/src/index.css"],
+  });
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.errors, []);
+});
