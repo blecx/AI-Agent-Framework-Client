@@ -15,6 +15,7 @@ export default defineConfig({
       '**/dist/**',
       '**/e2e/**',
       '**/.{idea,git,cache,output,temp}/**',
+      '**/scripts/check-ux-evidence.test.mjs',
     ],
     coverage: {
       provider: 'v8',
