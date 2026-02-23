@@ -12,13 +12,21 @@ vi.mock('react-i18next', () => ({
         'nav.openMenu': 'Open navigation menu',
         'nav.closeMenu': 'Close navigation menu',
         'nav.sections.projects': 'Projects',
+        'nav.sections.currentProject': 'Current project',
         'nav.sections.create': 'Create',
         'nav.sections.manage': 'Manage',
         'nav.guidedBuilder': 'Guided Builder',
         'nav.projects': 'Projects',
+        'nav.artifactBuilder': 'Artifact Builder',
+        'nav.readinessBuilder': 'Readiness Builder',
+        'nav.raid': 'RAID',
         'nav.commands': 'Commands',
         'nav.apiTester': 'API Tester',
         'nav.uiLibrary': 'UI Library',
+        'ac.title': 'Assisted Creation',
+        'projectView.tabs.proposeChanges': 'Propose Changes',
+        'projectView.tabs.applyProposals': 'Apply Proposals',
+        'projectView.tabs.audit': 'Audit',
         'nav.header.openApiDocs': 'API Docs',
         'nav.header.refreshStatus': 'Refresh',
         'nav.header.settings': 'Settings',
@@ -81,5 +89,98 @@ describe('AppNavigation', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Refresh' }));
 
     expect(onRetryConnection).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows current project section with workflow links on project routes', () => {
+    render(
+      <MemoryRouter initialEntries={['/projects/TEST-123/readiness']}>
+        <AppNavigation connectionState="online" />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Current project' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Artifact Builder' })).toHaveAttribute(
+      'href',
+      '/projects/TEST-123/artifacts',
+    );
+    expect(screen.getByRole('link', { name: 'Assisted Creation' })).toHaveAttribute(
+      'href',
+      '/projects/TEST-123/assisted-creation',
+    );
+    expect(screen.getByRole('link', { name: 'Readiness Builder' })).toHaveAttribute(
+      'href',
+      '/projects/TEST-123/readiness',
+    );
+    expect(screen.getByRole('link', { name: 'Propose Changes' })).toHaveAttribute(
+      'href',
+      '/projects/TEST-123/propose',
+    );
+    expect(screen.getByRole('link', { name: 'Apply Proposals' })).toHaveAttribute(
+      'href',
+      '/projects/TEST-123/apply',
+    );
+    expect(screen.getByRole('link', { name: 'RAID' })).toHaveAttribute(
+      'href',
+      '/projects/TEST-123/raid',
+    );
+    expect(screen.getByRole('link', { name: 'Audit' })).toHaveAttribute(
+      'href',
+      '/projects/TEST-123/audit',
+    );
+  });
+
+  it('does not show current project section on non-project routes', () => {
+    render(
+      <MemoryRouter initialEntries={['/projects']}>
+        <AppNavigation connectionState="online" />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Current project' })).not.toBeInTheDocument();
+  });
+
+  it('closes mobile drawer with Escape and restores focus to toggle', () => {
+    render(
+      <MemoryRouter>
+        <AppNavigation connectionState="online" />
+      </MemoryRouter>,
+    );
+
+    const toggle = screen.getByRole('button', { name: 'Open navigation menu' });
+    fireEvent.click(toggle);
+
+    expect(
+      screen.getAllByRole('button', { name: 'Close navigation menu' }).length,
+    ).toBeGreaterThan(0);
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    const reopenedToggle = screen.getByRole('button', { name: 'Open navigation menu' });
+    expect(reopenedToggle).toBeInTheDocument();
+    expect(document.activeElement).toBe(reopenedToggle);
+  });
+
+  it('keeps focus trapped inside drawer when tabbing', () => {
+    render(
+      <MemoryRouter initialEntries={['/projects/TEST-123/readiness']}>
+        <AppNavigation connectionState="online" />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open navigation menu' }));
+
+    const focusables = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-nav-focusable="true"]'),
+    );
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    last.focus();
+    fireEvent.keyDown(document, { key: 'Tab' });
+    expect(document.activeElement).toBe(first);
+
+    first.focus();
+    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(last);
   });
 });

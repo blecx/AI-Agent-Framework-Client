@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,7 @@ import CommandPanel from "./ProjectCommandPanel";
 import { ArtifactList } from "./ArtifactList";
 import { AuditViewer } from "./AuditViewer";
 import ReadinessBuilder from "./ReadinessBuilder";
+import RAIDList from "./RAIDList";
 import { AuditBadge } from "./AuditBadge";
 import { AuditApiClient } from "../services/AuditApiClient";
 import Skeleton from "./ui/Skeleton";
@@ -21,13 +22,16 @@ type TabType =
   | "commands"
   | "artifacts"
   | "readiness"
+  | "raid"
   | "audit";
 
 function tabFromPath(pathname: string): TabType {
   if (pathname.endsWith("/propose")) return "propose";
   if (pathname.endsWith("/apply")) return "apply";
+  if (pathname.endsWith("/commands")) return "commands";
   if (pathname.endsWith("/artifacts")) return "artifacts";
   if (pathname.endsWith("/readiness")) return "readiness";
+  if (pathname.endsWith("/raid")) return "raid";
   if (pathname.endsWith("/audit")) return "audit";
   return "overview";
 }
@@ -37,9 +41,45 @@ export default function ProjectView() {
   const { projectKey } = useParams<{ projectKey: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<TabType>(() =>
-    tabFromPath(location.pathname),
+  const activeTab = useMemo<TabType>(
+    () => tabFromPath(location.pathname),
+    [location.pathname],
   );
+
+  const navigateToTab = (tab: TabType) => {
+    if (!projectKey) {
+      return;
+    }
+
+    switch (tab) {
+      case "overview":
+        navigate(`/projects/${projectKey}`);
+        break;
+      case "propose":
+        navigate(`/projects/${projectKey}/propose`);
+        break;
+      case "apply":
+        navigate(`/projects/${projectKey}/apply`);
+        break;
+      case "commands":
+        navigate(`/projects/${projectKey}/commands`);
+        break;
+      case "artifacts":
+        navigate(`/projects/${projectKey}/artifacts`);
+        break;
+      case "readiness":
+        navigate(`/projects/${projectKey}/readiness`);
+        break;
+      case "raid":
+        navigate(`/projects/${projectKey}/raid`);
+        break;
+      case "audit":
+        navigate(`/projects/${projectKey}/audit`);
+        break;
+      default:
+        navigate(`/projects/${projectKey}`);
+    }
+  };
 
   // Fetch project data
   const {
@@ -147,7 +187,7 @@ export default function ProjectView() {
               errorCount={auditData.summary.errors}
               warningCount={auditData.summary.warnings}
               infoCount={auditData.summary.info}
-              onClick={() => setActiveTab("audit")}
+              onClick={() => navigateToTab("audit")}
             />
           )}
         </div>
@@ -156,43 +196,49 @@ export default function ProjectView() {
       <nav className="project-tabs">
         <button
           className={`tab ${activeTab === "overview" ? "active" : ""}`}
-          onClick={() => setActiveTab("overview")}
+          onClick={() => navigateToTab("overview")}
         >
           {t("projectView.tabs.overview")}
         </button>
         <button
           className={`tab ${activeTab === "propose" ? "active" : ""}`}
-          onClick={() => setActiveTab("propose")}
+          onClick={() => navigateToTab("propose")}
         >
           {t("projectView.tabs.proposeChanges")}
         </button>
         <button
           className={`tab ${activeTab === "apply" ? "active" : ""}`}
-          onClick={() => setActiveTab("apply")}
+          onClick={() => navigateToTab("apply")}
         >
           {t("projectView.tabs.applyProposals")}
         </button>
         <button
           className={`tab ${activeTab === "commands" ? "active" : ""}`}
-          onClick={() => setActiveTab("commands")}
+          onClick={() => navigateToTab("commands")}
         >
           {t("projectView.tabs.commands")}
         </button>
         <button
           className={`tab ${activeTab === "artifacts" ? "active" : ""}`}
-          onClick={() => setActiveTab("artifacts")}
+          onClick={() => navigateToTab("artifacts")}
         >
           {t("projectView.tabs.artifacts")}
         </button>
         <button
           className={`tab ${activeTab === "readiness" ? "active" : ""}`}
-          onClick={() => setActiveTab("readiness")}
+          onClick={() => navigateToTab("readiness")}
         >
           {t("nav.readinessBuilder")}
         </button>
         <button
+          className={`tab ${activeTab === "raid" ? "active" : ""}`}
+          onClick={() => navigateToTab("raid")}
+        >
+          {t("nav.raid")}
+        </button>
+        <button
           className={`tab ${activeTab === "audit" ? "active" : ""}`}
-          onClick={() => setActiveTab("audit")}
+          onClick={() => navigateToTab("audit")}
         >
           {t("projectView.tabs.audit")}
         </button>
@@ -293,7 +339,6 @@ export default function ProjectView() {
           <ArtifactList
             projectKey={projectKey}
             onCreateNew={() => {
-              setActiveTab("propose");
               navigate(`/projects/${projectKey}/propose`);
             }}
             onSelectArtifact={(artifact) => {
@@ -314,6 +359,9 @@ export default function ProjectView() {
         )}
         {activeTab === "readiness" && projectKey && (
           <ReadinessBuilder projectKey={projectKey} />
+        )}
+        {activeTab === "raid" && projectKey && (
+          <RAIDList projectKey={projectKey} />
         )}
         {activeTab === "audit" && projectKey && (
           <AuditViewer projectKey={projectKey} />

@@ -57,6 +57,9 @@ vi.mock("../AuditViewer", () => ({
 vi.mock("../ReadinessBuilder", () => ({
   default: () => <div>ReadinessBuilder</div>,
 }));
+vi.mock("../RAIDList", () => ({
+  default: () => <div>RAIDList</div>,
+}));
 
 const mockProject = {
   key: "TEST-123",
@@ -105,7 +108,12 @@ function renderWithProviders(
           <Routes>
             <Route path="/projects/:projectKey" element={ui} />
             <Route path="/projects/:projectKey/propose" element={ui} />
+            <Route path="/projects/:projectKey/apply" element={ui} />
+            <Route path="/projects/:projectKey/commands" element={ui} />
             <Route path="/projects/:projectKey/artifacts" element={ui} />
+            <Route path="/projects/:projectKey/readiness" element={ui} />
+            <Route path="/projects/:projectKey/raid" element={ui} />
+            <Route path="/projects/:projectKey/audit" element={ui} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
@@ -384,6 +392,51 @@ describe("ProjectView", () => {
 
     await waitFor(() => {
       expect(screen.getByText("ReadinessBuilder")).toBeInTheDocument();
+    });
+  });
+
+  it("switches to RAID tab when clicked", async () => {
+    mockGetProject.mockResolvedValue({ success: true, data: mockProject });
+    mockGetAuditResults.mockResolvedValue(mockAuditData);
+
+    const user = userEvent.setup();
+    renderWithProviders(<ProjectView />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Test Project")).toBeInTheDocument();
+    });
+
+    const raidTab = screen.getByRole("button", { name: /RAID/i });
+    await user.click(raidTab);
+
+    await waitFor(() => {
+      expect(screen.getByText("RAIDList")).toBeInTheDocument();
+    });
+  });
+
+  it("loads propose content when opened via propose route", async () => {
+    mockGetProject.mockResolvedValue({ success: true, data: mockProject });
+    mockGetAuditResults.mockResolvedValue(mockAuditData);
+
+    renderWithProviders(<ProjectView />, {
+      route: "/projects/TEST-123/propose",
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("ProposePanel")).toBeInTheDocument();
+    });
+  });
+
+  it("loads apply content when opened via apply route", async () => {
+    mockGetProject.mockResolvedValue({ success: true, data: mockProject });
+    mockGetAuditResults.mockResolvedValue(mockAuditData);
+
+    renderWithProviders(<ProjectView />, {
+      route: "/projects/TEST-123/apply",
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("ApplyPanel")).toBeInTheDocument();
     });
   });
 

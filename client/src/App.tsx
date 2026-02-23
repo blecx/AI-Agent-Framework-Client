@@ -8,8 +8,6 @@ import {
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ProjectList from './components/ProjectList';
 import ProjectView from './components/ProjectView';
-import ProposePanel from './components/ProposePanel';
-import ApplyPanel from './components/ApplyPanel';
 import CommandPanel from './components/CommandPanel';
 import ApiTester from './components/ApiTester';
 import UiLibraryDemo from './components/UiLibraryDemo';
@@ -31,7 +29,6 @@ import { UiPreferencesProvider } from './state/uiPreferences';
 import { WorkflowStateProvider } from './state/workflowState';
 import './App.css';
 
-// Create a QueryClient instance
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -40,11 +37,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-function ApplyPanelWrapper() {
-  const { projectKey } = useParams<{ projectKey: string }>();
-  return <ApplyPanel projectKey={projectKey || ''} />;
-}
 
 function AssistedCreationWrapper() {
   const { projectKey } = useParams<{ projectKey: string }>();
@@ -75,12 +67,7 @@ function App() {
                       />
                       <main id="main-content" className="app-main" tabIndex={-1}>
                         <Routes>
-                          <Route
-                            path="/"
-                            element={
-                              <Navigate to="/projects" replace />
-                            }
-                          />
+                          <Route path="/" element={<Navigate to="/projects" replace />} />
                           <Route
                             path="/projects"
                             element={
@@ -100,16 +87,24 @@ function App() {
                           <Route
                             path="/projects/:projectKey/propose"
                             element={
-                              <ErrorBoundary name="ProposePanel">
-                                <ProposePanel />
+                              <ErrorBoundary name="ProjectView">
+                                <ProjectView />
                               </ErrorBoundary>
                             }
                           />
                           <Route
                             path="/projects/:projectKey/apply"
                             element={
-                              <ErrorBoundary name="ApplyPanel">
-                                <ApplyPanelWrapper />
+                              <ErrorBoundary name="ProjectView">
+                                <ProjectView />
+                              </ErrorBoundary>
+                            }
+                          />
+                          <Route
+                            path="/projects/:projectKey/commands"
+                            element={
+                              <ErrorBoundary name="ProjectView">
+                                <ProjectView />
                               </ErrorBoundary>
                             }
                           />
@@ -123,6 +118,22 @@ function App() {
                           />
                           <Route
                             path="/projects/:projectKey/readiness"
+                            element={
+                              <ErrorBoundary name="ProjectView">
+                                <ProjectView />
+                              </ErrorBoundary>
+                            }
+                          />
+                          <Route
+                            path="/projects/:projectKey/raid"
+                            element={
+                              <ErrorBoundary name="ProjectView">
+                                <ProjectView />
+                              </ErrorBoundary>
+                            }
+                          />
+                          <Route
+                            path="/projects/:projectKey/audit"
                             element={
                               <ErrorBoundary name="ProjectView">
                                 <ProjectView />

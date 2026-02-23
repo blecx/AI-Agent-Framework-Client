@@ -1,5 +1,11 @@
-import { useMemo, useState, type KeyboardEventHandler } from 'react';
-import { NavLink } from 'react-router-dom';
+import {
+  useMemo,
+  useRef,
+  useState,
+  useEffect,
+  type KeyboardEventHandler,
+} from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 import ConnectionStatus from './ConnectionStatus';
@@ -32,7 +38,10 @@ export default function AppNavigation({
   onRetryConnection,
 }: AppNavigationProps) {
   const { t } = useTranslation();
+  const location = useLocation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const mobileToggleRef = useRef<HTMLButtonElement | null>(null);
+  const navRef = useRef<HTMLElement | null>(null);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     projects: true,
     create: true,
@@ -51,69 +60,132 @@ export default function AppNavigation({
   const showSettingsPlaceholder =
     import.meta.env.VITE_ENABLE_SETTINGS_PLACEHOLDER === 'true';
 
+  const currentProjectKey = useMemo(() => {
+    const match = location.pathname.match(/^\/projects\/([^/]+)(?:\/.*)?$/);
+    return match ? decodeURIComponent(match[1]) : null;
+  }, [location.pathname]);
+
   const sections: NavSection[] = useMemo(
-    () => [
-      {
-        key: 'primary',
-        labelKey: '',
-        items: [
-          {
-            key: 'guided-builder',
-            labelKey: 'nav.guidedBuilder',
-            path: '/guided-builder',
-            icon: '🚀',
-            primary: true,
-            helpAvailable: true,
-            helpPath: '/help/guided-builder',
-          },
-        ],
-      },
-      {
-        key: 'projects',
-        labelKey: 'nav.sections.projects',
-        items: [
-          {
-            key: 'projects',
-            labelKey: 'nav.projects',
-            path: '/projects',
-            icon: '📁',
-          },
-        ],
-      },
-      {
-        key: 'create',
-        labelKey: 'nav.sections.create',
-        items: [
-          {
-            key: 'commands',
-            labelKey: 'nav.commands',
-            path: '/commands',
-            icon: '🧠',
-            helpAvailable: true,
-            helpPath: '/help/workflows',
-          },
-        ],
-      },
-      {
-        key: 'manage',
-        labelKey: 'nav.sections.manage',
-        items: [
-          {
-            key: 'api-tester',
-            labelKey: 'nav.apiTester',
-            path: '/api-tester',
-            icon: '🧪',
-          },
-          {
-            key: 'ui-library',
-            labelKey: 'nav.uiLibrary',
-            path: '/ui',
-            icon: '🧩',
-          },
-        ],
-      },
-    ],
-    [],
+    () => {
+      const sectionList: NavSection[] = [
+        {
+          key: 'primary',
+          labelKey: '',
+          items: [
+            {
+              key: 'guided-builder',
+              labelKey: 'nav.guidedBuilder',
+              path: '/guided-builder',
+              icon: '🚀',
+              primary: true,
+              helpAvailable: true,
+              helpPath: '/help/guided-builder',
+            },
+          ],
+        },
+        {
+          key: 'projects',
+          labelKey: 'nav.sections.projects',
+          items: [
+            {
+              key: 'projects',
+              labelKey: 'nav.projects',
+              path: '/projects',
+              icon: '📁',
+            },
+          ],
+        },
+      ];
+
+      if (currentProjectKey) {
+        sectionList.push({
+          key: 'current-project',
+          labelKey: 'nav.sections.currentProject',
+          items: [
+            {
+              key: 'project-artifacts',
+              labelKey: 'nav.artifactBuilder',
+              path: `/projects/${currentProjectKey}/artifacts`,
+              icon: '📄',
+            },
+            {
+              key: 'project-assisted-creation',
+              labelKey: 'ac.title',
+              path: `/projects/${currentProjectKey}/assisted-creation`,
+              icon: '✨',
+            },
+            {
+              key: 'project-readiness',
+              labelKey: 'nav.readinessBuilder',
+              path: `/projects/${currentProjectKey}/readiness`,
+              icon: '✅',
+            },
+            {
+              key: 'project-propose',
+              labelKey: 'projectView.tabs.proposeChanges',
+              path: `/projects/${currentProjectKey}/propose`,
+              icon: '📝',
+            },
+            {
+              key: 'project-apply',
+              labelKey: 'projectView.tabs.applyProposals',
+              path: `/projects/${currentProjectKey}/apply`,
+              icon: '✔️',
+            },
+            {
+              key: 'project-raid',
+              labelKey: 'nav.raid',
+              path: `/projects/${currentProjectKey}/raid`,
+              icon: '📋',
+            },
+            {
+              key: 'project-audit',
+              labelKey: 'projectView.tabs.audit',
+              path: `/projects/${currentProjectKey}/audit`,
+              icon: '🔎',
+            },
+          ],
+        });
+      }
+
+      sectionList.push(
+        {
+          key: 'create',
+          labelKey: 'nav.sections.create',
+          items: [
+            {
+              key: 'commands',
+              labelKey: 'nav.commands',
+              path: '/commands',
+              icon: '🧠',
+              helpAvailable: true,
+              helpPath: '/help/workflows',
+            },
+          ],
+        },
+        {
+          key: 'manage',
+          labelKey: 'nav.sections.manage',
+          items: [
+            {
+              key: 'api-tester',
+              labelKey: 'nav.apiTester',
+              path: '/api-tester',
+              icon: '🧪',
+            },
+            {
+              key: 'ui-library',
+              labelKey: 'nav.uiLibrary',
+              path: '/ui',
+              icon: '🧩',
+            },
+          ],
+        },
+      );
+
+      return sectionList;
+    },
+    [currentProjectKey],
   );
 
   const closeMobile = () => setIsMobileOpen(false);
@@ -122,14 +194,72 @@ export default function AppNavigation({
     setExpandedSections((current) => ({ ...current, [key]: !current[key] }));
   };
 
+  const getNavFocusables = () =>
+    Array.from(
+      navRef.current?.querySelectorAll<HTMLElement>('[data-nav-focusable="true"]') ?? [],
+    );
+
+  useEffect(() => {
+    if (!isMobileOpen) {
+      return;
+    }
+
+    const toggleButton = mobileToggleRef.current;
+    const mainContent = document.getElementById('main-content');
+    mainContent?.setAttribute('inert', '');
+
+    const focusables = getNavFocusables();
+    focusables[0]?.focus();
+
+    const onMobileKeydown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsMobileOpen(false);
+        return;
+      }
+
+      if (event.key !== 'Tab') {
+        return;
+      }
+
+      const drawerFocusables = getNavFocusables();
+      if (drawerFocusables.length === 0) {
+        return;
+      }
+
+      const first = drawerFocusables[0];
+      const last = drawerFocusables[drawerFocusables.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+
+      if (event.shiftKey) {
+        if (active === first || !active || !drawerFocusables.includes(active)) {
+          event.preventDefault();
+          last.focus();
+        }
+        return;
+      }
+
+      if (active === last || !active || !drawerFocusables.includes(active)) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', onMobileKeydown);
+
+    return () => {
+      document.removeEventListener('keydown', onMobileKeydown);
+      mainContent?.removeAttribute('inert');
+      toggleButton?.focus();
+    };
+  }, [isMobileOpen]);
+
   const onArrowNavigate: KeyboardEventHandler<HTMLElement> = (event) => {
     if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') {
       return;
     }
 
-    const focusables = Array.from(
-      document.querySelectorAll<HTMLElement>('.app-nav [data-nav-focusable="true"]'),
-    );
+    const focusables = getNavFocusables();
 
     if (focusables.length === 0) {
       return;
@@ -152,6 +282,7 @@ export default function AppNavigation({
   return (
     <>
       <button
+        ref={mobileToggleRef}
         className="nav-mobile-toggle"
         type="button"
         onClick={() => setIsMobileOpen((open) => !open)}
@@ -164,7 +295,7 @@ export default function AppNavigation({
 
       {isMobileOpen && <button type="button" className="nav-mobile-overlay" onClick={closeMobile} aria-label={t('nav.closeMenu')} />}
 
-      <nav id="app-navigation" className={`app-nav ${isMobileOpen ? 'app-nav--mobile-open' : ''}`} aria-label={t('nav.primaryAria')} onKeyDown={onArrowNavigate}>
+      <nav ref={navRef} id="app-navigation" className={`app-nav ${isMobileOpen ? 'app-nav--mobile-open' : ''}`} aria-label={t('nav.primaryAria')} onKeyDown={onArrowNavigate}>
         <div className="app-nav__brand">
           <h1>{t('nav.brand')}</h1>
           <div className="app-nav__api-controls">
