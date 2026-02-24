@@ -12,6 +12,7 @@ vi.mock("react-i18next", () => ({
         "nav.openMenu": "Open navigation menu",
         "nav.closeMenu": "Close navigation menu",
         "nav.guidedBuilder": "Guided Builder",
+        "projects.list.cta.new": "Create Project",
         "nav.projects": "Projects",
         "nav.sections.projects": "Projects",
         "nav.sections.create": "Create",
@@ -45,6 +46,9 @@ describe("AppNavigation", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Guided Builder" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Create Project" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", {

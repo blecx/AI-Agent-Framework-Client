@@ -16,7 +16,6 @@ interface NavItem {
   key: string;
   labelKey: string;
   path: string;
-  icon?: string;
   primary?: boolean;
   helpAvailable?: boolean;
   helpPath?: string;
@@ -73,11 +72,15 @@ export default function AppNavigation({
           labelKey: '',
           items: [
             {
+              key: 'create-project',
+              labelKey: 'projects.list.cta.new',
+              path: '/projects?create=1',
+              primary: true,
+            },
+            {
               key: 'guided-builder',
               labelKey: 'nav.guidedBuilder',
               path: '/guided-builder',
-              icon: '🚀',
-              primary: true,
               helpAvailable: true,
               helpPath: '/help/guided-builder',
             },
@@ -91,7 +94,6 @@ export default function AppNavigation({
               key: 'projects',
               labelKey: 'nav.projects',
               path: '/projects',
-              icon: '📁',
             },
           ],
         },
@@ -106,43 +108,36 @@ export default function AppNavigation({
               key: 'project-artifacts',
               labelKey: 'nav.artifactBuilder',
               path: `/projects/${currentProjectKey}/artifacts`,
-              icon: '📄',
             },
             {
               key: 'project-assisted-creation',
               labelKey: 'ac.title',
               path: `/projects/${currentProjectKey}/assisted-creation`,
-              icon: '✨',
             },
             {
               key: 'project-readiness',
               labelKey: 'nav.readinessBuilder',
               path: `/projects/${currentProjectKey}/readiness`,
-              icon: '✅',
             },
             {
               key: 'project-propose',
               labelKey: 'projectView.tabs.proposeChanges',
               path: `/projects/${currentProjectKey}/propose`,
-              icon: '📝',
             },
             {
               key: 'project-apply',
               labelKey: 'projectView.tabs.applyProposals',
               path: `/projects/${currentProjectKey}/apply`,
-              icon: '✔️',
             },
             {
               key: 'project-raid',
               labelKey: 'nav.raid',
               path: `/projects/${currentProjectKey}/raid`,
-              icon: '📋',
             },
             {
               key: 'project-audit',
               labelKey: 'projectView.tabs.audit',
               path: `/projects/${currentProjectKey}/audit`,
-              icon: '🔎',
             },
           ],
         });
@@ -157,7 +152,6 @@ export default function AppNavigation({
               key: 'commands',
               labelKey: 'nav.commands',
               path: '/commands',
-              icon: '🧠',
               helpAvailable: true,
               helpPath: '/help/workflows',
             },
@@ -171,13 +165,11 @@ export default function AppNavigation({
               key: 'api-tester',
               labelKey: 'nav.apiTester',
               path: '/api-tester',
-              icon: '🧪',
             },
             {
               key: 'ui-library',
               labelKey: 'nav.uiLibrary',
               path: '/ui',
-              icon: '🧩',
             },
           ],
         },
@@ -375,7 +367,6 @@ export default function AppNavigation({
                           onClick={closeMobile}
                           data-nav-focusable="true"
                         >
-                          {item.icon && <span className="app-nav__icon" aria-hidden="true">{item.icon}</span>}
                           <span className="app-nav__label-group">
                             <span className="app-nav__label">{t(item.labelKey)}</span>
                           </span>
