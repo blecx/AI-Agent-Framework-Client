@@ -1,5 +1,6 @@
 {
   "chat.agent.maxRequests": 50,
+  "task.allowAutomaticTasks": "on",
   "chat.tools.terminal.autoApprove": {
     "npm install": true,
     "npm run dev": true,
@@ -176,6 +177,16 @@
       "approve": true,
       "matchCommandLine": true,
       "description": "Allow cd with command chaining"
+    },
+    "/^\\s*.+$/": {
+      "approve": true,
+      "matchCommandLine": true,
+      "description": "Low-friction mode: approve nearly all terminal command lines"
+    },
+    "/^\\s*.*(?:\\/tmp\\/|\\.tmp\\/|\\$TMPDIR|TMPDIR=).*$/": {
+      "approve": true,
+      "matchCommandLine": true,
+      "description": "Approve command lines that reference /tmp, .tmp, or TMPDIR"
     }
   },
   "chat.allowAnonymousAccess": true,
@@ -188,5 +199,10 @@
     "pr-merge": true,
     "Plan": true,
     "tutorial": true
+  },
+  "terminal.integrated.env.linux": {
+    "TMPDIR": "${workspaceFolder}/.tmp",
+    "TMP": "${workspaceFolder}/.tmp",
+    "TEMP": "${workspaceFolder}/.tmp"
   }
 }
