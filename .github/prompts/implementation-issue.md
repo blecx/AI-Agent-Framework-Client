@@ -36,6 +36,12 @@ Create a detailed implementation issue for the AI-Agent-Framework-Client with th
 - Types/interfaces needed: [List TypeScript types to add/modify]
 - Error handling: [How to handle errors]
 
+### Docs Grounding (MCP + Context7)
+- Libraries/frameworks in scope: [e.g., React, Vite, React Router]
+- Use Context7 docs for external framework/API correctness
+- Use repository conventions for component boundaries and architecture
+- Record assumptions when package version behavior is unclear
+
 ### Cross-Repo Dependencies
 - [ ] No backend API changes needed
 - OR
@@ -57,6 +63,7 @@ Create a detailed implementation issue for the AI-Agent-Framework-Client with th
 - [ ] No console errors in browser
 - [ ] Feature works as expected in browser
 - [ ] Error cases handled gracefully
+- [ ] Framework/API usage validated against Context7-backed docs
 
 ### Related Issues
 - Depends on: #[issue number]
