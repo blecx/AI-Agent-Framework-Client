@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import apiClient from "../services/apiClient";
@@ -14,6 +14,7 @@ import "./ProjectList.css";
 export default function ProjectList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const toast = useToast();
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -23,6 +24,9 @@ export default function ProjectList() {
     description: "",
   });
   const [error, setError] = useState<string | null>(null);
+
+  const shouldShowCreateFromQuery = searchParams.get("create") === "1";
+  const isCreateFormOpen = showCreateForm || shouldShowCreateFromQuery;
 
   // Fetch projects
   const {
@@ -77,6 +81,9 @@ export default function ProjectList() {
       setShowCreateForm(false);
       setNewProject({ key: "", name: "", description: "" });
       setError(null);
+      if (shouldShowCreateFromQuery) {
+        setSearchParams({});
+      }
       toast.showSuccess(t("projects.list.toast.created"));
     },
     onError: (error: Error) => {
@@ -188,9 +195,14 @@ export default function ProjectList() {
         <Button
           variant="primary"
           data-testid="create-project-button"
-          onClick={() => setShowCreateForm(!showCreateForm)}
+          onClick={() => {
+            setShowCreateForm(!isCreateFormOpen);
+            if (isCreateFormOpen && shouldShowCreateFromQuery) {
+              setSearchParams({});
+            }
+          }}
         >
-          {showCreateForm
+          {isCreateFormOpen
             ? t("projects.create.cta.cancel")
             : t("projects.list.cta.new")}
         </Button>
@@ -198,7 +210,7 @@ export default function ProjectList() {
 
       {error && <div className="error-message">{error}</div>}
 
-      {showCreateForm && (
+      {isCreateFormOpen && (
         <div className="create-project-form" data-testid="create-project-form">
           <h2>{t("projects.create.title")}</h2>
           <form onSubmit={handleCreateProject}>
@@ -262,6 +274,9 @@ export default function ProjectList() {
                 onClick={() => {
                   setShowCreateForm(false);
                   setError(null);
+                  if (shouldShowCreateFromQuery) {
+                    setSearchParams({});
+                  }
                 }}
               >
                 {t("projects.create.cta.cancel")}
