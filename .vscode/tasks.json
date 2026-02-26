@@ -2,12 +2,12 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "⚙️ Auto: Apply Low Approval (Shared Root)",
+      "label": "⚙️ Auto: Apply Safe Approval (Shared Root)",
       "type": "shell",
       "command": "bash",
       "args": [
         "-lc",
-        "if [ -x ../../scripts/setup-low-approval.sh ]; then ../../scripts/setup-low-approval.sh; else echo 'setup-low-approval.sh not found at ../../scripts'; fi"
+        "if [ -x ../../scripts/setup-low-approval.sh ]; then ../../scripts/setup-low-approval.sh safe; else echo 'setup-low-approval.sh not found at ../../scripts'; fi"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
