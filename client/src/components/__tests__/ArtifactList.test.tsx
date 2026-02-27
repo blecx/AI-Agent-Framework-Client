@@ -192,7 +192,7 @@ describe("ArtifactList", () => {
     expect(mockOnCreateNew).toHaveBeenCalledTimes(1);
   });
 
-  it("calls onSelectArtifact when artifact row is clicked", async () => {
+  it("calls onSelectArtifact when artifact button is clicked", async () => {
     const mockOnSelectArtifact = vi.fn();
     vi.spyOn(ArtifactApiClient.prototype, "listArtifacts").mockResolvedValue(
       mockArtifacts,
@@ -210,8 +210,8 @@ describe("ArtifactList", () => {
       expect(screen.getByText("charter.md")).toBeInTheDocument();
     });
 
-    const charterRow = screen.getByText("charter.md").closest("tr");
-    await user.click(charterRow!);
+    const charterButton = screen.getByRole("button", { name: "charter.md" });
+    await user.click(charterButton);
 
     expect(mockOnSelectArtifact).toHaveBeenCalledTimes(1);
     expect(mockOnSelectArtifact).toHaveBeenCalledWith(mockArtifacts[0]);
@@ -249,7 +249,7 @@ describe("ArtifactList", () => {
       expect(screen.getByText("charter.md")).toBeInTheDocument();
     });
 
-    const nameHeader = screen.getByText(/Name/);
+    const nameHeader = screen.getByRole("button", { name: /name/i });
 
     // First click - already sorted asc by default, should toggle to desc
     await user.click(nameHeader);
@@ -274,7 +274,7 @@ describe("ArtifactList", () => {
       expect(screen.getByText("charter.md")).toBeInTheDocument();
     });
 
-    const dateHeader = screen.getByText(/Last Modified/);
+    const dateHeader = screen.getByRole("button", { name: /last modified/i });
     await user.click(dateHeader);
 
     const rows = screen.getAllByRole("row");
@@ -342,6 +342,7 @@ describe("ArtifactList", () => {
       name: /artifacts\/planning/i,
     });
     expect(planningToggle).toHaveAttribute("aria-expanded", "true");
+    expect(planningToggle).toHaveAttribute("aria-controls");
     await user.click(planningToggle);
     expect(planningToggle).toHaveAttribute("aria-expanded", "false");
   });

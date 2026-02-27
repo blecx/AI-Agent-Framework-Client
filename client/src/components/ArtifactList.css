@@ -13,6 +13,18 @@
   margin-bottom: 2rem;
 }
 
+@media (max-width: 520px) {
+  .artifact-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .btn-create-artifact {
+    width: 100%;
+  }
+}
+
 .artifact-list-toolbar {
   margin-bottom: 1rem;
 }
@@ -27,9 +39,9 @@
 }
 
 .artifact-search-input:focus {
-  outline: 2px solid #80bdff;
+  outline: 2px solid #2563eb;
   outline-offset: 1px;
-  border-color: #80bdff;
+  border-color: #2563eb;
 }
 
 .artifact-list-header h2 {
@@ -47,6 +59,16 @@
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s;
+}
+
+.btn-create-artifact:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.btn-create-artifact:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-create-artifact:hover {
@@ -96,6 +118,11 @@
   cursor: pointer;
   font-size: 0.95rem;
   text-align: left;
+}
+
+.artifact-group-toggle:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
 }
 
 .artifact-group-toggle:hover {
@@ -153,6 +180,12 @@
   overflow: hidden;
 }
 
+.artifact-list-table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
 .artifact-list-table thead {
   background-color: #f8f9fa;
   border-bottom: 2px solid #dee2e6;
@@ -169,12 +202,26 @@
 }
 
 .artifact-list-table th.sortable {
-  cursor: pointer;
   user-select: none;
 }
 
 .artifact-list-table th.sortable:hover {
   background-color: #e9ecef;
+}
+
+.artifact-sort-button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.artifact-sort-button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }
 
 .artifact-list-table tbody tr {
@@ -184,10 +231,6 @@
 
 .artifact-list-table tbody tr:last-child {
   border-bottom: none;
-}
-
-.artifact-row {
-  cursor: pointer;
 }
 
 .artifact-row:hover {
@@ -202,6 +245,24 @@
 .artifact-name {
   font-weight: 500;
   color: #007bff;
+}
+
+.artifact-open-button {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.artifact-open-button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }
 
 .artifact-path {

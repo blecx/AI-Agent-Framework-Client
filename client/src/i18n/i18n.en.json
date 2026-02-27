@@ -142,7 +142,7 @@
       "artifacts": {
         "title": "Artifacts",
         "summary": "Structured ISO 21500 deliverables.",
-        "content": "Artifacts represent key project outputs such as charter, WBS, RAID, and schedules, with lifecycle states and review gates."
+        "content": "Artifacts represent key project outputs such as charter, WBS, RAID, and schedules, with lifecycle states and review gates. Keyboard navigation: use Tab to reach group toggles and sort buttons; press Enter/Space to toggle; press Enter to open an artifact."
       },
       "raid": {
         "title": "RAID Log",
