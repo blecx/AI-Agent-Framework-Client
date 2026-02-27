@@ -6,6 +6,7 @@ import apiClient from '../services/apiClient';
 import type { RAIDItem, RAIDType, RAIDStatus, RAIDPriority } from '../types';
 import EmptyState from './ui/EmptyState';
 import { Button } from './ui/Button';
+import OwnerAvatar from './ui/OwnerAvatar';
 import { TypeBadge, StatusBadge, PriorityBadge } from './raid/RAIDBadge';
 import { RAIDFilters, type RAIDFiltersState } from './raid/RAIDFilters';
 import { RAIDCreateModal } from './raid/RAIDCreateModal';
@@ -310,7 +311,12 @@ export default function RAIDList({ projectKey }: RAIDListProps) {
                   <td>
                     <PriorityBadge value={item.priority} size="sm" />
                   </td>
-                  <td>{item.owner}</td>
+                  <td className="raid-owner-cell">
+                    <OwnerAvatar
+                      owner={item.owner}
+                      avatarUrl={item.owner_avatar_url}
+                    />
+                  </td>
                   <td className="raid-date">{formatDate(item.created_at)}</td>
                 </tr>
               ))}

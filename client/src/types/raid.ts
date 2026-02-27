@@ -77,6 +77,8 @@ export interface RAIDItem {
   status: RAIDStatus;
   /** Owner/assignee */
   owner: string;
+  /** Optional avatar URL for owner */
+  owner_avatar_url?: string | null;
   /** Priority/severity */
   priority: RAIDPriority;
   /** Impact level (primarily for risks) */

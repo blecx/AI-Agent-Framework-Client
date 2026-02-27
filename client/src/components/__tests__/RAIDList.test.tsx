@@ -84,6 +84,7 @@ describe('RAIDList', () => {
     title: 'Security Risk',
     description: 'Potential security vulnerability',
     owner: 'john@example.com',
+    owner_avatar_url: 'https://github.com/john.png',
     created_at: '2026-02-01T10:00:00Z',
     updated_at: '2026-02-01T10:00:00Z',
     created_by: 'admin',
@@ -105,6 +106,7 @@ describe('RAIDList', () => {
     title: 'Resource Assumption',
     description: 'Assuming team availability',
     owner: 'jane@example.com',
+    owner_avatar_url: null,
     created_at: '2026-01-28T10:00:00Z',
     updated_at: '2026-01-28T10:00:00Z',
     created_by: 'admin',
@@ -126,6 +128,7 @@ describe('RAIDList', () => {
     title: 'Minor Bug',
     description: 'Low priority issue',
     owner: 'john@example.com',
+    owner_avatar_url: null,
     created_at: '2026-01-25T10:00:00Z',
     updated_at: '2026-02-01T10:00:00Z',
     created_by: 'admin',
@@ -338,6 +341,75 @@ describe('RAIDList', () => {
       await waitFor(() => {
         // Table doesn't have "Owner:" label, just displays email in Owner column
         expect(screen.getByText('john@example.com')).toBeInTheDocument();
+      });
+    });
+
+    it('should render owner avatar image when owner_avatar_url is present', async () => {
+      (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
+        success: true,
+        data: { items: [mockRiskItem], total: 1 },
+      });
+
+      const { container } = renderWithProviders(<RAIDList projectKey="TEST-123" />);
+
+      await waitFor(() => {
+        const avatarImage = container.querySelector(
+          'img.owner-avatar[src="https://github.com/john.png"]'
+        );
+        expect(avatarImage).toBeInTheDocument();
+      });
+    });
+
+    it('should render initials fallback when avatar URL is missing', async () => {
+      (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
+        success: true,
+        data: { items: [mockAssumptionItem], total: 1 },
+      });
+
+      const { container } = renderWithProviders(<RAIDList projectKey="TEST-123" />);
+
+      await waitFor(() => {
+        const fallback = container.querySelector('.owner-avatar-fallback');
+        expect(fallback).toBeInTheDocument();
+        expect(fallback).toHaveTextContent('JA');
+      });
+    });
+
+    it('should render Unassigned fallback for missing owner', async () => {
+      const unassignedItem: RAIDItem = {
+        ...mockAssumptionItem,
+        id: 'raid-unassigned',
+        owner: '',
+        owner_avatar_url: null,
+      };
+
+      (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
+        success: true,
+        data: { items: [unassignedItem], total: 1 },
+      });
+
+      renderWithProviders(<RAIDList projectKey="TEST-123" />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Unassigned')).toBeInTheDocument();
+      });
+    });
+
+    it('should not add extra focusable elements to owner cell', async () => {
+      (apiClient.listRAIDItems as ReturnType<typeof vi.fn>).mockResolvedValue({
+        success: true,
+        data: { items: [mockRiskItem], total: 1 },
+      });
+
+      const { container } = renderWithProviders(<RAIDList projectKey="TEST-123" />);
+
+      await waitFor(() => {
+        const ownerCell = container.querySelector('.raid-owner-cell');
+        expect(ownerCell).toBeInTheDocument();
+        const focusable = ownerCell?.querySelectorAll(
+          'button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        expect(focusable?.length).toBe(0);
       });
     });
 

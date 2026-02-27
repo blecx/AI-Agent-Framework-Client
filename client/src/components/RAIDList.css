@@ -96,6 +96,10 @@
   font-size: 0.875rem;
 }
 
+.raid-owner-cell {
+  white-space: nowrap;
+}
+
 /* Type badges */
 .type-badge {
   display: inline-block;
