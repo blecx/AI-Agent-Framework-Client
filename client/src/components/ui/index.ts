@@ -28,3 +28,6 @@ export type { LoadingSpinnerProps } from './LoadingSpinner';
 export { default as EmptyState } from './EmptyState';
 
 export { default as Skeleton, SkeletonProjectCard } from './Skeleton';
+
+export { default as OwnerAvatar } from './OwnerAvatar';
+export { getOwnerInitials } from './ownerAvatarUtils';
