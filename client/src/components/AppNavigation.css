@@ -92,6 +92,13 @@
   background: #f3f4f6;
 }
 
+.app-nav__api-link:focus-visible,
+.app-nav__api-refresh:focus-visible,
+.app-nav__api-settings:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+
 .app-nav__api-refresh,
 .app-nav__api-settings {
   cursor: pointer;
@@ -223,6 +230,10 @@
 
 .app-nav__label {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .app-nav__label-group {
@@ -395,6 +406,23 @@
   .app-main {
     margin-left: 0;
     padding-top: 4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-nav {
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  .app-nav__api-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-nav__scope-badge {
+    font-size: 0.58rem;
+    padding: 0.14rem 0.3rem;
   }
 }
 

@@ -205,4 +205,27 @@ describe("AppNavigation", () => {
     expect(projectsLink).toHaveTextContent("GLB");
     expect(artifactLink).toHaveTextContent("PRJ");
   });
+
+  it("supports Home/End keyboard navigation across focusable nav controls", () => {
+    render(
+      <MemoryRouter initialEntries={["/projects/alpha-proj/artifacts"]}>
+        <AppNavigation connectionState="online" />
+      </MemoryRouter>,
+    );
+
+    const nav = screen.getByRole("navigation", { name: "Main navigation" });
+    const projectsButton = screen.getByRole("button", { name: /Projects/i });
+
+    projectsButton.focus();
+    fireEvent.keyDown(nav, { key: "End" });
+
+    const focusables = Array.from(
+      nav.querySelectorAll<HTMLElement>('[data-nav-focusable="true"]'),
+    );
+
+    expect(document.activeElement).toBe(focusables[focusables.length - 1]);
+
+    fireEvent.keyDown(nav, { key: "Home" });
+    expect(document.activeElement).toBe(focusables[0]);
+  });
 });

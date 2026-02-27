@@ -59,6 +59,9 @@ This client implements a **hybrid approach** combining AI-guided artifact creati
 - Collapsible navigation sections expose `aria-expanded` and `aria-controls` on toggle buttons.
 - Artifact group controls preserve accessible expand/collapse semantics and clear focus-visible states.
 - Navigation and grouping motion polish includes `prefers-reduced-motion` fallbacks.
+- Sidebar keyboard flow supports `ArrowUp`/`ArrowDown` plus `Home`/`End` for deterministic traversal across focusable navigation controls (`data-nav-focusable="true"`).
+- At `max-width: 480px`, the sidebar expands to full viewport width, utility actions reflow to a compact two-column layout, and scope badges are reduced to prevent clipping.
+- Keyboard traversal behavior is covered by focused navigation tests in `src/components/AppNavigation.test.tsx`.
 
 ## 🛠️ Tech Stack
 
