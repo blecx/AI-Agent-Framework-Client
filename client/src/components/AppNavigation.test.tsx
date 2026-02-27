@@ -15,11 +15,19 @@ vi.mock("react-i18next", () => ({
         "projects.list.cta.new": "Create Project",
         "nav.projects": "Projects",
         "nav.sections.projects": "Projects",
+        "nav.sections.currentProject": "Current Project",
         "nav.sections.create": "Create",
         "nav.sections.manage": "Manage",
         "nav.commands": "Commands",
         "nav.apiTester": "API Tester",
         "nav.uiLibrary": "UI Library",
+        "nav.artifactBuilder": "Artifact Builder",
+        "nav.readinessBuilder": "Readiness Builder",
+        "nav.raid": "RAID",
+        "projectView.tabs.proposeChanges": "Propose Changes",
+        "projectView.tabs.applyProposals": "Apply Proposals",
+        "projectView.tabs.audit": "Audit",
+        "ac.title": "Assisted Creation",
         "nav.helpAvailable": "Help is available for this feature",
       })[key] ?? key,
   }),
@@ -121,5 +129,80 @@ describe("AppNavigation", () => {
     expect(
       screen.queryByText(/Open a project to assess readiness/i),
     ).not.toBeInTheDocument();
+  });
+
+  it("renders deterministic section and project item order", () => {
+    render(
+      <MemoryRouter initialEntries={["/projects/alpha-proj/audit"]}>
+        <AppNavigation connectionState="online" />
+      </MemoryRouter>,
+    );
+
+    const projectsButton = screen.getByRole("button", { name: /Projects/i });
+    const currentProjectButton = screen.getByRole("button", {
+      name: /Current Project/i,
+    });
+    const createButton = screen.getByRole("button", { name: /Create/i });
+    const manageButton = screen.getByRole("button", { name: /Manage/i });
+
+    expect(
+      projectsButton.compareDocumentPosition(currentProjectButton) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      currentProjectButton.compareDocumentPosition(createButton) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      createButton.compareDocumentPosition(manageButton) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+
+    const artifactLink = screen.getByRole("link", { name: "Artifact Builder" });
+    const assistedLink = screen.getByRole("link", { name: "Assisted Creation" });
+    const readinessLink = screen.getByRole("link", { name: "Readiness Builder" });
+    const proposeLink = screen.getByRole("link", { name: "Propose Changes" });
+    const applyLink = screen.getByRole("link", { name: "Apply Proposals" });
+    const raidLink = screen.getByRole("link", { name: "RAID" });
+    const auditLink = screen.getByRole("link", { name: "Audit" });
+
+    expect(
+      artifactLink.compareDocumentPosition(assistedLink) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      assistedLink.compareDocumentPosition(readinessLink) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      readinessLink.compareDocumentPosition(proposeLink) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      proposeLink.compareDocumentPosition(applyLink) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      applyLink.compareDocumentPosition(raidLink) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      raidLink.compareDocumentPosition(auditLink) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("shows scope markers for global and project scoped entries", () => {
+    render(
+      <MemoryRouter initialEntries={["/projects/alpha-proj/artifacts"]}>
+        <AppNavigation connectionState="online" />
+      </MemoryRouter>,
+    );
+
+    const projectsLink = screen.getByRole("link", { name: "Projects" });
+    const artifactLink = screen.getByRole("link", { name: "Artifact Builder" });
+
+    expect(projectsLink).toHaveTextContent("GLB");
+    expect(artifactLink).toHaveTextContent("PRJ");
   });
 });
