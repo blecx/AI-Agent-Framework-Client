@@ -409,6 +409,23 @@
   }
 }
 
+@media (max-width: 480px) {
+  .app-nav {
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  .app-nav__api-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-nav__scope-badge {
+    font-size: 0.58rem;
+    padding: 0.14rem 0.3rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .app-nav,
   .app-nav__item,

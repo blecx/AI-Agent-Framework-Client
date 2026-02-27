@@ -301,13 +301,30 @@ export default function AppNavigation({
   }, [isMobileOpen]);
 
   const onArrowNavigate: KeyboardEventHandler<HTMLElement> = (event) => {
-    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') {
+    if (
+      event.key !== 'ArrowDown' &&
+      event.key !== 'ArrowUp' &&
+      event.key !== 'Home' &&
+      event.key !== 'End'
+    ) {
       return;
     }
 
     const focusables = getNavFocusables();
 
     if (focusables.length === 0) {
+      return;
+    }
+
+    if (event.key === 'Home') {
+      event.preventDefault();
+      focusables[0]?.focus();
+      return;
+    }
+
+    if (event.key === 'End') {
+      event.preventDefault();
+      focusables[focusables.length - 1]?.focus();
       return;
     }
 
