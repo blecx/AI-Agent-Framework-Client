@@ -183,6 +183,22 @@
   margin-left: 0.4rem;
 }
 
+.app-nav__item--scope-global {
+  border-left: 2px solid transparent;
+}
+
+.app-nav__item--scope-project {
+  border-left: 2px solid #4f46e5;
+}
+
+.app-nav__item--state-inactive {
+  opacity: 0.96;
+}
+
+.app-nav__item--state-active {
+  opacity: 1;
+}
+
 .app-nav__item--primary {
   background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);
   color: #ffffff;
@@ -212,8 +228,29 @@
 .app-nav__label-group {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
   min-width: 0;
+}
+
+.app-nav__scope-badge {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  line-height: 1;
+  border-radius: 9999px;
+  padding: 0.18rem 0.35rem;
+  font-weight: 700;
+}
+
+.app-nav__scope-badge--global {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.app-nav__scope-badge--project {
+  background: #e0e7ff;
+  color: #3730a3;
 }
 
 .app-nav__hint {

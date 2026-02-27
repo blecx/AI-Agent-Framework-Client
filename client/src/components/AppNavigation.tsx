@@ -16,6 +16,8 @@ interface NavItem {
   key: string;
   labelKey: string;
   path: string;
+  order: number;
+  scope: 'global' | 'project';
   primary?: boolean;
   helpAvailable?: boolean;
   helpPath?: string;
@@ -24,6 +26,7 @@ interface NavItem {
 interface NavSection {
   key: string;
   labelKey: string;
+  order: number;
   items: NavItem[];
 }
 
@@ -31,6 +34,171 @@ interface AppNavigationProps {
   connectionState: ConnectionState;
   onRetryConnection?: () => void;
 }
+
+const sortNavItems = (items: NavItem[]): NavItem[] =>
+  [...items].sort((left, right) => {
+    if (left.order !== right.order) {
+      return left.order - right.order;
+    }
+    return left.key.localeCompare(right.key);
+  });
+
+const sortNavSections = (sections: NavSection[]): NavSection[] =>
+  [...sections]
+    .sort((left, right) => {
+      if (left.order !== right.order) {
+        return left.order - right.order;
+      }
+      return left.key.localeCompare(right.key);
+    })
+    .map((section) => ({
+      ...section,
+      items: sortNavItems(section.items),
+    }));
+
+const buildSections = (currentProjectKey: string | null): NavSection[] => {
+  const sectionList: NavSection[] = [
+    {
+      key: 'primary',
+      labelKey: '',
+      order: 0,
+      items: [
+        {
+          key: 'create-project',
+          labelKey: 'projects.list.cta.new',
+          path: '/projects?create=1',
+          order: 0,
+          scope: 'global',
+          primary: true,
+        },
+        {
+          key: 'guided-builder',
+          labelKey: 'nav.guidedBuilder',
+          path: '/guided-builder',
+          order: 1,
+          scope: 'global',
+          helpAvailable: true,
+          helpPath: '/help/guided-builder',
+        },
+      ],
+    },
+    {
+      key: 'projects',
+      labelKey: 'nav.sections.projects',
+      order: 1,
+      items: [
+        {
+          key: 'projects',
+          labelKey: 'nav.projects',
+          path: '/projects',
+          order: 0,
+          scope: 'global',
+        },
+      ],
+    },
+  ];
+
+  if (currentProjectKey) {
+    sectionList.push({
+      key: 'current-project',
+      labelKey: 'nav.sections.currentProject',
+      order: 2,
+      items: [
+        {
+          key: 'project-artifacts',
+          labelKey: 'nav.artifactBuilder',
+          path: `/projects/${currentProjectKey}/artifacts`,
+          order: 0,
+          scope: 'project',
+        },
+        {
+          key: 'project-assisted-creation',
+          labelKey: 'ac.title',
+          path: `/projects/${currentProjectKey}/assisted-creation`,
+          order: 1,
+          scope: 'project',
+        },
+        {
+          key: 'project-readiness',
+          labelKey: 'nav.readinessBuilder',
+          path: `/projects/${currentProjectKey}/readiness`,
+          order: 2,
+          scope: 'project',
+        },
+        {
+          key: 'project-propose',
+          labelKey: 'projectView.tabs.proposeChanges',
+          path: `/projects/${currentProjectKey}/propose`,
+          order: 3,
+          scope: 'project',
+        },
+        {
+          key: 'project-apply',
+          labelKey: 'projectView.tabs.applyProposals',
+          path: `/projects/${currentProjectKey}/apply`,
+          order: 4,
+          scope: 'project',
+        },
+        {
+          key: 'project-raid',
+          labelKey: 'nav.raid',
+          path: `/projects/${currentProjectKey}/raid`,
+          order: 5,
+          scope: 'project',
+        },
+        {
+          key: 'project-audit',
+          labelKey: 'projectView.tabs.audit',
+          path: `/projects/${currentProjectKey}/audit`,
+          order: 6,
+          scope: 'project',
+        },
+      ],
+    });
+  }
+
+  sectionList.push(
+    {
+      key: 'create',
+      labelKey: 'nav.sections.create',
+      order: 3,
+      items: [
+        {
+          key: 'commands',
+          labelKey: 'nav.commands',
+          path: '/commands',
+          order: 0,
+          scope: 'global',
+          helpAvailable: true,
+          helpPath: '/help/workflows',
+        },
+      ],
+    },
+    {
+      key: 'manage',
+      labelKey: 'nav.sections.manage',
+      order: 4,
+      items: [
+        {
+          key: 'api-tester',
+          labelKey: 'nav.apiTester',
+          path: '/api-tester',
+          order: 0,
+          scope: 'global',
+        },
+        {
+          key: 'ui-library',
+          labelKey: 'nav.uiLibrary',
+          path: '/ui',
+          order: 1,
+          scope: 'global',
+        },
+      ],
+    },
+  );
+
+  return sortNavSections(sectionList);
+};
 
 export default function AppNavigation({
   connectionState,
@@ -64,121 +232,7 @@ export default function AppNavigation({
     return match ? decodeURIComponent(match[1]) : null;
   }, [location.pathname]);
 
-  const sections: NavSection[] = useMemo(
-    () => {
-      const sectionList: NavSection[] = [
-        {
-          key: 'primary',
-          labelKey: '',
-          items: [
-            {
-              key: 'create-project',
-              labelKey: 'projects.list.cta.new',
-              path: '/projects?create=1',
-              primary: true,
-            },
-            {
-              key: 'guided-builder',
-              labelKey: 'nav.guidedBuilder',
-              path: '/guided-builder',
-              helpAvailable: true,
-              helpPath: '/help/guided-builder',
-            },
-          ],
-        },
-        {
-          key: 'projects',
-          labelKey: 'nav.sections.projects',
-          items: [
-            {
-              key: 'projects',
-              labelKey: 'nav.projects',
-              path: '/projects',
-            },
-          ],
-        },
-      ];
-
-      if (currentProjectKey) {
-        sectionList.push({
-          key: 'current-project',
-          labelKey: 'nav.sections.currentProject',
-          items: [
-            {
-              key: 'project-artifacts',
-              labelKey: 'nav.artifactBuilder',
-              path: `/projects/${currentProjectKey}/artifacts`,
-            },
-            {
-              key: 'project-assisted-creation',
-              labelKey: 'ac.title',
-              path: `/projects/${currentProjectKey}/assisted-creation`,
-            },
-            {
-              key: 'project-readiness',
-              labelKey: 'nav.readinessBuilder',
-              path: `/projects/${currentProjectKey}/readiness`,
-            },
-            {
-              key: 'project-propose',
-              labelKey: 'projectView.tabs.proposeChanges',
-              path: `/projects/${currentProjectKey}/propose`,
-            },
-            {
-              key: 'project-apply',
-              labelKey: 'projectView.tabs.applyProposals',
-              path: `/projects/${currentProjectKey}/apply`,
-            },
-            {
-              key: 'project-raid',
-              labelKey: 'nav.raid',
-              path: `/projects/${currentProjectKey}/raid`,
-            },
-            {
-              key: 'project-audit',
-              labelKey: 'projectView.tabs.audit',
-              path: `/projects/${currentProjectKey}/audit`,
-            },
-          ],
-        });
-      }
-
-      sectionList.push(
-        {
-          key: 'create',
-          labelKey: 'nav.sections.create',
-          items: [
-            {
-              key: 'commands',
-              labelKey: 'nav.commands',
-              path: '/commands',
-              helpAvailable: true,
-              helpPath: '/help/workflows',
-            },
-          ],
-        },
-        {
-          key: 'manage',
-          labelKey: 'nav.sections.manage',
-          items: [
-            {
-              key: 'api-tester',
-              labelKey: 'nav.apiTester',
-              path: '/api-tester',
-            },
-            {
-              key: 'ui-library',
-              labelKey: 'nav.uiLibrary',
-              path: '/ui',
-            },
-          ],
-        },
-      );
-
-      return sectionList;
-    },
-    [currentProjectKey],
-  );
+  const sections: NavSection[] = useMemo(() => buildSections(currentProjectKey), [currentProjectKey]);
 
   const closeMobile = () => setIsMobileOpen(false);
 
@@ -368,6 +422,10 @@ export default function AppNavigation({
                             item.primary
                               ? 'app-nav__item--primary'
                               : 'app-nav__item--secondary',
+                            `app-nav__item--scope-${item.scope}`,
+                            isActive
+                              ? 'app-nav__item--state-active'
+                              : 'app-nav__item--state-inactive',
                             isActive ? 'app-nav__item--active' : '',
                           ]
                             .filter(Boolean)
@@ -378,6 +436,9 @@ export default function AppNavigation({
                       >
                         <span className="app-nav__label-group">
                           <span className="app-nav__label">{t(item.labelKey)}</span>
+                          <span className={`app-nav__scope-badge app-nav__scope-badge--${item.scope}`} aria-hidden="true">
+                            {item.scope === 'project' ? 'PRJ' : 'GLB'}
+                          </span>
                         </span>
                       </NavLink>
                       {item.helpAvailable && item.helpPath && (
