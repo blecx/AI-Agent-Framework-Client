@@ -22,6 +22,43 @@ interface ArtifactListProps {
 type SortField = "name" | "date";
 type SortDirection = "asc" | "desc";
 
+const EXTENSION_ICON_MAP: Record<string, string> = {
+  md: "📝",
+  markdown: "📝",
+  txt: "📄",
+  pdf: "📕",
+  doc: "📘",
+  docx: "📘",
+  xls: "📊",
+  xlsx: "📊",
+  csv: "📈",
+  ppt: "📽",
+  pptx: "📽",
+  json: "🧩",
+  yml: "⚙",
+  yaml: "⚙",
+  xml: "🧾",
+};
+
+function getArtifactIcon(artifact: Artifact): string {
+  const extensionFromName = artifact.name.split(".").pop()?.toLowerCase();
+  if (extensionFromName && EXTENSION_ICON_MAP[extensionFromName]) {
+    return EXTENSION_ICON_MAP[extensionFromName];
+  }
+
+  const extensionFromPath = artifact.path.split(".").pop()?.toLowerCase();
+  if (extensionFromPath && EXTENSION_ICON_MAP[extensionFromPath]) {
+    return EXTENSION_ICON_MAP[extensionFromPath];
+  }
+
+  const extensionFromType = artifact.type.toLowerCase();
+  if (EXTENSION_ICON_MAP[extensionFromType]) {
+    return EXTENSION_ICON_MAP[extensionFromType];
+  }
+
+  return "📄";
+}
+
 function toSafeDomId(value: string) {
   const normalized = value
     .toLowerCase()
@@ -392,7 +429,10 @@ export const ArtifactList: React.FC<ArtifactListProps> = ({
                                   onClick={() => handleArtifactClick(artifact)}
                                   disabled={!onSelectArtifact}
                                 >
-                                  {artifact.name}
+                                  <span className="artifact-file-icon" aria-hidden="true">
+                                    {getArtifactIcon(artifact)}
+                                  </span>{" "}
+                                  <span className="artifact-file-name">{artifact.name}</span>
                                 </button>
                               </td>
                               <td>{artifact.type}</td>

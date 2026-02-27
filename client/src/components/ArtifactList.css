@@ -265,6 +265,12 @@
   outline-offset: 2px;
 }
 
+.artifact-file-icon {
+  display: inline-flex;
+  width: 1.1rem;
+  justify-content: center;
+}
+
 .artifact-path {
   font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Menlo, monospace;
   color: #334155;

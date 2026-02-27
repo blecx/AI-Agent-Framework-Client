@@ -232,7 +232,11 @@ describe("ArtifactList", () => {
     // Skip header row (index 0)
     const artifactNames = rows
       .slice(1)
-      .map((row) => within(row).getAllByRole("cell")[1].textContent);
+      .map((row) => {
+        const cell = within(row).getAllByRole("cell")[1];
+        const label = cell.querySelector(".artifact-file-name");
+        return label?.textContent ?? "";
+      });
 
     expect(artifactNames).toEqual(["charter.md", "raid.md", "wbs.md"]);
   });
@@ -257,7 +261,11 @@ describe("ArtifactList", () => {
     const rows = screen.getAllByRole("row");
     const artifactNames = rows
       .slice(1)
-      .map((row) => within(row).getAllByRole("cell")[1].textContent);
+      .map((row) => {
+        const cell = within(row).getAllByRole("cell")[1];
+        const label = cell.querySelector(".artifact-file-name");
+        return label?.textContent ?? "";
+      });
 
     expect(artifactNames).toEqual(["wbs.md", "raid.md", "charter.md"]);
   });
@@ -280,7 +288,11 @@ describe("ArtifactList", () => {
     const rows = screen.getAllByRole("row");
     const artifactNames = rows
       .slice(1)
-      .map((row) => within(row).getAllByRole("cell")[1].textContent);
+      .map((row) => {
+        const cell = within(row).getAllByRole("cell")[1];
+        const label = cell.querySelector(".artifact-file-name");
+        return label?.textContent ?? "";
+      });
 
     // Sorted by date ascending: wbs (Jan 10) -> charter (Jan 15) -> raid (Jan 20)
     expect(artifactNames).toEqual(["wbs.md", "charter.md", "raid.md"]);
@@ -405,5 +417,46 @@ describe("ArtifactList", () => {
 
     const mdTypes = screen.getAllByText("md");
     expect(mdTypes.length).toBe(3); // All test artifacts are .md files
+  });
+
+  it("renders deterministic icons based on file extension", async () => {
+    const artifactsWithExtensions: Artifact[] = [
+      {
+        path: "artifacts/project-plan.pdf",
+        name: "project-plan.pdf",
+        type: "pdf",
+        versions: [{ version: "current", date: "2026-01-15T10:00:00Z" }],
+      },
+      {
+        path: "artifacts/schedule.xlsx",
+        name: "schedule.xlsx",
+        type: "xlsx",
+        versions: [{ version: "current", date: "2026-01-20T12:00:00Z" }],
+      },
+      {
+        path: "artifacts/notes.custom",
+        name: "notes.custom",
+        type: "custom",
+        versions: [{ version: "current", date: "2026-01-22T08:00:00Z" }],
+      },
+    ];
+
+    vi.spyOn(ArtifactApiClient.prototype, "listArtifacts").mockResolvedValue(
+      artifactsWithExtensions,
+    );
+
+    render(<ArtifactList projectKey={mockProjectKey} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("project-plan.pdf")).toBeInTheDocument();
+    });
+
+    const pdfRow = screen.getByText("project-plan.pdf").closest("tr");
+    const xlsxRow = screen.getByText("schedule.xlsx").closest("tr");
+    const fallbackRow = screen.getByText("notes.custom").closest("tr");
+
+    expect(within(pdfRow!).getByText("📕")).toBeInTheDocument();
+    expect(within(xlsxRow!).getByText("📊")).toBeInTheDocument();
+    expect(within(fallbackRow!).getByText("📄")).toBeInTheDocument();
   });
 });
