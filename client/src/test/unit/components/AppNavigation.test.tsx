@@ -183,4 +183,60 @@ describe('AppNavigation', () => {
     fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
     expect(document.activeElement).toBe(last);
   });
+
+  it('supports Home and End key navigation across nav focusables', () => {
+    render(
+      <MemoryRouter initialEntries={['/projects/TEST-123/readiness']}>
+        <AppNavigation connectionState="online" />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open navigation menu' }));
+
+    const focusables = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-nav-focusable="true"]'),
+    );
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    first.focus();
+    fireEvent.keyDown(first, { key: 'End' });
+    expect(document.activeElement).toBe(last);
+
+    fireEvent.keyDown(last, { key: 'Home' });
+    expect(document.activeElement).toBe(first);
+  });
+
+  it('avoids misleading tree/menu semantics for site navigation', () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/projects/TEST-123/readiness']}>
+        <AppNavigation connectionState="online" />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByRole('tree')).not.toBeInTheDocument();
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    expect(container.querySelector('[aria-level]')).not.toBeInTheDocument();
+    expect(container.querySelector('[aria-posinset]')).not.toBeInTheDocument();
+    expect(container.querySelector('[aria-setsize]')).not.toBeInTheDocument();
+  });
+
+  it('closes mobile drawer from overlay click and restores focus to toggle', () => {
+    render(
+      <MemoryRouter initialEntries={['/projects/TEST-123/readiness']}>
+        <AppNavigation connectionState="online" />
+      </MemoryRouter>,
+    );
+
+    const toggle = screen.getByRole('button', { name: 'Open navigation menu' });
+    fireEvent.click(toggle);
+
+    const overlay = document.querySelector<HTMLButtonElement>('.nav-mobile-overlay');
+    expect(overlay).toBeTruthy();
+    fireEvent.click(overlay as HTMLButtonElement);
+
+    const reopenedToggle = screen.getByRole('button', { name: 'Open navigation menu' });
+    expect(reopenedToggle).toBeInTheDocument();
+    expect(document.activeElement).toBe(reopenedToggle);
+  });
 });
