@@ -84,6 +84,8 @@ describe("AppNavigation", () => {
     const menuToggle = screen.getByRole("button", {
       name: /Open navigation menu/i,
     });
+    expect(menuToggle).toHaveAttribute("aria-controls", "app-navigation");
+    expect(menuToggle).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(menuToggle);
 
     expect(menuToggle).toHaveAttribute("aria-label", "Close navigation menu");
