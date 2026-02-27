@@ -142,7 +142,7 @@
       "artifacts": {
         "title": "Artefakte",
         "summary": "Strukturierte ISO-21500-Lieferobjekte.",
-        "content": "Artefakte repräsentieren zentrale Projektergebnisse wie Auftrag, PSP, RAID und Terminpläne mit Lifecycle-Status und Review-Gates."
+        "content": "Artefakte repräsentieren zentrale Projektergebnisse wie Auftrag, PSP, RAID und Terminpläne mit Lifecycle-Status und Review-Gates. Tastaturnavigation: Mit Tab die Gruppenschalter und Sortier-Buttons erreichen; mit Enter/Leertaste umschalten; mit Enter ein Artefakt öffnen."
       },
       "raid": {
         "title": "RAID-Log",

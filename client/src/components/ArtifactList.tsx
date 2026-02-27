@@ -22,6 +22,33 @@ interface ArtifactListProps {
 type SortField = "name" | "date";
 type SortDirection = "asc" | "desc";
 
+function toSafeDomId(value: string) {
+  const normalized = value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return normalized.length > 0 ? normalized : "root";
+}
+
+function stableIdSuffix(value: string) {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash * 31 + value.charCodeAt(i)) | 0;
+  }
+
+  return Math.abs(hash).toString(36);
+}
+
+function getAriaSort(field: SortField, sortField: SortField, sortDirection: SortDirection) {
+  if (field !== sortField) {
+    return "none";
+  }
+
+  return sortDirection === "asc" ? "ascending" : "descending";
+}
+
 export const ArtifactList: React.FC<ArtifactListProps> = ({
   projectKey,
   onCreateNew,
@@ -220,6 +247,8 @@ export const ArtifactList: React.FC<ArtifactListProps> = ({
           className="btn-create-artifact"
           onClick={onCreateNew}
           aria-label={t("art.list.actions.createNewAria")}
+          type="button"
+          disabled={!onCreateNew}
         >
           {t("art.list.actions.createNew")}
         </button>
@@ -257,13 +286,10 @@ export const ArtifactList: React.FC<ArtifactListProps> = ({
           </button>
         </div>
       ) : (
-        <div
-          className="artifact-explorer"
-          role="tree"
-          aria-label={t("art.list.groups.aria")}
-        >
+        <section className="artifact-explorer" aria-label={t("art.list.groups.aria")}>
           {Object.entries(groupedArtifacts).map(([groupName, groupItems]) => {
             const isExpanded = expandedGroups[groupName] ?? true;
+            const groupContentId = `artifact-group-${toSafeDomId(groupName)}-${stableIdSuffix(groupName)}`;
 
             return (
               <section className="artifact-group" key={groupName}>
@@ -272,6 +298,7 @@ export const ArtifactList: React.FC<ArtifactListProps> = ({
                   className="artifact-group-toggle"
                   onClick={() => toggleGroup(groupName)}
                   aria-expanded={isExpanded}
+                  aria-controls={groupContentId}
                 >
                   <span className="artifact-group-chevron" aria-hidden="true">
                     {isExpanded ? "▾" : "▸"}
@@ -282,86 +309,107 @@ export const ArtifactList: React.FC<ArtifactListProps> = ({
                   </span>
                 </button>
 
-                {isExpanded && (
+                <div
+                  className="artifact-list-table-wrapper"
+                  id={groupContentId}
+                  hidden={!isExpanded}
+                >
                   <table className="artifact-list-table">
-                    <thead>
-                      <tr>
-                        <th
-                          className="artifact-status-col"
-                          title="Audit Status"
-                        >
-                          {t("art.list.columns.status")}
-                        </th>
-                        <th
-                          onClick={() => handleSort("name")}
-                          className="sortable"
-                        >
-                          {t("art.list.columns.name")}{" "}
-                          {sortField === "name" &&
-                            (sortDirection === "asc" ? "↑" : "↓")}
-                        </th>
-                        <th>{t("art.list.columns.type")}</th>
-                        <th>{t("art.list.columns.path")}</th>
-                        <th
-                          onClick={() => handleSort("date")}
-                          className="sortable"
-                        >
-                          {t("art.list.columns.lastModified")}{" "}
-                          {sortField === "date" &&
-                            (sortDirection === "asc" ? "↑" : "↓")}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {groupItems.map((artifact) => {
-                        const auditStatus = auditIssuesMap[artifact.name] || {
-                          hasErrors: false,
-                          hasWarnings: false,
-                        };
-                        const statusIcon = auditStatus.hasErrors
-                          ? "✗"
-                          : auditStatus.hasWarnings
-                            ? "⚠"
-                            : "✓";
-                        const statusClass = auditStatus.hasErrors
-                          ? "error"
-                          : auditStatus.hasWarnings
-                            ? "warning"
-                            : "success";
-                        const statusTitle = auditStatus.hasErrors
-                          ? "Has errors"
-                          : auditStatus.hasWarnings
-                            ? "Has warnings"
-                            : "Complete";
-
-                        return (
-                          <tr
-                            key={artifact.path}
-                            onClick={() => handleArtifactClick(artifact)}
-                            className="artifact-row"
+                      <thead>
+                        <tr>
+                          <th className="artifact-status-col" scope="col">
+                            {t("art.list.columns.status")}
+                          </th>
+                          <th
+                            className="sortable"
+                            scope="col"
+                            aria-sort={getAriaSort("name", sortField, sortDirection)}
                           >
-                            <td
-                              className={`artifact-status artifact-status--${statusClass}`}
-                              title={statusTitle}
+                            <button
+                              type="button"
+                              className="artifact-sort-button"
+                              onClick={() => handleSort("name")}
                             >
-                              {statusIcon}
-                            </td>
-                            <td className="artifact-name">{artifact.name}</td>
-                            <td>{artifact.type}</td>
-                            <td className="artifact-path" title={artifact.path}>
-                              {artifact.path}
-                            </td>
-                            <td>{artifact.versions?.[0]?.date || "N/A"}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                )}
+                              {t("art.list.columns.name")}
+                              {sortField === "name" &&
+                                (sortDirection === "asc" ? "↑" : "↓")}
+                            </button>
+                          </th>
+                          <th scope="col">{t("art.list.columns.type")}</th>
+                          <th scope="col">{t("art.list.columns.path")}</th>
+                          <th
+                            className="sortable"
+                            scope="col"
+                            aria-sort={getAriaSort("date", sortField, sortDirection)}
+                          >
+                            <button
+                              type="button"
+                              className="artifact-sort-button"
+                              onClick={() => handleSort("date")}
+                            >
+                              {t("art.list.columns.lastModified")}
+                              {sortField === "date" &&
+                                (sortDirection === "asc" ? "↑" : "↓")}
+                            </button>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {groupItems.map((artifact) => {
+                          const auditStatus = auditIssuesMap[artifact.name] || {
+                            hasErrors: false,
+                            hasWarnings: false,
+                          };
+
+                          const statusLabel = auditStatus.hasErrors
+                            ? t("art.state.needsAttention")
+                            : auditStatus.hasWarnings
+                              ? t("art.state.inReview")
+                              : t("art.state.complete");
+                          const statusIcon = auditStatus.hasErrors
+                            ? "✗"
+                            : auditStatus.hasWarnings
+                              ? "⚠"
+                              : "✓";
+                          const statusClass = auditStatus.hasErrors
+                            ? "error"
+                            : auditStatus.hasWarnings
+                              ? "warning"
+                              : "success";
+
+                          return (
+                            <tr key={artifact.path} className="artifact-row">
+                              <td
+                                className={`artifact-status artifact-status--${statusClass}`}
+                                aria-label={statusLabel}
+                              >
+                                <span aria-hidden="true">{statusIcon}</span>
+                              </td>
+                              <td className="artifact-name">
+                                <button
+                                  type="button"
+                                  className="artifact-open-button"
+                                  onClick={() => handleArtifactClick(artifact)}
+                                  disabled={!onSelectArtifact}
+                                >
+                                  {artifact.name}
+                                </button>
+                              </td>
+                              <td>{artifact.type}</td>
+                              <td className="artifact-path" title={artifact.path}>
+                                {artifact.path}
+                              </td>
+                              <td>{artifact.versions?.[0]?.date || "N/A"}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                    </div>
               </section>
             );
           })}
-        </div>
+        </section>
       )}
     </div>
   );

@@ -333,6 +333,7 @@ export default function AppNavigation({
           {sections.map((section) => {
             const hasHeader = section.labelKey.length > 0;
             const expanded = expandedSections[section.key] ?? true;
+            const itemsId = hasHeader ? `app-nav-section-items-${section.key}` : undefined;
 
             return (
               <section key={section.key} className="app-nav__section" aria-label={hasHeader ? t(section.labelKey) : undefined}>
@@ -342,6 +343,7 @@ export default function AppNavigation({
                     className="app-nav__section-header"
                     onClick={() => toggleSection(section.key)}
                     aria-expanded={expanded}
+                    aria-controls={itemsId}
                     data-nav-focusable="true"
                   >
                     <span>{t(section.labelKey)}</span>
@@ -349,43 +351,49 @@ export default function AppNavigation({
                   </button>
                 )}
 
-                {(!hasHeader || expanded) && (
-                  <div className="app-nav__items">
-                    {section.items.map((item) => (
-                      <div key={item.key} className="app-nav__item-row">
+                <div
+                  className="app-nav__items"
+                  id={itemsId}
+                  hidden={hasHeader ? !expanded : false}
+                >
+                  {section.items.map((item) => (
+                    <div key={item.key} className="app-nav__item-row">
+                      <NavLink
+                        to={item.path}
+                        className={({ isActive }) =>
+                          [
+                            'app-nav__item',
+                            item.primary
+                              ? 'app-nav__item--primary'
+                              : 'app-nav__item--secondary',
+                            isActive ? 'app-nav__item--active' : '',
+                          ]
+                            .filter(Boolean)
+                            .join(' ')
+                        }
+                        onClick={closeMobile}
+                        data-nav-focusable="true"
+                      >
+                        <span className="app-nav__label-group">
+                          <span className="app-nav__label">{t(item.labelKey)}</span>
+                        </span>
+                      </NavLink>
+                      {item.helpAvailable && item.helpPath && (
                         <NavLink
-                          to={item.path}
-                          className={({ isActive }) =>
-                            [
-                              'app-nav__item',
-                              item.primary ? 'app-nav__item--primary' : 'app-nav__item--secondary',
-                              isActive ? 'app-nav__item--active' : '',
-                            ]
-                              .filter(Boolean)
-                              .join(' ')
-                          }
+                          to={item.helpPath}
+                          className="app-nav__help-link"
+                          aria-label={`${t('nav.helpAvailable')}: ${t(item.labelKey)}`}
                           onClick={closeMobile}
                           data-nav-focusable="true"
                         >
-                          <span className="app-nav__label-group">
-                            <span className="app-nav__label">{t(item.labelKey)}</span>
+                          <span className="app-nav__help" aria-hidden="true">
+                            ?
                           </span>
                         </NavLink>
-                        {item.helpAvailable && item.helpPath && (
-                          <NavLink
-                            to={item.helpPath}
-                            className="app-nav__help-link"
-                            aria-label={`${t('nav.helpAvailable')}: ${t(item.labelKey)}`}
-                            onClick={closeMobile}
-                            data-nav-focusable="true"
-                          >
-                            <span className="app-nav__help" aria-hidden="true">?</span>
-                          </NavLink>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      )}
+                    </div>
+                  ))}
+                </div>
               </section>
             );
           })}
