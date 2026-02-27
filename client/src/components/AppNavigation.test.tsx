@@ -92,9 +92,14 @@ describe("AppNavigation", () => {
     expect(menuToggle).toHaveAttribute("aria-expanded", "true");
 
     const createSectionButton = screen.getByRole("button", { name: /Create/i });
+    const createSectionId = createSectionButton.getAttribute("aria-controls");
+    expect(createSectionId).toBeTruthy();
+    const createSectionPanel = document.getElementById(createSectionId ?? "");
+    expect(createSectionPanel).toBeTruthy();
     expect(createSectionButton).toHaveAttribute("aria-expanded", "true");
     fireEvent.click(createSectionButton);
     expect(createSectionButton).toHaveAttribute("aria-expanded", "false");
+    expect(createSectionPanel).toHaveAttribute("hidden");
   });
 
   it("does not expose duplicate project-scoped shortcuts in global navigation", () => {

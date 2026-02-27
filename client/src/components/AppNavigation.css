@@ -128,6 +128,7 @@
   padding: 0.3rem 0.45rem;
   border-radius: 0.4rem;
   cursor: pointer;
+  transition: background-color 0.16s ease;
 }
 
 .app-nav__section-header:hover {
@@ -147,6 +148,14 @@
   gap: 0.2rem;
 }
 
+.app-nav__section-chevron {
+  transition: transform 0.16s ease;
+}
+
+.app-nav__section-header[aria-expanded="false"] .app-nav__section-chevron {
+  transform: rotate(-90deg);
+}
+
 .app-nav__item-row {
   display: flex;
   align-items: center;
@@ -163,6 +172,7 @@
   padding: 0.55rem 0.6rem;
   color: #1f2937;
   font-size: 0.92rem;
+  transition: background-color 0.16s ease, color 0.16s ease;
 }
 
 .app-nav__item:hover {
@@ -247,6 +257,11 @@
   justify-content: center;
   text-decoration: none;
   flex-shrink: 0;
+  transition: background-color 0.16s ease;
+}
+
+.app-nav__help-link:hover {
+  background: #e0f2fe;
 }
 
 .app-nav__help-link:focus-visible {
@@ -343,5 +358,15 @@
   .app-main {
     margin-left: 0;
     padding-top: 4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-nav,
+  .app-nav__item,
+  .app-nav__section-header,
+  .app-nav__section-chevron,
+  .app-nav__help-link {
+    transition: none;
   }
 }
