@@ -347,7 +347,9 @@ export default function AppNavigation({
                     data-nav-focusable="true"
                   >
                     <span>{t(section.labelKey)}</span>
-                    <span aria-hidden="true">{expanded ? '▾' : '▸'}</span>
+                    <span className="app-nav__section-chevron" aria-hidden="true">
+                      {expanded ? '▾' : '▸'}
+                    </span>
                   </button>
                 )}
 

@@ -54,6 +54,12 @@ This client implements a **hybrid approach** combining AI-guided artifact creati
   - Browse artifacts created via chat
 - **Responsive Design**: Works on desktop and mobile
 
+### Navigation Accessibility Baseline
+
+- Collapsible navigation sections expose `aria-expanded` and `aria-controls` on toggle buttons.
+- Artifact group controls preserve accessible expand/collapse semantics and clear focus-visible states.
+- Navigation and grouping motion polish includes `prefers-reduced-motion` fallbacks.
+
 ## 🛠️ Tech Stack
 
 - **React 19** + **TypeScript 5.9** - Modern React with strict typing
