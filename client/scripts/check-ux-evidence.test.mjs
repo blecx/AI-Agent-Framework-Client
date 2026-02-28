@@ -40,12 +40,29 @@ test("UI changes fail when authority checkbox is missing", () => {
   assert.match(result.errors.join("\n"), /blecs-ux-authority/);
 });
 
+test("UI changes fail when requirement-gap disposition line is missing", () => {
+  const result = validateUxEvidence({
+    body: `# Summary
+
+## UX / Navigation Review
+- [x] blecs-ux-authority consulted: pass
+- [x] Responsive behavior validated on target breakpoints.
+- [x] Keyboard navigation and a11y pass reviewed.
+`,
+    changedFiles: ["client/src/components/ProjectView.tsx"],
+  });
+
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join("\n"), /requirement-gap disposition/i);
+});
+
 test("UI changes pass with complete UX evidence", () => {
   const result = validateUxEvidence({
     body: `# Summary
 
 ## UX / Navigation Review
 - [x] blecs-ux-authority consulted: pass
+- [x] Requirement-gap disposition: none (non-blocking)
 - [x] Responsive behavior validated on desktop/tablet/mobile breakpoints.
 - [x] Navigation + keyboard/a11y checks passed with evidence in manual test section.
 `,
