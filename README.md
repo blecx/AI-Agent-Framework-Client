@@ -91,7 +91,7 @@ npm run build
 npm run test:ux-evidence
 ```
 
-For UI/UX-affecting PRs, include a completed `## UX / Navigation Review` section in the PR body with a checked `blecs-ux-authority` consultation result. Non-UI PRs are not blocked by this UX-specific requirement.
+For UI/UX-affecting PRs, include a completed `## UX / Navigation Review` section in the PR body with a checked `blecs-ux-authority` consultation result and a checked requirement-gap disposition line (blocking/non-blocking, resolved/deferred, or none). Non-UI PRs are not blocked by this UX-specific requirement.
 
 API integration validation (requires a running backend API at `http://localhost:8000`):
 

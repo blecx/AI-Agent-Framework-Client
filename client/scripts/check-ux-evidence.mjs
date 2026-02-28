@@ -57,6 +57,17 @@ export function validateUxEvidence({ body, changedFiles }) {
     if (!authorityChecked) {
       errors.push("UX / Navigation Review must include a checked blecs-ux-authority consultation result for UI/UX-affecting changes.");
     }
+
+    const requirementGapChecked = boxes.some((line) =>
+      /^- \[[xX]\].*(requirement[- ]?gap|gap disposition).*(blocking|non[- ]?blocking|resolved|deferred|none)/i.test(
+        line,
+      ),
+    );
+    if (!requirementGapChecked) {
+      errors.push(
+        "UX / Navigation Review must include a checked requirement-gap disposition line (blocking/non-blocking, resolved/deferred, or none).",
+      );
+    }
   }
 
   return {
