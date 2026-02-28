@@ -34,7 +34,13 @@
     "history": "History",
     "sync": "Sync",
     "conflicts": "Conflicts",
-    "advancedTools": "Advanced Tools"
+    "advancedTools": "Advanced Tools",
+    "journeys": {
+      "planner": "Planner Journey",
+      "reviewer": "Reviewer Journey",
+      "approver": "Approver Journey",
+      "conflictResolution": "Conflict Resolution"
+    }
   },
   "help": {
     "title": "Help & Documentation",

@@ -24,6 +24,10 @@ vi.mock("react-i18next", () => ({
         "nav.artifactBuilder": "Artifact Builder",
         "nav.readinessBuilder": "Readiness Builder",
         "nav.raid": "RAID",
+        "nav.journeys.planner": "Planner Journey",
+        "nav.journeys.reviewer": "Reviewer Journey",
+        "nav.journeys.approver": "Approver Journey",
+        "nav.journeys.conflictResolution": "Conflict Resolution",
         "projectView.tabs.proposeChanges": "Propose Changes",
         "projectView.tabs.applyProposals": "Apply Proposals",
         "projectView.tabs.audit": "Audit",
@@ -204,6 +208,31 @@ describe("AppNavigation", () => {
 
     expect(projectsLink).toHaveTextContent("GLB");
     expect(artifactLink).toHaveTextContent("PRJ");
+  });
+
+  it("includes multi-role journey and conflict-resolution navigation links", () => {
+    render(
+      <MemoryRouter initialEntries={["/projects/alpha-proj/readiness"]}>
+        <AppNavigation connectionState="online" />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("link", { name: "Planner Journey" })).toHaveAttribute(
+      "href",
+      "/projects/alpha-proj/readiness?journey=planner",
+    );
+    expect(screen.getByRole("link", { name: "Reviewer Journey" })).toHaveAttribute(
+      "href",
+      "/projects/alpha-proj/propose?journey=reviewer",
+    );
+    expect(screen.getByRole("link", { name: "Approver Journey" })).toHaveAttribute(
+      "href",
+      "/projects/alpha-proj/apply?journey=approver",
+    );
+    expect(screen.getByRole("link", { name: "Conflict Resolution" })).toHaveAttribute(
+      "href",
+      "/projects/alpha-proj/apply?journey=conflict-resolution",
+    );
   });
 
   it("supports Home/End keyboard navigation across focusable nav controls", () => {

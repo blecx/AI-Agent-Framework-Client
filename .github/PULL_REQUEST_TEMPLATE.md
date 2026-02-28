@@ -115,6 +115,8 @@ For non-UI changes, write: "N/A (non-UI change)".
 - [ ] N/A (non-UI scope)
 - [ ] blecs-ux-authority consulted: pass/fail documented
 - [ ] Requirement-gap disposition documented (blocking/non-blocking, resolved/deferred, or none)
+- [ ] Multi-role workflow journey validated (planner/reviewer/approver)
+- [ ] Conflict-resolution flow validated with clear next actions
 - [ ] Responsive behavior validated (desktop/tablet/mobile)
 - [ ] Navigation + keyboard/a11y checks validated
 
