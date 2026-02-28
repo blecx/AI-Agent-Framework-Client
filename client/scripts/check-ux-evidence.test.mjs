@@ -23,6 +23,7 @@ test("UI changes fail when UX section is missing", () => {
   assert.equal(result.ok, false);
   assert.equal(result.uiTouched, true);
   assert.match(result.errors.join("\n"), /UX \/ Navigation Review/);
+  assert.match(result.errors.join("\n"), /Canonical guidance:/);
 });
 
 test("UI changes fail when authority checkbox is missing", () => {

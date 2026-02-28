@@ -110,11 +110,14 @@ If manual testing is truly not applicable, explain why and what alternative vali
 <!--
 Required only for UI/UX-affecting changes (client/src, styles, JSX/TSX).
 For non-UI changes, write: "N/A (non-UI change)".
+Canonical guidance:
+- https://github.com/blecx/AI-Agent-Framework/blob/main/.github/prompts/modules/ux/delegation-policy.md
+- https://github.com/blecx/AI-Agent-Framework/blob/main/.github/agents/blecs-ux-authority.agent.md
 -->
 
 - [ ] N/A (non-UI scope)
-- [ ] blecs-ux-authority consulted: pass/fail documented
-- [ ] Requirement-gap disposition documented (blocking/non-blocking, resolved/deferred, or none)
+- [ ] blecs-ux-authority consulted: pass/fail documented (required)
+- [ ] Requirement-gap disposition documented: blocking/non-blocking, resolved/deferred, or none
 - [ ] Multi-role workflow journey validated (planner/reviewer/approver)
 - [ ] Conflict-resolution flow validated with clear next actions
 - [ ] Responsive behavior validated (desktop/tablet/mobile)
