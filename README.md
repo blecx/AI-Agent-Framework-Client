@@ -98,6 +98,28 @@ Canonical governance references (backend source of truth):
 - https://github.com/blecx/AI-Agent-Framework/blob/main/.github/prompts/modules/ux/delegation-policy.md
 - https://github.com/blecx/AI-Agent-Framework/blob/main/.github/agents/blecs-ux-authority.agent.md
 
+#### UX evidence gate triage (when CI fails)
+
+Use this checklist in order and update the PR body before re-running CI:
+
+1. Confirm your PR includes a `## UX / Navigation Review` section.
+2. Add checkbox evidence lines and make sure all of them are checked (`- [x] ...`).
+3. Add a checked `blecs-ux-authority` consultation line (consulted + pass/remediated).
+4. Add a checked requirement-gap disposition line (blocking/non-blocking, resolved/deferred, or none).
+5. If navigation-affecting files changed, add checked lines for:
+  - multi-role journey validation (planner/reviewer/approver), and
+  - conflict-resolution flow validation with clear next actions.
+6. Re-run the local checks:
+
+```bash
+cd client
+npm run test:ux-evidence
+npm run lint
+npm run build
+```
+
+If the checker still fails, copy the failing message text into your PR description and address it directly in `## UX / Navigation Review`.
+
 API integration validation (requires a running backend API at `http://localhost:8000`):
 
 ```bash
