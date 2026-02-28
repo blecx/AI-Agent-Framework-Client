@@ -23,12 +23,12 @@ describe('navigationModel', () => {
     ]);
   });
 
-  it('builds deterministic project item order', () => {
+  it('builds deterministic current-project item order with mandatory core entries', () => {
     const sections = buildNavSections('ALPHA');
     const currentProject = sections.find((section) => section.key === 'current-project');
     expect(currentProject).toBeTruthy();
 
-    expect(currentProject?.items.map((item) => item.key)).toEqual([
+    const expectedOrder = [
       'project-artifacts',
       'project-assisted-creation',
       'project-readiness',
@@ -36,6 +36,13 @@ describe('navigationModel', () => {
       'project-apply',
       'project-raid',
       'project-audit',
-    ]);
+    ];
+
+    const actualOrder = currentProject?.items.map((item) => item.key);
+    expect(actualOrder).toEqual(expectedOrder);
+
+    for (const requiredKey of expectedOrder) {
+      expect(actualOrder).toContain(requiredKey);
+    }
   });
 });

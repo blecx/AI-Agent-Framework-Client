@@ -31,6 +31,10 @@ For navigation-affecting changes, include checked evidence in `## UX / Navigatio
 - Multi-role workflow journey validation (planner/reviewer/approver)
 - Conflict-resolution flow validation with clear next actions
 
+Deterministic unit-test evidence is expected in `client/src/test/unit/components/navigationModel.test.ts`:
+- `current-project` item order assertion covers the mandatory core project workflow keys in deterministic order
+- required key presence assertions guard against accidental removals
+
 ## Non-Trivial Design Quality Bar
 
 - Route grouping supports discovery → execution → review → traceability.
