@@ -25,8 +25,20 @@ function isUiAffectingPath(path) {
   );
 }
 
+function isNavigationAffectingPath(path) {
+  return (
+    path.includes("/AppNavigation") ||
+    path.includes("/navigationModel") ||
+    path.includes("/ProjectView") ||
+    path.includes("/ConflictResolver")
+  );
+}
+
 export function validateUxEvidence({ body, changedFiles }) {
   const uiTouched = (changedFiles || []).some((path) => isUiAffectingPath(path));
+  const navigationTouched = (changedFiles || []).some((path) =>
+    isNavigationAffectingPath(path),
+  );
   if (!uiTouched) {
     return {
       ok: true,
@@ -67,6 +79,30 @@ export function validateUxEvidence({ body, changedFiles }) {
       errors.push(
         "UX / Navigation Review must include a checked requirement-gap disposition line (blocking/non-blocking, resolved/deferred, or none).",
       );
+    }
+
+    if (navigationTouched) {
+      const multiRoleJourneyChecked = boxes.some((line) =>
+        /^- \[[xX]\].*(multi-role|planner|reviewer|approver).*(journey|workflow).*(validated|covered|mapped)/i.test(
+          line,
+        ),
+      );
+      if (!multiRoleJourneyChecked) {
+        errors.push(
+          "Navigation-affecting changes require a checked multi-role journey validation line (planner/reviewer/approver).",
+        );
+      }
+
+      const conflictFlowChecked = boxes.some((line) =>
+        /^- \[[xX]\].*(conflict[- ]?resolution|conflict flow).*(reachable|validated|next action)/i.test(
+          line,
+        ),
+      );
+      if (!conflictFlowChecked) {
+        errors.push(
+          "Navigation-affecting changes require a checked conflict-resolution flow validation line with clear next actions.",
+        );
+      }
     }
   }
 
