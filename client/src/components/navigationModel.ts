@@ -91,6 +91,34 @@ const buildCurrentProjectSection = (currentProjectKey: string): NavSection => ({
       order: 6,
       scope: 'project',
     },
+    {
+      key: 'project-journey-planner',
+      labelKey: 'nav.journeys.planner',
+      path: `/projects/${currentProjectKey}/readiness?journey=planner`,
+      order: 7,
+      scope: 'project',
+    },
+    {
+      key: 'project-journey-reviewer',
+      labelKey: 'nav.journeys.reviewer',
+      path: `/projects/${currentProjectKey}/propose?journey=reviewer`,
+      order: 8,
+      scope: 'project',
+    },
+    {
+      key: 'project-journey-approver',
+      labelKey: 'nav.journeys.approver',
+      path: `/projects/${currentProjectKey}/apply?journey=approver`,
+      order: 9,
+      scope: 'project',
+    },
+    {
+      key: 'project-conflict-resolution',
+      labelKey: 'nav.journeys.conflictResolution',
+      path: `/projects/${currentProjectKey}/apply?journey=conflict-resolution`,
+      order: 10,
+      scope: 'project',
+    },
   ],
 });
 
