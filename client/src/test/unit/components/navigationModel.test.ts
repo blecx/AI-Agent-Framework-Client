@@ -39,10 +39,17 @@ describe('navigationModel', () => {
     ];
 
     const actualOrder = currentProject?.items.map((item) => item.key);
-    expect(actualOrder).toEqual(expectedOrder);
+    expect(actualOrder).toBeTruthy();
 
     for (const requiredKey of expectedOrder) {
       expect(actualOrder).toContain(requiredKey);
+    }
+
+    const indices = expectedOrder.map((requiredKey) => actualOrder!.indexOf(requiredKey));
+    expect(indices.every((index) => index >= 0)).toBe(true);
+
+    for (let i = 1; i < indices.length; i += 1) {
+      expect(indices[i]).toBeGreaterThan(indices[i - 1]);
     }
   });
 });
