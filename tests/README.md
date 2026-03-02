@@ -50,6 +50,36 @@ describe('Form Validation', () => {
 });
 ```
 
+### Artifact Editor Form Validation (S3R-UX-02)
+
+The canonical validation entry point for the artifact editor is `validateArtifactForm` in
+`client/src/components/artifact-editor/formValidation.ts`.
+
+**Behavior contract:**
+
+| Input state | Return value |
+|---|---|
+| `template === null` | `{}` (empty, no errors) |
+| All fields valid | `{}` (empty) |
+| One or more invalid fields | `{ [fieldName]: errorMessageKey, … }` |
+
+**Field error keys:**
+
+- `artifactEditor.validation.required` — required field is empty
+- `artifactEditor.validation.mustBeString` — expected string, got other type
+- `artifactEditor.validation.mustBeNumber` — expected number, got other type
+- `artifactEditor.validation.minLength` — string shorter than `schema.minLength`
+- `artifactEditor.validation.maxLength` — string longer than `schema.maxLength`
+- `artifactEditor.validation.invalidFormat` — string does not match `schema.pattern`
+
+**Error ordering is deterministic**: follows `template.schema.properties` key order across repeated calls.
+
+Tests: `client/src/components/__tests__/artifact-editor.formValidation.test.ts`
+
+```bash
+cd client && npm test -- --run --reporter=verbose 2>&1 | grep "consistency pass"
+```
+
 ### Real-time Validation
 
 Test that validation errors appear as users type:
