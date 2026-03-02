@@ -198,7 +198,8 @@
     "close-issue": true,
     "pr-merge": true,
     "Plan": true,
-    "tutorial": true
+    "tutorial": true,
+    "resolve-issue": true
   },
   "terminal.integrated.env.linux": {
     "TMPDIR": "${workspaceFolder}/.tmp",
