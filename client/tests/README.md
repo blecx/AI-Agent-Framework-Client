@@ -1354,3 +1354,34 @@ npm run build                    # Production build
 - **Coverage questions**: Review HTML coverage report
 
 For questions or issues, consult the development team or create an issue in the repository.
+
+---
+
+## API Contracts (S3R Components)
+
+### Form Validation (S3R-UX-02)
+
+The `validateArtifactForm` utility (`src/utils/validateArtifactForm.ts`) provides
+consistent client-side validation across all artifact forms.
+
+**Contract:**
+- All required fields must be validated before submission
+- Error messages must be deterministic (same input → same message)
+- Returns `{ valid: boolean, errors: Record<string, string> }`
+
+**Tests:** `src/test/unit/utils/validateArtifactForm.test.ts`
+
+---
+
+### API Fallback (S3R-UX-03)
+
+The `withApiFallback` wrapper (`src/services/withApiFallback.ts`) provides
+deterministic error handling for all API calls.
+
+**Contract:**
+- Wraps any async API call: `withApiFallback(fn, fallback, onError?)`
+- Catches `ApiError` and returns `{ data: fallback, error }`
+- Re-throws non-`ApiError` exceptions unchanged
+- `buildFallbackMessage(err)` maps each `ApiErrorType` to a user-facing string
+
+**Tests:** `src/test/unit/services/withApiFallback.test.ts`
