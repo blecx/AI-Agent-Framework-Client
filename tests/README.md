@@ -118,6 +118,33 @@ it('retries failed operations', async () => {
 });
 ```
 
+### API Error Fallback (`withApiFallback`) — S3R-UX-03
+
+`withApiFallback` provides a deterministic error fallback wrapper for any async
+API call. It catches `ApiError` instances, returns a safe fallback value, and
+optionally invokes an `onError` callback for consistent error display.
+
+```typescript
+import { withApiFallback, buildFallbackMessage } from '../src/services/withApiFallback';
+
+// Wrap any API call — never throws on ApiError:
+const { data, error } = await withApiFallback(
+  () => projectApiClient.listProjects(),
+  [],                          // fallback value on failure
+  (err) => console.error(buildFallbackMessage(err)),
+);
+// data is [] on failure, the real list on success
+// error is the ApiError or null
+```
+
+Key rules:
+- `data` is always the fallback when an `ApiError` is thrown
+- Non-`ApiError` exceptions are re-thrown (programming errors, not API errors)
+- `buildFallbackMessage(err)` returns a consistent user-facing string per error type
+- Result is deterministic: same error in → same `{ data, error }` out
+
+Tests: `src/test/unit/services/withApiFallback.test.ts`
+
 ### API Error Responses
 
 Mock API errors and verify user-friendly messages:
