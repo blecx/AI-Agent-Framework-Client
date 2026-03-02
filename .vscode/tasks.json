@@ -22,6 +22,60 @@
         "focus": false,
         "clear": false
       }
+    },
+    {
+      "label": "🔍 Work on Issue (Dry Run, Shared Root)",
+      "type": "shell",
+      "command": "${workspaceFolder}/../../scripts/work-issue.py",
+      "args": [
+        "--issue",
+        "${input:issueNumber}",
+        "--dry-run",
+        "--llm-config",
+        "${workspaceFolder}/../../configs/llm.workflow.json"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/../.."
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true,
+        "clear": true
+      },
+      "group": "none"
+    },
+    {
+      "label": "💬 Work on Issue (Interactive, Shared Root)",
+      "type": "shell",
+      "command": "${workspaceFolder}/../../scripts/work-issue.py",
+      "args": [
+        "--issue",
+        "${input:issueNumber}",
+        "--interactive",
+        "--llm-config",
+        "${workspaceFolder}/../../configs/llm.workflow.json"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/../.."
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true,
+        "clear": true
+      },
+      "group": "none"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "issueNumber",
+      "type": "promptString",
+      "description": "Enter GitHub issue number",
+      "default": ""
     }
   ]
 }
