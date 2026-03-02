@@ -3,6 +3,7 @@ import type { Template } from '../../types/template';
 import {
   isArtifactFormValid,
   validateArtifactField,
+  validateArtifactForm,
 } from '../artifact-editor/formValidation';
 
 const t = (key: string) => key;
@@ -64,5 +65,69 @@ describe('artifact-editor/formValidation', () => {
         code: 'AB-12',
       }),
     ).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// validateArtifactForm — S3R-UX-02 deterministic whole-form validation
+// ---------------------------------------------------------------------------
+
+describe('validateArtifactForm — consistency pass (#268)', () => {
+  it('returns empty object for a fully valid form (success path)', () => {
+    const errors = validateArtifactForm(
+      template,
+      { title: 'Apollo', budget: 5000, code: 'AB-01' },
+      t,
+    );
+    expect(errors).toEqual({});
+  });
+
+  it('returns error for missing required field (validation-error path)', () => {
+    const errors = validateArtifactForm(template, { title: '' }, t);
+    expect(errors.title).toBe('artifactEditor.validation.required');
+  });
+
+  it('reports type mismatch as validation error', () => {
+    const errors = validateArtifactForm(
+      template,
+      { title: 'Apollo', budget: 'not-a-number' },
+      t,
+    );
+    expect(errors.budget).toBe('artifactEditor.validation.mustBeNumber');
+  });
+
+  it('reports pattern mismatch as validation error', () => {
+    const errors = validateArtifactForm(
+      template,
+      { title: 'Apollo', code: 'invalid' },
+      t,
+    );
+    expect(errors.code).toBe('artifactEditor.validation.invalidFormat');
+  });
+
+  it('collects multiple errors in deterministic field order', () => {
+    const errors = validateArtifactForm(
+      template,
+      { title: '', budget: 'bad', code: 'invalid' },
+      t,
+    );
+    // All three invalid fields should be reported
+    expect(Object.keys(errors)).toEqual(
+      expect.arrayContaining(['title', 'budget', 'code']),
+    );
+    expect(Object.keys(errors)).toHaveLength(3);
+  });
+
+  it('field order in returned errors is deterministic across three calls', () => {
+    const data = { title: '', budget: 'bad', code: 'invalid' };
+    const keys1 = Object.keys(validateArtifactForm(template, data, t));
+    const keys2 = Object.keys(validateArtifactForm(template, data, t));
+    const keys3 = Object.keys(validateArtifactForm(template, data, t));
+    expect(keys1).toEqual(keys2);
+    expect(keys2).toEqual(keys3);
+  });
+
+  it('returns empty object when template is null', () => {
+    expect(validateArtifactForm(null, { title: '' }, t)).toEqual({});
   });
 });

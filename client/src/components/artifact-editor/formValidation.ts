@@ -73,3 +73,39 @@ export const isArtifactFormValid = (
 
   return true;
 };
+
+/**
+ * Validate every field in a template form and return all errors at once.
+ *
+ * Field order is deterministic: follows the declaration order of
+ * `template.schema.properties` keys (as defined in the template schema).
+ *
+ * @param template  The template whose schema defines the required fields.
+ * @param formData  The current form values keyed by field name.
+ * @param t         Translation function, same signature as useArtifactEditorForm.
+ * @returns         An object mapping fieldName → error message for each invalid
+ *                  field. An empty object means the form is valid.
+ */
+export const validateArtifactForm = (
+  template: Template | null,
+  formData: Record<string, unknown>,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): Record<string, string> => {
+  const errors: Record<string, string> = {};
+
+  if (!template) {
+    return errors;
+  }
+
+  for (const [fieldName, fieldSchema] of Object.entries(
+    template.schema.properties,
+  )) {
+    const value = formData[fieldName];
+    const error = validateArtifactField(fieldName, value, fieldSchema, template, t);
+    if (error !== null) {
+      errors[fieldName] = error;
+    }
+  }
+
+  return errors;
+};
