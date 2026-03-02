@@ -167,6 +167,7 @@ client/
 │   │   └── 05-error-handling.spec.ts    # Error scenarios
 │   ├── helpers/                         # Reusable test helpers
 │   │   ├── api-helpers.ts              # Direct API calls
+│   │   ├── deterministic-fixture-helper.ts  # No-sleep deterministic helper (S3R-UX-01)
 │   │   ├── test-data.ts                # Test data generation
 │   │   └── ui-helpers.ts               # UI interaction helpers
 │   ├── fixtures.ts                      # Playwright fixtures
@@ -307,6 +308,38 @@ test.describe('Feature Name', () => {
 - **`page`**: Playwright Page object
 - **`apiHelper`**: Direct API access for setup/verification
 - **`uniqueProjectKey`**: Guaranteed unique project key
+
+### Deterministic Fixture Helper (S3R-UX-01)
+
+`e2e/helpers/deterministic-fixture-helper.ts` provides a lightweight, no-sleep
+fixture lifecycle for API-only tests.
+
+**When to use:**
+- Tests that only need to create/verify/delete projects via the API
+- Any scenario where sleep-based waits would make results non-deterministic
+- Stability checks that must pass 3+ consecutive runs
+
+**Usage:**
+
+```typescript
+import { DeterministicFixtureHelper } from '../helpers/deterministic-fixture-helper';
+
+test('my deterministic test', async ({ request }) => {
+  const fixture = new DeterministicFixtureHelper(request, process.env.API_BASE_URL ?? 'http://localhost:8000');
+  await fixture.setup();                         // polls /health — no sleep
+  const project = await fixture.createProject('e2e-my-test'); // polls until ready
+  // … assertions …
+  await fixture.teardown();                      // deletes all created projects
+});
+```
+
+**Baseline tests:** `e2e/tests/s3r-ux-01-fixture-baseline.spec.ts`
+
+```bash
+npx playwright test e2e/tests/s3r-ux-01-fixture-baseline.spec.ts
+# or filter by tag:
+npx playwright test --grep "@fixture"
+```
 
 ### Helper Functions
 
