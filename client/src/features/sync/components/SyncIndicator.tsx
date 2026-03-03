@@ -46,7 +46,7 @@ export default function SyncIndicator() {
     return (
       <div className="flex items-center gap-2 text-yellow-600 bg-yellow-50 px-2 py-1 rounded">
         <span>{syncState.unsynced_commits} Unsynced</span>
-        <Button size="sm" variant="outline" onClick={handlePush}>Sync Now</Button>
+        <Button size="sm" variant="secondary" onClick={handlePush}>Sync Now</Button>
       </div>
     );
   }

@@ -109,11 +109,11 @@ export default function ProjectList() {
 
   if (isLoading) {
     return (
-      <div className="project-list-container">
-        <header className="project-list-header">
+      <div className="max-w-6xl mx-auto p-6 w-full">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <h1>{t("projects.list.title")}</h1>
         </header>
-        <div className="projects-grid">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <SkeletonProjectCard />
           <SkeletonProjectCard />
           <SkeletonProjectCard />
@@ -124,7 +124,7 @@ export default function ProjectList() {
 
   if (queryError) {
     return (
-      <div className="project-list-container">
+      <div className="max-w-6xl mx-auto p-6 w-full">
         <div className="error">
           {t("projects.list.errors.loadingWithMessage", {
             message: (queryError as Error).message,
@@ -188,8 +188,8 @@ export default function ProjectList() {
   ];
 
   return (
-    <div className="project-list-container">
-      <header className="project-list-header">
+    <div className="max-w-6xl mx-auto p-6 w-full">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <h1>{t("projects.list.title")}</h1>
         <Button
           variant="primary"
@@ -211,7 +211,7 @@ export default function ProjectList() {
 
       {isCreateFormOpen && (
         <div className="create-project-form" data-testid="create-project-form">
-          <h2>{t("projects.create.title")}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 m-0">{t("projects.create.title")}</h2>
           <form onSubmit={handleCreateProject}>
             <div className="form-group">
               <label htmlFor="projectKey">

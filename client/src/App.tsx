@@ -27,7 +27,7 @@ import { ProjectsStateProvider } from './state/projectsState';
 import { RaidStateProvider } from './state/raidState';
 import { UiPreferencesProvider } from './state/uiPreferences';
 import { WorkflowStateProvider } from './state/workflowState';
-import './App.css';
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,7 +55,7 @@ function App() {
               <ToastProvider>
                 <ErrorBoundary>
                   <Router>
-                    <div className="App">
+                    <div className="min-h-screen bg-gray-50 flex flex-col text-gray-900">
                       <SkipToContent />
                       <AppNavigation
                         connectionState={connectionState}
@@ -65,7 +65,7 @@ function App() {
                         state={connectionState}
                         onRetry={retryConnection}
                       />
-                      <main id="main-content" className="app-main" tabIndex={-1}>
+                      <main id="main-content" className="flex-1 w-full flex flex-col" tabIndex={-1}>
                         <Routes>
                           <Route path="/" element={<Navigate to="/projects" replace />} />
                           <Route

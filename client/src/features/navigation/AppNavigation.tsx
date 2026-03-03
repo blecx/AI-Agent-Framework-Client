@@ -374,7 +374,7 @@ export default function AppNavigation({
     <>
       <button
         ref={mobileToggleRef}
-        className="nav-mobile-toggle"
+        className="md:hidden p-2 text-gray-500 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
         type="button"
         onClick={() => setIsMobileOpen((open) => !open)}
         aria-label={isMobileOpen ? t('nav.closeMenu') : t('nav.openMenu')}
@@ -387,10 +387,10 @@ export default function AppNavigation({
       {isMobileOpen && <button type="button" className="nav-mobile-overlay" onClick={closeMobile} aria-label={t('nav.closeMenu')} />}
 
       <nav ref={navRef} id="app-navigation" className={`app-nav ${isMobileOpen ? 'app-nav--mobile-open' : ''}`} aria-label={t('nav.primaryAria')} onKeyDown={onArrowNavigate}>
-        <div className="app-nav__brand">
+        <div className="flex items-center gap-4">
           <h1>{t('nav.brand')}</h1>
-          <div className="app-nav__api-controls">
-            <div className="app-nav__api-status" role="status" aria-live="polite">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-gray-600" role="status" aria-live="polite">
               <span className={`app-nav__api-dot app-nav__api-dot--${connectionState}`} aria-hidden="true" />
               <span>{t('nav.header.apiStatusLabel', { state: t(`conn.state.${connectionState}`) })}</span>
             </div>
