@@ -95,7 +95,7 @@ For UI/UX-affecting PRs, include a completed `## UX / Navigation Review` section
 
 Canonical governance references (backend source of truth):
 
-- https://github.com/blecx/AI-Agent-Framework/blob/main/.github/prompts/modules/ux/delegation-policy.md
+- https://github.com/blecx/AI-Agent-Framework/blob/main/.copilot/skills/ux-delegation-policy/SKILL.md
 - https://github.com/blecx/AI-Agent-Framework/blob/main/.github/agents/blecs-ux-authority.agent.md
 
 #### UX evidence gate triage (when CI fails)

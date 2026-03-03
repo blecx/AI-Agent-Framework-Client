@@ -111,7 +111,7 @@ If manual testing is truly not applicable, explain why and what alternative vali
 Required only for UI/UX-affecting changes (client/src, styles, JSX/TSX).
 For non-UI changes, write: "N/A (non-UI change)".
 Canonical guidance:
-- https://github.com/blecx/AI-Agent-Framework/blob/main/.github/prompts/modules/ux/delegation-policy.md
+- https://github.com/blecx/AI-Agent-Framework/blob/main/.copilot/skills/ux-delegation-policy/SKILL.md
 - https://github.com/blecx/AI-Agent-Framework/blob/main/.github/agents/blecs-ux-authority.agent.md
 -->
 
