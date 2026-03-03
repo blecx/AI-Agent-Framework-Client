@@ -374,7 +374,7 @@ export default function AppNavigation({
     <>
       <button
         ref={mobileToggleRef}
-        className="md:hidden p-2 text-gray-500 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
+        className="nav-mobile-toggle"
         type="button"
         onClick={() => setIsMobileOpen((open) => !open)}
         aria-label={isMobileOpen ? t('nav.closeMenu') : t('nav.openMenu')}
@@ -384,22 +384,22 @@ export default function AppNavigation({
         {isMobileOpen ? '✕' : '☰'}
       </button>
 
-      {isMobileOpen && <button type="button" className="nav-mobile-overlay" onClick={closeMobile} aria-label={t('nav.closeMenu')} />}
+      {isMobileOpen && <button type="button" className="fixed inset-0 bg-gray-900/50 z-40 lg:hidden" onClick={closeMobile} aria-label={t('nav.closeMenu')} />}
 
-      <nav ref={navRef} id="app-navigation" className={`app-nav ${isMobileOpen ? 'app-nav--mobile-open' : ''}`} aria-label={t('nav.primaryAria')} onKeyDown={onArrowNavigate}>
-        <div className="flex items-center gap-4">
-          <h1>{t('nav.brand')}</h1>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-gray-600" role="status" aria-live="polite">
-              <span className={`app-nav__api-dot app-nav__api-dot--${connectionState}`} aria-hidden="true" />
+      <nav ref={navRef} id="app-navigation" className={`fixed top-0 left-0 w-[280px] h-screen bg-white border-r border-gray-200 flex flex-col z-50 transform transition-transform duration-200 ease-in-out ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`} aria-label={t('nav.primaryAria')} onKeyDown={onArrowNavigate}>
+        <div className="p-5 border-b border-gray-100 flex flex-col">
+          <h1 className="text-xl font-bold text-gray-900 m-0">{t("nav.brand")}</h1>
+          <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-sm text-gray-700" role="status" aria-live="polite">
+              <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${connectionState === "online" ? "bg-green-500" : "bg-red-500"}`} aria-hidden="true" />
               <span>{t('nav.header.apiStatusLabel', { state: t(`conn.state.${connectionState}`) })}</span>
             </div>
-            <p className="app-nav__api-refresh-note">
+            <p className="text-xs text-gray-500">
               {t('nav.header.refreshInfo', { seconds: healthCheckIntervalSeconds })}
             </p>
-            <div className="app-nav__api-actions">
+            <div className="flex gap-3 text-xs">
               <a
-                className="app-nav__api-link"
+                className="text-indigo-600 hover:text-indigo-800 font-medium"
                 href={apiDocsUrl}
                 target="_blank"
                 rel="noreferrer"
@@ -408,7 +408,7 @@ export default function AppNavigation({
               </a>
               <button
                 type="button"
-                className="app-nav__api-refresh"
+                className="text-gray-500 hover:text-gray-800 cursor-pointer border-none bg-transparent p-0"
                 onClick={onRetryConnection}
                 disabled={!onRetryConnection}
               >
@@ -417,7 +417,7 @@ export default function AppNavigation({
               {showSettingsPlaceholder && (
                 <button
                   type="button"
-                  className="app-nav__api-settings"
+                  className="text-gray-400 cursor-not-allowed border-none bg-transparent p-0"
                   disabled
                   title={t('nav.header.settingsSoon')}
                 >
@@ -428,60 +428,46 @@ export default function AppNavigation({
           </div>
         </div>
 
-        <div className="app-nav__sections">
+        <div className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-6">
           {sections.map((section) => {
             const hasHeader = section.labelKey.length > 0;
             const expanded = expandedSections[section.key] ?? true;
             const itemsId = hasHeader ? `app-nav-section-items-${section.key}` : undefined;
 
             return (
-              <section key={section.key} className="app-nav__section" aria-label={hasHeader ? t(section.labelKey) : undefined}>
+              <section key={section.key} className="flex flex-col gap-1" aria-label={hasHeader ? t(section.labelKey) : undefined}>
                 {hasHeader && (
                   <button
                     type="button"
-                    className="app-nav__section-header"
+                    className="flex justify-between items-center px-3 py-1.5 uppercase text-xs font-semibold tracking-wider text-gray-500"
                     onClick={() => toggleSection(section.key)}
                     aria-expanded={expanded}
                     aria-controls={itemsId}
                     data-nav-focusable="true"
                   >
                     <span>{t(section.labelKey)}</span>
-                    <span className="app-nav__section-chevron" aria-hidden="true">
+                    <span className="text-gray-400" aria-hidden="true">
                       {expanded ? '▾' : '▸'}
                     </span>
                   </button>
                 )}
 
                 <div
-                  className="app-nav__items"
+                  className="flex flex-col gap-1"
                   id={itemsId}
                   hidden={hasHeader ? !expanded : false}
                 >
                   {section.items.map((item) => (
-                    <div key={item.key} className="app-nav__item-row">
+                    <div key={item.key} className="flex items-center group relative">
                       <NavLink
                         to={item.path}
-                        className={({ isActive }) =>
-                          [
-                            'app-nav__item',
-                            item.primary
-                              ? 'app-nav__item--primary'
-                              : 'app-nav__item--secondary',
-                            `app-nav__item--scope-${item.scope}`,
-                            isActive
-                              ? 'app-nav__item--state-active'
-                              : 'app-nav__item--state-inactive',
-                            isActive ? 'app-nav__item--active' : '',
-                          ]
-                            .filter(Boolean)
-                            .join(' ')
-                        }
+                        className={({ isActive }) => `flex-1 flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors ${isActive ? "bg-indigo-50 text-indigo-700 font-medium" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"}`}
                         onClick={closeMobile}
                         data-nav-focusable="true"
                       >
-                        <span className="app-nav__label-group">
-                          <span className="app-nav__label">{t(item.labelKey)}</span>
-                          <span className={`app-nav__scope-badge app-nav__scope-badge--${item.scope}`} aria-hidden="true">
+                        <span className="flex items-center gap-2 truncate">
+                          <span className="truncate">{t(item.labelKey)}</span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded leading-none ${item.scope === "global" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-600"}`} aria-hidden="true">
                             {item.scope === 'project' ? 'PRJ' : 'GLB'}
                           </span>
                         </span>
@@ -489,12 +475,12 @@ export default function AppNavigation({
                       {item.helpAvailable && item.helpPath && (
                         <NavLink
                           to={item.helpPath}
-                          className="app-nav__help-link"
+                          className="p-2 text-gray-400 hover:text-indigo-600 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
                           aria-label={`${t('nav.helpAvailable')}: ${t(item.labelKey)}`}
                           onClick={closeMobile}
                           data-nav-focusable="true"
                         >
-                          <span className="app-nav__help" aria-hidden="true">
+                          <span className="flex items-center justify-center" aria-hidden="true">
                             ?
                           </span>
                         </NavLink>
@@ -507,7 +493,7 @@ export default function AppNavigation({
           })}
         </div>
 
-        <div className="app-nav__footer">
+        <div className="p-4 border-t border-gray-200 mt-auto">
           <LanguageSwitcher />
           <ConnectionStatus state={connectionState} />
           <SyncIndicator />
