@@ -1,65 +1,65 @@
-# Dependencies
+# ── Node / npm ────────────────────────────────────────────────────────────────
 node_modules/
-package-lock.json
-
-# Build output
-dist/
-build/
-
-# Environment variables
-.env
-.env.local
-.env.*.local
-
-# IDE
 client/node_modules/
+# Note: package-lock.json MUST be committed — do not add it here
 
-# Build outputs
+# ── Build output ──────────────────────────────────────────────────────────────
 dist/
 build/
 client/dist/
 client/build/
 
-# Environment files
+# ── Vite / bundler cache ──────────────────────────────────────────────────────
+.vite/
+.eslintcache
+*.tsbuildinfo
+
+# ── Environment / secrets ─────────────────────────────────────────────────────
 .env
 .env.local
 .env.*.local
 client/.env.local
 
-# IDE files (allow .vscode/settings.json and tasks.json)
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-.idea/
-*.swp
-*.swo
+# ── Test & coverage runtime ───────────────────────────────────────────────────
+coverage/
+.nyc_output/
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
 
-# OS
-*~
+# ── Python runtime (tooling scripts) ─────────────────────────────────────────
+*.pyc
+*.pyo
+*.pyd
+**/__pycache__/
+*.egg-info/
+venv/
+.venv/
 
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs
+# ── Logs ──────────────────────────────────────────────────────────────────────
 logs/
-logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Testing
-coverage/
-
-# Testing
-coverage/
-.nyc_output/
-
-# Temporary files
+# ── Temp & AI agent workspace files ──────────────────────────────────────────
+.tmp/
 tmp/
 temp/
 
-# AI Agent temporary files (workspace-scoped for better tool access)
-.tmp/
+# ── VS Code (keep settings and tasks) ────────────────────────────────────────
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+.idea/
