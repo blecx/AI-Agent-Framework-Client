@@ -251,7 +251,7 @@ class ApiClient {
     try {
       const data = await this.projectClient.updateProject(key, {
         name: updates.name,
-        description: updates.description,
+        description: updates.description || undefined,
       });
       return {
         success: true,

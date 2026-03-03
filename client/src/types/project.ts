@@ -26,9 +26,9 @@ export const DocumentSchema = z.object({
 });
 
 export const ProjectSchema = z.object({
-  key: z.string().min(1).max(20).regex(/^[A-Z0-9-]+$/, 'Project key must be uppercase alphanumeric with hyphens'),
+  key: z.string().min(1).max(100).regex(/^[a-zA-Z0-9-]+$/, 'Project key must be alphanumeric with hyphens'),
   name: z.string().min(1).max(100),
-  description: z.string().max(500).optional(),
+  description: z.string().max(500).nullable().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   documents: z.array(DocumentSchema).optional(),
@@ -52,12 +52,12 @@ export type Project = z.infer<typeof ProjectSchema>;
 export interface CreateProjectRequest {
   key: string;
   name: string;
-  description?: string;
+  description?: string | null;
 }
 
 export interface UpdateProjectRequest {
   name?: string;
-  description?: string;
+  description?: string | null;
 }
 
 export const CreateProjectRequestSchema = z.object({

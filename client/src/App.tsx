@@ -157,7 +157,7 @@ function App() {
                             }
                           />
                           <Route
-                            path="/guided-builder"
+                            path="/guided-builder/:step?"
                             element={
                               <ErrorBoundary name="GuidedBuilder">
                                 <GuidedBuilder />
