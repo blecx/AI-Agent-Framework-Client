@@ -9,6 +9,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 import ConnectionStatus from './ConnectionStatus';
+import SyncIndicator from '../sync/components/SyncIndicator';
 import type { ConnectionState } from '@/types/connection';
 
 interface NavItem {
@@ -509,6 +510,7 @@ export default function AppNavigation({
         <div className="app-nav__footer">
           <LanguageSwitcher />
           <ConnectionStatus state={connectionState} />
+          <SyncIndicator />
         </div>
       </nav>
     </>
