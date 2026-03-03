@@ -5,7 +5,7 @@
  */
 
 import { CommandType, type CommandIntent } from './types';
-import { RAIDType } from '../types/raid';
+import { RAIDType } from '@/types/raid';
 
 /**
  * Parse a user message into a command intent

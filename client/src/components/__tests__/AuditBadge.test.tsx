@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { AuditBadge } from '../AuditBadge';
+import { AuditBadge } from '@/features/audit/AuditBadge';
 
 describe('AuditBadge', () => {
   it('displays success status when no errors or warnings', () => {

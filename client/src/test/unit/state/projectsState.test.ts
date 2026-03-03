@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   projectsReducer,
   type ProjectsState,
-} from '../../../state/projectsSlice';
-import { createAsyncSlice } from '../../../state/types';
+} from '@/state/projectsSlice';
+import { createAsyncSlice } from '@/state/types';
 
 describe('projectsState', () => {
   const initialState: ProjectsState = {

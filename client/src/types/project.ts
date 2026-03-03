@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { ValidationError } from '../services/errors';
+import { ValidationError } from '@/services/errors';
 
 /**
  * Zod Schemas for Runtime Validation

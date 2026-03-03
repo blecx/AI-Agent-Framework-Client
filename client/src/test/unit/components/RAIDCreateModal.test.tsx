@@ -2,16 +2,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { RAIDCreateModal } from '../../../components/raid/RAIDCreateModal';
-import { apiClient } from '../../../services/apiClient';
-import { showToast } from '../../../utils/toast';
-import { RAIDType, RAIDStatus, RAIDPriority } from '../../../types/raid';
+import { RAIDCreateModal } from '@/features/raid/raid/RAIDCreateModal';
+import { apiClient } from '@/services/apiClient';
+import { showToast } from '@/utils/toast';
+import { RAIDType, RAIDStatus, RAIDPriority } from '@/types/raid';
 
 // Note: RAIDCreateModal refactored to use sub-components (TypeSection, DetailsSection, MetadataSection, DatesSection).
 // These tests remain valid as they test the public API of RAIDCreateModal, not implementation details.
 
-vi.mock('../../../services/apiClient');
-vi.mock('../../../utils/toast');
+vi.mock('@/services/apiClient');
+vi.mock('@/utils/toast');
 
 const createWrapper = () => {
   const queryClient = new QueryClient({

@@ -5,10 +5,10 @@
 import { createRef } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ChatInterface } from '../../../components/chat/ChatInterface';
-import { ChatInput } from '../../../components/chat/ChatInput';
-import { ChatMessageBubble } from '../../../components/chat/ChatMessageBubble';
-import { ChatMessageList } from '../../../components/chat/ChatMessageList';
+import { ChatInterface } from '@/components/chat/ChatInterface';
+import { ChatInput } from '@/components/chat/ChatInput';
+import { ChatMessageBubble } from '@/components/chat/ChatMessageBubble';
+import { ChatMessageList } from '@/components/chat/ChatMessageList';
 import type { ChatMessage } from '../../../chat/types';
 import * as chatApi from '../../../chat/chatApi';
 

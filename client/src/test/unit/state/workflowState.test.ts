@@ -4,8 +4,8 @@ import {
   type AllowedTransitions,
   type WorkflowSliceState,
   type WorkflowState,
-} from '../../../state/workflowSlice';
-import { createAsyncSlice } from '../../../state/types';
+} from '@/state/workflowSlice';
+import { createAsyncSlice } from '@/state/types';
 
 describe('workflowState', () => {
   const initialState: WorkflowSliceState = {

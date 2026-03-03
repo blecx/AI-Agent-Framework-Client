@@ -10,7 +10,7 @@ import {
   getConversationProgress,
 } from '../../../chat/conversationManager';
 import { CommandType, type CreateRAIDState } from '../../../chat/types';
-import { RAIDType, RAIDStatus, RAIDPriority } from '../../../types/raid';
+import { RAIDType, RAIDStatus, RAIDPriority } from '@/types/raid';
 
 describe('conversationManager', () => {
   describe('initCreateRAIDConversation', () => {

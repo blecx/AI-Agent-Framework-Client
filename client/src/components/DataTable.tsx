@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import EmptyState from './ui/EmptyState';
 import { LoadingSkeleton } from './LoadingSkeleton';
 import TableFilters from './TableFilters';
-import type { TableColumn, TableFilter, TableSortOrder } from '../types/table';
+import type { TableColumn, TableFilter, TableSortOrder } from '@/types/table';
 
 interface DataTableProps<T> {
   columns: Array<TableColumn<T>>;

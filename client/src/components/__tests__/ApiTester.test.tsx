@@ -6,10 +6,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ApiTester from '../ApiTester';
-import apiService, { type TestResult } from '../../services/api';
+import apiService, { type TestResult } from '@/services/api';
 
 // Mock dependencies
-vi.mock('../../services/api', () => ({
+vi.mock('@/services/api', () => ({
   default: {
     getBaseUrl: vi.fn(),
     setBaseUrl: vi.fn(),
@@ -21,7 +21,7 @@ vi.mock('../../services/api', () => ({
   },
 }));
 
-vi.mock('../../hooks/useToast', () => ({
+vi.mock('@/hooks/useToast', () => ({
   useToast: () => ({
     showSuccess: vi.fn(),
     showError: vi.fn(),

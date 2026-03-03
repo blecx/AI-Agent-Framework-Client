@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
 import { Routes, Route, MemoryRouter } from 'react-router-dom';
-import ProjectView from '../ProjectView';
+import ProjectView from '@/features/projects/ProjectView';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient({

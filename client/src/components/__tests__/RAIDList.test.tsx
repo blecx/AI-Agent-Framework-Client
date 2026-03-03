@@ -8,13 +8,13 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
-import RAIDList from '../RAIDList';
-import apiClient from '../../services/apiClient';
-import i18n from '../../i18n/config';
-import type { RAIDItem } from '../../types';
+import RAIDList from '@/features/raid/RAIDList';
+import apiClient from '@/services/apiClient';
+import i18n from '@/i18n/config';
+import type { RAIDItem } from '@/types';
 
 // Mock dependencies
-vi.mock('../../services/apiClient', () => ({
+vi.mock('@/services/apiClient', () => ({
   default: {
     listRAIDItems: vi.fn(),
   },

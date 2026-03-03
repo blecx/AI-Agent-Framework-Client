@@ -6,10 +6,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
-import { ArtifactEditor } from '../ArtifactEditor';
-import { templateApiClient } from '../../services/TemplateApiClient';
-import i18n from '../../i18n/config';
-import type { Template } from '../../types/template';
+import { ArtifactEditor } from '@/features/artifacts/ArtifactEditor';
+import { templateApiClient } from '@/services/TemplateApiClient';
+import i18n from '@/i18n/config';
+import type { Template } from '@/types/template';
 
 const mockNavigate = vi.fn();
 
@@ -25,14 +25,14 @@ vi.mock('react-router-dom', async () => {
 });
 
 // Mock the templateApiClient
-vi.mock('../../services/TemplateApiClient', () => ({
+vi.mock('@/services/TemplateApiClient', () => ({
   templateApiClient: {
     getTemplate: vi.fn(),
   },
 }));
 
 // Mock useToast hook to avoid ToastProvider requirement
-vi.mock('../../hooks/useToast', () => ({
+vi.mock('@/hooks/useToast', () => ({
   useToast: () => ({
     showSuccess: vi.fn(),
     showError: vi.fn(),
@@ -42,7 +42,7 @@ vi.mock('../../hooks/useToast', () => ({
 }));
 
 // Mock useUnsavedChanges hook to avoid react-router dependency
-vi.mock('../../hooks/useUnsavedChanges', () => ({
+vi.mock('@/hooks/useUnsavedChanges', () => ({
   useUnsavedChanges: () => ({
     isBlocked: false,
     confirmNavigation: vi.fn(),

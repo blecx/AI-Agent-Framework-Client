@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { parseCommand } from '../../../chat/commandParser';
 import { CommandType } from '../../../chat/types';
-import { RAIDType } from '../../../types/raid';
+import { RAIDType } from '@/types/raid';
 
 describe('commandParser', () => {
   describe('CREATE RAID patterns', () => {

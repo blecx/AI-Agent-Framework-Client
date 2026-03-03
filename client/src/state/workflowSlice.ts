@@ -1,6 +1,6 @@
 import type { AsyncSlice } from './types';
 import { createAsyncSlice } from './types';
-import type { WorkflowState as BackendWorkflowState } from '../types/workflow';
+import type { WorkflowState as BackendWorkflowState } from '@/types/workflow';
 
 /**
  * Mirror backend workflow enum semantics (lower_snake_case, full ISO lifecycle).

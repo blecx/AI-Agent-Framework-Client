@@ -6,12 +6,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import ErrorBoundary from '../components/ErrorBoundary';
-import ConfirmDialog from '../components/ConfirmDialog';
-import { LoadingSkeleton, FormSkeleton } from '../components/LoadingSkeleton';
-import SkipToContent from '../components/SkipToContent';
-import Toast from '../components/Toast';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import ConfirmDialog from '@/components/ConfirmDialog';
+import { LoadingSkeleton, FormSkeleton } from '@/components/LoadingSkeleton';
+import SkipToContent from '@/components/SkipToContent';
+import Toast from '@/components/Toast';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({

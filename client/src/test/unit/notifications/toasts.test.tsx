@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
-import { ToastProvider } from '../../../components/ToastContext';
-import ToastContainer from '../../../components/ToastContainer';
-import { notify } from '../../../notifications/notificationBus';
+import { ToastProvider } from '@/components/ToastContext';
+import ToastContainer from '@/components/ToastContainer';
+import { notify } from '@/notifications/notificationBus';
 
 function TestToasts() {
   return (

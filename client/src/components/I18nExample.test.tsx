@@ -9,7 +9,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { I18nextProvider } from "react-i18next";
 import { Suspense } from "react";
 import I18nExample from "./I18nExample";
-import i18n from "../i18n/config"; // Import initialized i18n instance
+import i18n from "@/i18n/config"; // Import initialized i18n instance
 
 describe("I18nExample Component", () => {
   beforeEach(async () => {

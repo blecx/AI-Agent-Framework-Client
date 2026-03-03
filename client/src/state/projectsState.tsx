@@ -7,7 +7,7 @@ import {
   useMemo,
   useReducer,
 } from 'react';
-import type { Project } from '../types';
+import type { Project } from '@/types';
 import {
   defaultProjectsState,
   projectsReducer,

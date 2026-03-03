@@ -8,12 +8,12 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { I18nextProvider } from "react-i18next";
-import i18n from "../../i18n/config";
-import ProjectView from "../ProjectView";
-import { AuditApiClient } from "../../services/AuditApiClient";
+import i18n from "@/i18n/config";
+import ProjectView from "@/features/projects/ProjectView";
+import { AuditApiClient } from "@/services/AuditApiClient";
 
 // Mock dependencies
-vi.mock("../../services/apiClient", () => ({
+vi.mock("@/services/apiClient", () => ({
   default: {
     getProject: vi.fn(),
   },
@@ -130,7 +130,7 @@ describe("ProjectView", () => {
     mockGetProject = vi.fn();
     mockGetAuditResults = vi.fn().mockResolvedValue(mockAuditData);
 
-    const apiClient = await import("../../services/apiClient");
+    const apiClient = await import("@/services/apiClient");
     vi.mocked(apiClient.default.getProject).mockImplementation(mockGetProject);
 
     vi.spyOn(AuditApiClient.prototype, "getAuditResults").mockImplementation(

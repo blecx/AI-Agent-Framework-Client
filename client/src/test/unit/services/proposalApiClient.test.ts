@@ -8,7 +8,7 @@ import {
   ProposalApiClient,
   type Proposal,
   type ProposalCreate,
-} from '../../../services/ProposalApiClient';
+} from '@/services/ProposalApiClient';
 
 // Mock axios
 vi.mock('axios');

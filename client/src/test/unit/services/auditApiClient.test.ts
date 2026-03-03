@@ -7,7 +7,7 @@ import axios from 'axios';
 import {
   AuditApiClient,
   type AuditResult,
-} from '../../../services/AuditApiClient';
+} from '@/services/AuditApiClient';
 
 // Mock axios
 vi.mock('axios');

@@ -5,8 +5,8 @@ import {
   TypeBadge,
   StatusBadge,
   PriorityBadge,
-} from '../../../components/raid/RAIDBadge';
-import { RAIDType, RAIDStatus, RAIDPriority } from '../../../types/raid';
+} from '@/features/raid/raid/RAIDBadge';
+import { RAIDType, RAIDStatus, RAIDPriority } from '@/types/raid';
 
 describe('RAIDBadge', () => {
   describe('Type badges', () => {

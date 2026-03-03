@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import ConnectionBanner from "../../../components/ConnectionBanner";
+import ConnectionBanner from "@/features/navigation/ConnectionBanner";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({

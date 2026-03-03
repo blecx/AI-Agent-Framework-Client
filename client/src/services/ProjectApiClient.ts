@@ -13,7 +13,7 @@ import {
   validateProjectList,
   validateCreateProjectRequest,
   validateUpdateProjectRequest,
-} from '../types/project';
+} from '@/types/project';
 import {
   ApiError,
   NetworkError,

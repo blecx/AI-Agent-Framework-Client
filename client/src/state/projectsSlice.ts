@@ -1,4 +1,4 @@
-import type { Project } from '../types';
+import type { Project } from '@/types';
 import type { AsyncSlice } from './types';
 import { createAsyncSlice } from './types';
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import WorkflowStatePanel from '../../../components/WorkflowStatePanel';
+import WorkflowStatePanel from '@/components/WorkflowStatePanel';
 
 const tMock = (key: string, options?: Record<string, string | number>) => {
   const map: Record<string, string> = {
@@ -38,7 +38,7 @@ const { mockApiClient } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('../../../services/apiClient', () => ({
+vi.mock('@/services/apiClient', () => ({
   default: mockApiClient,
 }));
 

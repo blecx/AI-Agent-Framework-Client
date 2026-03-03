@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { RAIDFilters, type RAIDFiltersState } from '../../../components/raid/RAIDFilters';
-import { RAIDType, RAIDStatus, RAIDPriority } from '../../../types/raid';
+import { RAIDFilters, type RAIDFiltersState } from '@/features/raid/raid/RAIDFilters';
+import { RAIDType, RAIDStatus, RAIDPriority } from '@/types/raid';
 
 describe('RAIDFilters', () => {
   const mockOnFiltersChange = vi.fn();

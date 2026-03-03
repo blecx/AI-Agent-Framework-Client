@@ -4,8 +4,8 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import axios from 'axios';
-import { TemplateApiClient } from '../../../services/TemplateApiClient';
-import type { Template, TemplateCreate, TemplateUpdate } from '../../../types/template';
+import { TemplateApiClient } from '@/services/TemplateApiClient';
+import type { Template, TemplateCreate, TemplateUpdate } from '@/types/template';
 
 // Mock axios
 vi.mock('axios');
@@ -384,7 +384,7 @@ describe('TemplateApiClient', () => {
   describe('singleton instance', () => {
     it('should export singleton templateApiClient', async () => {
       const { templateApiClient } = await import(
-        '../../../services/TemplateApiClient'
+        '@/services/TemplateApiClient'
       );
 
       expect(templateApiClient).toBeDefined();

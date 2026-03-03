@@ -18,7 +18,7 @@ import CommandPanel from "../CommandPanel";
 const mockNavigate = vi.fn();
 
 // Mock dependencies
-vi.mock("../../services/apiClient", () => ({
+vi.mock("@/services/apiClient", () => ({
   default: {
     createProject: vi.fn(),
     listProjects: vi.fn(),
@@ -27,7 +27,7 @@ vi.mock("../../services/apiClient", () => ({
   },
 }));
 
-vi.mock("../../hooks/useToast", () => ({
+vi.mock("@/hooks/useToast", () => ({
   useToast: () => ({
     showSuccess: vi.fn(),
     showError: vi.fn(),
@@ -59,7 +59,7 @@ describe("CommandPanel", () => {
     mockNavigate.mockClear();
 
     // Import mocked apiClient after mocks are set up
-    const apiClient = await import("../../services/apiClient");
+    const apiClient = await import("@/services/apiClient");
     mockCreateProject = apiClient.default.createProject as ReturnType<
       typeof vi.fn
     >;

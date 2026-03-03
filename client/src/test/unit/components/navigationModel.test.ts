@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildNavSections } from '../../../components/navigationModel';
+import { buildNavSections } from '@/components/navigationModel';
 
 describe('navigationModel', () => {
   it('builds deterministic section order without a current project', () => {

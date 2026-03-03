@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import type { Template } from '../../types/template';
+import type { Template } from '@/types/template';
 import {
   isArtifactFormValid,
   validateArtifactField,
   validateArtifactForm,
-} from '../artifact-editor/formValidation';
+} from '@/features/artifacts/artifact-editor/formValidation';
 
 const t = (key: string) => key;
 

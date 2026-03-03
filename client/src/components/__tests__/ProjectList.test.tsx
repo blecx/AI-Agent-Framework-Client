@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import ProjectList from '../ProjectList';
+import ProjectList from '@/features/projects/ProjectList';
 
 const mockShowSuccess = vi.fn();
 const mockShowError = vi.fn();
@@ -46,14 +46,14 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('../../hooks/useToast', () => ({
+vi.mock('@/hooks/useToast', () => ({
   useToast: () => ({
     showSuccess: mockShowSuccess,
     showError: mockShowError,
   }),
 }));
 
-vi.mock('../../services/apiClient', () => ({
+vi.mock('@/services/apiClient', () => ({
   default: {
     listProjects: (...args: unknown[]) => mockListProjects(...args),
     createProject: (...args: unknown[]) => mockCreateProject(...args),

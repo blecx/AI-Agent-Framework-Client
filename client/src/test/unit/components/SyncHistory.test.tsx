@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import SyncHistory from '../../../components/SyncHistory';
+import SyncHistory from '@/features/sync/SyncHistory';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({

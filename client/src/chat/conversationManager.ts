@@ -11,7 +11,7 @@ import {
   type ConversationStep,
   type CommandIntent,
 } from './types';
-import { RAIDType, RAIDStatus, RAIDPriority } from '../types/raid';
+import { RAIDType, RAIDStatus, RAIDPriority } from '@/types/raid';
 
 /**
  * Initialize conversation state for CREATE RAID command

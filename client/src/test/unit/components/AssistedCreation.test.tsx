@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import AssistedCreation from '../../../components/AssistedCreation';
+import AssistedCreation from '@/features/builder/AssistedCreation';
 
-vi.mock('../../../services/mockAIService', () => ({
+vi.mock('@/services/mockAIService', () => ({
   mockAIService: {
     startSession: vi.fn(async () => ({
       sessionId: 'session-1',

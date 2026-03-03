@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import AssistedCreationControls from '../../../components/AssistedCreationControls';
+import AssistedCreationControls from '@/features/builder/AssistedCreationControls';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({

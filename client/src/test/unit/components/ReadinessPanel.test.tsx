@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import ReadinessPanel from "../../../components/ReadinessPanel";
+import ReadinessPanel from "@/features/builder/ReadinessPanel";
 
 const mockNavigate = vi.fn();
 

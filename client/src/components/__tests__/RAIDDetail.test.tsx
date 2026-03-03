@@ -7,12 +7,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { RAIDDetail } from '../RAIDDetail';
-import apiClient from '../../services/apiClient';
-import type { RAIDItem, RAIDItemUpdate } from '../../types';
+import { RAIDDetail } from '@/features/raid/RAIDDetail';
+import apiClient from '@/services/apiClient';
+import type { RAIDItem, RAIDItemUpdate } from '@/types';
 
 // Mock dependencies
-vi.mock('../../services/apiClient', () => {
+vi.mock('@/services/apiClient', () => {
   const mockFn = vi.fn();
   return {
     default: {
@@ -25,7 +25,7 @@ vi.mock('../../services/apiClient', () => {
 });
 
 let mockShowToast: ReturnType<typeof vi.fn>;
-vi.mock('../../utils/toast', () => ({
+vi.mock('@/utils/toast', () => ({
   showToast: (message: string, type?: string) => {
     mockShowToast(message, type);
   },

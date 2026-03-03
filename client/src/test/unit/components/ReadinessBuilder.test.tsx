@@ -1,13 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import ReadinessBuilder from '../../../components/ReadinessBuilder';
+import ReadinessBuilder from '@/features/builder/ReadinessBuilder';
 
-vi.mock('../../../components/WorkflowStatePanel', () => ({
+vi.mock('@/components/WorkflowStatePanel', () => ({
   default: () => <div>WorkflowStatePanel</div>,
 }));
 
-vi.mock('../../../services/mockReadinessService', () => ({
+vi.mock('@/services/mockReadinessService', () => ({
   mockReadinessService: {
     getProjectReadiness: vi.fn(async () => ({
       overallStatus: 'warn',

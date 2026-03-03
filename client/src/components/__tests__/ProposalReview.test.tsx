@@ -5,11 +5,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ProposalReview } from '../ProposalReview';
+import { ProposalReview } from '@/features/proposals/ProposalReview';
 import {
   proposalApiClient,
   type Proposal,
-} from '../../services/ProposalApiClient';
+} from '@/services/ProposalApiClient';
 
 const mockShowSuccess = vi.fn();
 const mockShowError = vi.fn();
@@ -48,7 +48,7 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('../../hooks/useToast', () => ({
+vi.mock('@/hooks/useToast', () => ({
   useToast: () => ({
     showSuccess: mockShowSuccess,
     showError: mockShowError,
@@ -56,7 +56,7 @@ vi.mock('../../hooks/useToast', () => ({
 }));
 
 // Mock the ProposalApiClient
-vi.mock('../../services/ProposalApiClient', () => ({
+vi.mock('@/services/ProposalApiClient', () => ({
   proposalApiClient: {
     getProposal: vi.fn(),
     applyProposal: vi.fn(),

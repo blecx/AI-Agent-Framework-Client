@@ -7,12 +7,12 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
-import ApplyPanel from "../ApplyPanel";
-import apiClient from "../../services/apiClient";
-import type { Proposal } from "../../types";
+import ApplyPanel from "@/features/proposals/ApplyPanel";
+import apiClient from "@/services/apiClient";
+import type { Proposal } from "@/types";
 
 // Mock dependencies
-vi.mock("../../services/apiClient", () => ({
+vi.mock("@/services/apiClient", () => ({
   default: {
     getProposals: vi.fn(),
     applyProposal: vi.fn(),
@@ -20,7 +20,7 @@ vi.mock("../../services/apiClient", () => ({
   },
 }));
 
-vi.mock("../../hooks/useToast", () => ({
+vi.mock("@/hooks/useToast", () => ({
   useToast: () => ({
     showSuccess: vi.fn(),
     showError: vi.fn(),

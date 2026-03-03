@@ -6,7 +6,7 @@ import {
   RAIDPriority,
   RAIDStatus,
   RAIDType,
-} from '../../../types/raid';
+} from '@/types/raid';
 
 describe('RAID types', () => {
   it('exposes expected string literal values', () => {

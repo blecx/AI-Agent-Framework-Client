@@ -16,7 +16,7 @@ import { describe, it, expect, vi } from 'vitest';
 import {
   withApiFallback,
   buildFallbackMessage,
-} from '../../../services/withApiFallback';
+} from '@/services/withApiFallback';
 import {
   NetworkError,
   NotFoundError,
@@ -24,7 +24,7 @@ import {
   ValidationError,
   AuthenticationError,
   ApiError,
-} from '../../../services/errors';
+} from '@/services/errors';
 
 // ---------------------------------------------------------------------------
 // withApiFallback — fallback + callback behaviour

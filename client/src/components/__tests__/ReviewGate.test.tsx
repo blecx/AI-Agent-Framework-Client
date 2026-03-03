@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import ReviewGate from '../ReviewGate';
-import type { ValidationCheck } from '../../types/reviewGate';
+import ReviewGate from '@/features/proposals/ReviewGate';
+import type { ValidationCheck } from '@/types/reviewGate';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({

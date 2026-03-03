@@ -1,4 +1,4 @@
-import type { ProjectReadiness } from "../types/readiness";
+import type { ProjectReadiness } from "@/types/readiness";
 
 // TODO: Replace with backend readiness API
 export const mockReadinessService = {

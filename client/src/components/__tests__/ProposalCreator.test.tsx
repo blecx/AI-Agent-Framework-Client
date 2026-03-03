@@ -5,17 +5,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ProposalCreator } from '../ProposalCreator';
-import { artifactApiClient } from '../../services/ArtifactApiClient';
-import { proposalApiClient } from '../../services/ProposalApiClient';
+import { ProposalCreator } from '@/features/proposals/ProposalCreator';
+import { artifactApiClient } from '@/services/ArtifactApiClient';
+import { proposalApiClient } from '@/services/ProposalApiClient';
 
-vi.mock('../../services/ArtifactApiClient', () => ({
+vi.mock('@/services/ArtifactApiClient', () => ({
   artifactApiClient: {
     getArtifact: vi.fn(),
   },
 }));
 
-vi.mock('../../services/ProposalApiClient', () => ({
+vi.mock('@/services/ProposalApiClient', () => ({
   proposalApiClient: {
     createProposal: vi.fn(),
   },

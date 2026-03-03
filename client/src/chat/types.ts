@@ -5,7 +5,7 @@
  * and managing multi-turn conversation state.
  */
 
-import type { RAIDType, RAIDItem } from '../types/raid';
+import type { RAIDType, RAIDItem } from '@/types/raid';
 
 /**
  * Command types that can be parsed from chat messages

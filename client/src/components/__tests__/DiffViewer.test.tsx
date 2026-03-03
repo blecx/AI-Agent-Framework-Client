@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { DiffViewer } from '../DiffViewer';
+import { DiffViewer } from '@/features/proposals/DiffViewer';
 
 describe('DiffViewer', () => {
   const oldContent = 'line 1\nline 2\nline 3';

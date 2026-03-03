@@ -4,7 +4,7 @@ import type {
   SyncEvent,
   SyncState,
   SyncStatus,
-} from '../types/sync';
+} from '@/types/sync';
 
 const SYNC_STATES: SyncState[] = [
   'clean',

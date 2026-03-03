@@ -23,8 +23,8 @@ import type {
   AllowedTransitionsResponse,
   AuditEventList,
   AuditEventType,
-} from '../types';
-import { notify } from '../notifications/notificationBus';
+} from '@/types';
+import { notify } from '@/notifications/notificationBus';
 import { ProjectApiClient } from './ProjectApiClient';
 import { isApiError } from './errors';
 import { RaidApiClient } from './RaidApiClient';

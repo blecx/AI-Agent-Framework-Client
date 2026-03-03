@@ -5,11 +5,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ProposalList } from '../ProposalList';
-import type { Proposal } from '../../services/ProposalApiClient';
+import { ProposalList } from '@/features/proposals/ProposalList';
+import type { Proposal } from '@/services/ProposalApiClient';
 
 // Mock the ProposalApiClient
-vi.mock('../../services/ProposalApiClient', () => ({
+vi.mock('@/services/ProposalApiClient', () => ({
   ProposalApiClient: vi.fn().mockImplementation(() => ({
     listProposals: vi.fn(),
   })),
@@ -58,7 +58,7 @@ describe('ProposalList', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     mockListProposals = vi.fn();
-    const module = await import('../../services/ProposalApiClient');
+    const module = await import('@/services/ProposalApiClient');
     vi.mocked(module.ProposalApiClient).mockImplementation(
       () =>
         ({

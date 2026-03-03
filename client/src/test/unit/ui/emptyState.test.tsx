@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import EmptyState from '../../../components/ui/EmptyState';
+import EmptyState from '@/components/ui/EmptyState';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({

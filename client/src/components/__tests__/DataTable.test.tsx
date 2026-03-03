@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import DataTable from '../DataTable';
-import type { TableColumn, TableFilter } from '../../types/table';
+import type { TableColumn, TableFilter } from '@/types/table';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({

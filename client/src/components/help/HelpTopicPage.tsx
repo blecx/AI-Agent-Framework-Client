@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { findHelpTopic } from '../../content/helpTopics';
+import { findHelpTopic } from '@/content/helpTopics';
 
 export default function HelpTopicPage() {
   const { t } = useTranslation();

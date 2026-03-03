@@ -9,11 +9,11 @@ import {
   canExecuteCommand,
 } from '../../../chat/chatApi';
 import { CommandType, type CreateRAIDState, type EditRAIDState } from '../../../chat/types';
-import { RAIDType, RAIDStatus, RAIDPriority, type RAIDItem } from '../../../types/raid';
-import * as apiClientModule from '../../../services/apiClient';
+import { RAIDType, RAIDStatus, RAIDPriority, type RAIDItem } from '@/types/raid';
+import * as apiClientModule from '@/services/apiClient';
 
 // Mock the apiClient
-vi.mock('../../../services/apiClient', () => ({
+vi.mock('@/services/apiClient', () => ({
   apiClient: {
     createRAIDItem: vi.fn(),
     updateRAIDItem: vi.fn(),

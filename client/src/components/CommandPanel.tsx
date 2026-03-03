@@ -5,10 +5,10 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../services/apiClient';
+import apiClient from '@/services/apiClient';
 import InputModal from './InputModal';
 import ConfirmDialog from './ConfirmDialog';
-import { useToast } from '../hooks/useToast';
+import { useToast } from '@/hooks/useToast';
 
 interface CommandHistoryEntry {
   id: string;

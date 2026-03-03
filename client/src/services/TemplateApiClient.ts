@@ -4,7 +4,7 @@
  */
 
 import axios, { type AxiosInstance } from 'axios';
-import type { Template, TemplateCreate, TemplateUpdate } from '../types/template';
+import type { Template, TemplateCreate, TemplateUpdate } from '@/types/template';
 
 export class TemplateApiClient {
   private client: AxiosInstance;

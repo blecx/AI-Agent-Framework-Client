@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import ConflictResolver from '../../../components/ConflictResolver';
+import ConflictResolver from '@/features/proposals/ConflictResolver';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({

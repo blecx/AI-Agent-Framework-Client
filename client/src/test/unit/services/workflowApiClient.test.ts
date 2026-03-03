@@ -3,14 +3,14 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { apiClient } from '../../../services/apiClient';
-import { WorkflowState, AuditEventType } from '../../../types';
+import { apiClient } from '@/services/apiClient';
+import { WorkflowState, AuditEventType } from '@/types';
 import type {
   WorkflowStateInfo,
   WorkflowStateUpdate,
   AllowedTransitionsResponse,
   AuditEventList,
-} from '../../../types';
+} from '@/types';
 
 describe('Workflow API Client', () => {
   beforeEach(() => {

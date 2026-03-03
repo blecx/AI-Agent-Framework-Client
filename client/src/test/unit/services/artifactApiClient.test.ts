@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import axios from 'axios';
-import { ArtifactApiClient, type Artifact } from '../../../services/ArtifactApiClient';
+import { ArtifactApiClient, type Artifact } from '@/services/ArtifactApiClient';
 
 // Mock axios
 vi.mock('axios');
@@ -231,7 +231,7 @@ describe('ArtifactApiClient', () => {
     it('should export singleton artifactApiClient', async () => {
       // Import the singleton
       const { artifactApiClient } = await import(
-        '../../../services/ArtifactApiClient'
+        '@/services/ArtifactApiClient'
       );
 
       expect(artifactApiClient).toBeDefined();

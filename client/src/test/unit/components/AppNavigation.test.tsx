@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import AppNavigation from '../../../components/AppNavigation';
+import AppNavigation from '@/features/navigation/AppNavigation';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -50,11 +50,11 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('../../../components/ConnectionStatus', () => ({
+vi.mock('@/features/navigation/ConnectionStatus', () => ({
   default: ({ state }: { state: string }) => <div>ConnectionStatus:{state}</div>,
 }));
 
-vi.mock('../../../components/LanguageSwitcher', () => ({
+vi.mock('@/features/navigation/LanguageSwitcher', () => ({
   default: () => <div>LanguageSwitcher</div>,
 }));
 

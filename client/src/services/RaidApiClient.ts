@@ -7,7 +7,7 @@ import type {
   RAIDPriority,
   RAIDStatus,
   RAIDType,
-} from '../types';
+} from '@/types';
 import {
   ApiError,
   AuthenticationError,

@@ -4,7 +4,7 @@
 
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { subscribe } from '../notifications/notificationBus';
+import { subscribe } from '@/notifications/notificationBus';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 

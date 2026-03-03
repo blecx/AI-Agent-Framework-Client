@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { AxiosError } from 'axios';
-import { handleApiClientAxiosError } from '../../../services/apiClient';
-import type { NotificationEvent } from '../../../notifications/notificationBus';
+import { handleApiClientAxiosError } from '@/services/apiClient';
+import type { NotificationEvent } from '@/notifications/notificationBus';
 
 describe('apiClient error handling', () => {
   it('notifies and throws a user-friendly message by default', () => {

@@ -14,15 +14,15 @@ import {
 } from 'vitest';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
-import { apiClient } from '../../../services/apiClient';
-import { WorkflowState, AuditEventType } from '../../../types';
+import { apiClient } from '@/services/apiClient';
+import { WorkflowState, AuditEventType } from '@/types';
 import type {
   WorkflowStateInfo,
   WorkflowStateUpdate,
   AllowedTransitionsResponse,
   AuditEventList,
   AuditEvent,
-} from '../../../types';
+} from '@/types';
 
 const API_BASE_URL = 'http://localhost:8000';
 const TEST_PROJECT_KEY = 'TEST_PROJ';

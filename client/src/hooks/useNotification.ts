@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useToastContext } from '../components/ToastContext';
+import { useToastContext } from '@/components/ToastContext';
 
 export function useNotification() {
   const { showToast } = useToastContext();

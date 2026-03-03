@@ -2,19 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { RAIDDetail } from '../../../components/RAIDDetail';
-import type { RAIDItem } from '../../../types/raid';
+import { RAIDDetail } from '@/features/raid/RAIDDetail';
+import type { RAIDItem } from '@/types/raid';
 import {
   RAIDType,
   RAIDStatus,
   RAIDPriority,
-} from '../../../types/raid';
-import { apiClient } from '../../../services/apiClient';
-import * as toastUtils from '../../../utils/toast';
+} from '@/types/raid';
+import { apiClient } from '@/services/apiClient';
+import * as toastUtils from '@/utils/toast';
 
 // Mock dependencies
-vi.mock('../../../services/apiClient');
-vi.mock('../../../utils/toast');
+vi.mock('@/services/apiClient');
+vi.mock('@/utils/toast');
 
 const mockItem: RAIDItem = {
   id: 'RAID-001',

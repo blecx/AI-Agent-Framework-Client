@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import SyncPanel from '../../../components/SyncPanel';
-import type { SyncConflict, SyncState } from '../../../types/sync';
+import SyncPanel from '@/features/sync/SyncPanel';
+import type { SyncConflict, SyncState } from '@/types/sync';
 
 const mockSetDemoState = vi.fn();
 const mockUseSyncStatus = vi.fn(() => ({
@@ -13,7 +13,7 @@ const mockUseSyncStatus = vi.fn(() => ({
   setDemoState: mockSetDemoState,
 }));
 
-vi.mock('../../../hooks/useSyncStatus', () => ({
+vi.mock('@/hooks/useSyncStatus', () => ({
   useSyncStatus: () => mockUseSyncStatus(),
 }));
 

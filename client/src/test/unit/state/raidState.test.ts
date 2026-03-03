@@ -4,8 +4,8 @@ import {
   type RaidItem,
   type RaidItemList,
   type RaidState,
-} from '../../../state/raidSlice';
-import { createAsyncSlice } from '../../../state/types';
+} from '@/state/raidSlice';
+import { createAsyncSlice } from '@/state/types';
 
 describe('raidState', () => {
   const initialState: RaidState = {

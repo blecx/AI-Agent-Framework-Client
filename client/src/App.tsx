@@ -6,20 +6,20 @@ import {
   useParams,
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import ProjectList from './components/ProjectList';
-import ProjectView from './components/ProjectView';
+import ProjectList from '@/features/projects/ProjectList';
+import ProjectView from '@/features/projects/ProjectView';
 import CommandPanel from './components/CommandPanel';
 import ApiTester from './components/ApiTester';
 import UiLibraryDemo from './components/UiLibraryDemo';
-import GuidedBuilder from './components/GuidedBuilder';
-import AppNavigation from './components/AppNavigation';
+import GuidedBuilder from '@/features/builder/GuidedBuilder';
+import AppNavigation from '@/features/navigation/AppNavigation';
 import { ToastProvider } from './components/ToastContext';
 import ToastContainer from './components/ToastContainer';
 import ErrorBoundary from './components/ErrorBoundary';
-import ConnectionBanner from './components/ConnectionBanner';
-import SyncPanel from './components/SyncPanel';
+import ConnectionBanner from '@/features/navigation/ConnectionBanner';
+import SyncPanel from '@/features/sync/SyncPanel';
 import { useConnection } from './hooks/useConnection';
-import AssistedCreation from './components/AssistedCreation';
+import AssistedCreation from '@/features/builder/AssistedCreation';
 import SkipToContent from './components/SkipToContent';
 import HelpPage from './components/help/HelpPage';
 import HelpTopicPage from './components/help/HelpTopicPage';

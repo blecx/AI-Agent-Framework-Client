@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import GuidedBuilder from '../../../components/GuidedBuilder';
+import GuidedBuilder from '@/features/builder/GuidedBuilder';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({

@@ -11,12 +11,12 @@ import {
   fireEvent,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ArtifactList } from "../ArtifactList";
+import { ArtifactList } from "@/features/artifacts/ArtifactList";
 import {
   ArtifactApiClient,
   type Artifact,
-} from "../../services/ArtifactApiClient";
-import { AuditApiClient } from "../../services/AuditApiClient";
+} from "@/services/ArtifactApiClient";
+import { AuditApiClient } from "@/services/AuditApiClient";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({

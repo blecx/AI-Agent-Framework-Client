@@ -4,11 +4,11 @@
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { AuditViewer } from '../AuditViewer';
+import { AuditViewer } from '@/features/audit/AuditViewer';
 import {
   AuditApiClient,
   type AuditResult,
-} from '../../services/AuditApiClient';
+} from '@/services/AuditApiClient';
 
 const mockAuditResult: AuditResult = {
   projectKey: 'TEST-001',

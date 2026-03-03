@@ -38,6 +38,11 @@ function uiBuildProvenancePlugin() {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), uiBuildProvenancePlugin()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
   preview: {
     port: 3000,
   },

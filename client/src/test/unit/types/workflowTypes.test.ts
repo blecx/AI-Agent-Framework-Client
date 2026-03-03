@@ -4,7 +4,7 @@ import {
   AuditEventType,
   VALID_WORKFLOW_TRANSITIONS,
   WorkflowState,
-} from '../../../types/workflow';
+} from '@/types/workflow';
 
 describe('Workflow types', () => {
   it('exposes expected workflow state values', () => {

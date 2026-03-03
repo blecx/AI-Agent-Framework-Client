@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import apiClient from "../services/apiClient";
-import type { ConnectionState } from "../types/connection";
+import apiClient from "@/services/apiClient";
+import type { ConnectionState } from "@/types/connection";
 
 interface UseConnectionResult {
   state: ConnectionState;

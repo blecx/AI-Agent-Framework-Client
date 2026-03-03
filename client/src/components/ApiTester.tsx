@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import apiService, { type TestResult } from '../services/api';
-import { useToast } from '../hooks/useToast';
+import apiService, { type TestResult } from '@/services/api';
+import { useToast } from '@/hooks/useToast';
 
 interface TestConfig {
   name: string;

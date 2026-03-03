@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { apiClient } from '../../../services/apiClient';
-import { ApiError } from '../../../services/errors';
+import { apiClient } from '@/services/apiClient';
+import { ApiError } from '@/services/errors';
 import type {
   RAIDItem,
   RAIDItemCreate,
   RAIDItemList,
   RAIDItemUpdate,
-} from '../../../types';
+} from '@/types';
 
 type RaidClientPort = {
   listRAIDItems: (projectKey: string, filters?: object) => Promise<RAIDItemList>;
