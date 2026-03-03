@@ -65,7 +65,7 @@ function App() {
                         state={connectionState}
                         onRetry={retryConnection}
                       />
-                      <main id="main-content" className="lg:ml-[280px] p-6 lg:p-8 flex-1 min-h-screen transition-all" tabIndex={-1}>
+                      <main id="main-content" className="lg:!ml-[280px] p-6 lg:p-8 flex-1 min-h-screen transition-all" tabIndex={-1}>
                         <Routes>
                           <Route path="/" element={<Navigate to="/projects" replace />} />
                           <Route
