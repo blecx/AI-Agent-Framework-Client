@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import apiClient from '../services/apiClient';
 import { useToast } from '../hooks/useToast';
-import './ProposePanel.css';
 
 interface ProposePanelProps {
   projectKey?: string;

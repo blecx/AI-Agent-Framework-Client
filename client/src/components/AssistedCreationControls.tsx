@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import type { AssistedCreationState } from '../types/assistedCreation';
-import './AssistedCreationControls.css';
 
 interface AssistedCreationControlsProps {
   state: AssistedCreationState;

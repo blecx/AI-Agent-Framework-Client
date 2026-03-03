@@ -9,7 +9,6 @@ import {
   type Proposal,
   type ProposalStatus,
 } from '../services/ProposalApiClient';
-import './ProposalList.css';
 
 interface ProposalListProps {
   projectKey: string;

@@ -15,7 +15,6 @@ import ArtifactStateBadge from "./ArtifactStateBadge";
 import { ArtifactEditorField } from "./artifact-editor/ArtifactEditorField";
 import { ArtifactEditorActions } from "./artifact-editor/ArtifactEditorActions";
 import { useArtifactEditorForm } from "./artifact-editor/useArtifactEditorForm";
-import "./ArtifactEditor.css";
 
 export interface ArtifactEditorProps {
   templateId: string;

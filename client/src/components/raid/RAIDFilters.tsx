@@ -1,5 +1,4 @@
 import { RAIDType, RAIDStatus, RAIDPriority } from '../../types/raid';
-import './RAIDFilters.css';
 
 export interface RAIDFiltersState {
   type?: RAIDType;

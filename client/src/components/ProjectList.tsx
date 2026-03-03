@@ -9,7 +9,6 @@ import { SkeletonProjectCard } from "./ui/Skeleton";
 import { Button } from "./ui/Button";
 import DataTable from "./DataTable";
 import type { TableColumn, TableFilter } from "../types/table";
-import "./ProjectList.css";
 
 export default function ProjectList() {
   const { t } = useTranslation();

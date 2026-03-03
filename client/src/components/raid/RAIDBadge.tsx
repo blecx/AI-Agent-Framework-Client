@@ -3,7 +3,6 @@ import type {
   RAIDStatus,
   RAIDPriority,
 } from '../../types/raid';
-import './RAIDBadge.css';
 
 interface RAIDBadgeProps {
   variant: 'type' | 'status' | 'priority';

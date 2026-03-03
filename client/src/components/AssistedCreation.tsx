@@ -6,7 +6,6 @@ import AssistedCreationPrompt from './AssistedCreationPrompt';
 import AssistedCreationDraft from './AssistedCreationDraft';
 import { mockAIService } from '../services/mockAIService';
 import type { AssistedCreationSession } from '../types/assistedCreation';
-import './AssistedCreation.css';
 
 interface AssistedCreationProps {
   projectKey: string;

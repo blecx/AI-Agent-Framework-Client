@@ -6,7 +6,6 @@ import ReadinessChecks from "./ReadinessChecks";
 import WorkflowStatePanel from "./WorkflowStatePanel";
 import { mockReadinessService } from "../services/mockReadinessService";
 import type { ProjectReadiness } from "../types/readiness";
-import "./ReadinessBuilder.css";
 
 interface ReadinessBuilderProps {
   projectKey?: string;

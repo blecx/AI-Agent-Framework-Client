@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import type { ArtifactState } from '../types/artifact';
-import './ArtifactStateBadge.css';
 
 interface ArtifactStateBadgeProps {
   state: ArtifactState;

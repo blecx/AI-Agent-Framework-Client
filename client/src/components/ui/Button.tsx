@@ -1,5 +1,4 @@
 import { forwardRef } from 'react';
-import './ui.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -31,11 +30,26 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const isDisabled = disabled || isLoading;
 
+    const baseStyles = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:pointer-events-none disabled:opacity-50";
+    
+    const variants = {
+      primary: "bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm",
+      secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200 border border-gray-200",
+      danger: "bg-red-600 text-white hover:bg-red-700 shadow-sm",
+      ghost: "hover:bg-gray-100 hover:text-gray-900",
+    };
+    
+    const sizes = {
+      sm: "h-8 px-3 text-xs",
+      md: "h-10 px-4 py-2 text-sm",
+      lg: "h-12 px-8 text-base",
+    };
+
     const classes = [
-      'ui-button',
-      `ui-button--${variant}`,
-      `ui-button--${size}`,
-      fullWidth ? 'ui-button--fullWidth' : '',
+      baseStyles,
+      variants[variant],
+      sizes[size],
+      fullWidth ? 'w-full' : '',
       className || '',
     ]
       .filter(Boolean)

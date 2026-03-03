@@ -5,7 +5,6 @@ import { useSyncStatus } from '../hooks/useSyncStatus';
 import type { ConflictResolution, SyncState } from '../types/sync';
 import ConflictResolver from './ConflictResolver';
 import SyncHistory from './SyncHistory';
-import './SyncPanel.css';
 
 const ICON_BY_STATE: Record<SyncState, string> = {
   clean: '✓',

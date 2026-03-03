@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiffViewer } from './DiffViewer';
 import type { ConflictResolution, SyncConflict } from '../types/sync';
-import './ConflictResolver.css';
 
 interface ConflictResolverProps {
   conflict: SyncConflict;

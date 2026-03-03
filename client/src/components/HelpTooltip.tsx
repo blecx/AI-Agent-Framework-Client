@@ -1,7 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import './HelpTooltip.css';
 
 export interface HelpTooltipProps {
   titleKey: string;

@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 import ConnectionStatus from './ConnectionStatus';
 import type { ConnectionState } from '../types/connection';
-import './AppNavigation.css';
 
 interface NavItem {
   key: string;

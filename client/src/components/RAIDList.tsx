@@ -10,7 +10,6 @@ import OwnerAvatar from './ui/OwnerAvatar';
 import { TypeBadge, StatusBadge, PriorityBadge } from './raid/RAIDBadge';
 import { RAIDFilters, type RAIDFiltersState } from './raid/RAIDFilters';
 import { RAIDCreateModal } from './raid/RAIDCreateModal';
-import './RAIDList.css';
 
 interface RAIDListProps {
   projectKey: string;

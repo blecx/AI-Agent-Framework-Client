@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import './ui.css';
 
 export type SortDirection = 'asc' | 'desc';
 

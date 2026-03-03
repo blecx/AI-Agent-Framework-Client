@@ -1,5 +1,4 @@
 import { forwardRef, useId } from 'react';
-import './ui.css';
 
 export interface SelectOption {
   label: string;

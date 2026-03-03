@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import apiClient from "../services/apiClient";
 import type { WorkflowState, WorkflowStateInfo } from "../types";
-import "./WorkflowStatePanel.css";
 
 interface WorkflowStatePanelProps {
   projectKey?: string;

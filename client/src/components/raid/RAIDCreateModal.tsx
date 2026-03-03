@@ -8,7 +8,6 @@ import { RAIDTypeSection } from './RAIDTypeSection';
 import { RAIDDetailsSection } from './RAIDDetailsSection';
 import { RAIDMetadataSection } from './RAIDMetadataSection';
 import { RAIDDatesSection } from './RAIDDatesSection';
-import './RAIDCreateModal.css';
 
 interface RAIDCreateModalProps {
   projectKey: string;

@@ -4,7 +4,6 @@
  */
 
 import React from 'react';
-import './AuditBadge.css';
 
 export interface AuditBadgeProps {
   errorCount: number;

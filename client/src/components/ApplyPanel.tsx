@@ -4,7 +4,6 @@ import apiClient from '../services/apiClient';
 import type { Proposal } from '../types';
 import ConfirmDialog from './ConfirmDialog';
 import { useToast } from '../hooks/useToast';
-import './ApplyPanel.css';
 
 interface ApplyPanelProps {
   projectKey: string;

@@ -7,7 +7,6 @@ import React, { useState, useEffect } from 'react';
 import { DiffViewer } from './DiffViewer';
 import { proposalApiClient, type ChangeType } from '../services/ProposalApiClient';
 import { artifactApiClient } from '../services/ArtifactApiClient';
-import './ProposalCreator.css';
 
 export interface ProposalCreatorProps {
   projectKey: string;

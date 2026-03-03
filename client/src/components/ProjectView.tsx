@@ -13,7 +13,6 @@ import RAIDList from "./RAIDList";
 import { AuditBadge } from "./AuditBadge";
 import { AuditApiClient } from "../services/AuditApiClient";
 import Skeleton from "./ui/Skeleton";
-import "./ProjectView.css";
 
 type TabType =
   | "overview"

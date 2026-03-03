@@ -9,7 +9,6 @@ import {
   type AuditResult,
   type AuditIssue,
 } from '../services/AuditApiClient';
-import './AuditViewer.css';
 
 interface AuditViewerProps {
   projectKey: string;

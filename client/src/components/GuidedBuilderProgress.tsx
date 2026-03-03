@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import './GuidedBuilderProgress.css';
 
 interface GuidedBuilderProgressProps {
   current: number;

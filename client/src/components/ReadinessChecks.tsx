@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import type { ReadinessCheck, ReadinessState } from "../types/readiness";
-import "./ReadinessChecks.css";
 
 interface ReadinessChecksProps {
   checks: ReadinessCheck[];

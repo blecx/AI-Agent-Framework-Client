@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import './LanguageSwitcher.css';
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },

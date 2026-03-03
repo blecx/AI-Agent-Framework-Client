@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import './EmptyState.css';
 
 interface EmptyStateProps {
   icon?: string;

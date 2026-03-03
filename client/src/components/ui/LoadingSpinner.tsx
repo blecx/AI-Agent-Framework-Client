@@ -1,4 +1,3 @@
-import './LoadingSpinner.css';
 
 export interface LoadingSpinnerProps {
   size?: 'small' | 'medium' | 'large';

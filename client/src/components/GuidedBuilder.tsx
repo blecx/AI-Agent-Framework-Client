@@ -11,7 +11,6 @@ import type {
   GuidedBuilderState,
   GuidedBuilderStep,
 } from "../types/guidedBuilder";
-import "./GuidedBuilder.css";
 
 const STEPS: GuidedBuilderStep[] = [
   "welcome",

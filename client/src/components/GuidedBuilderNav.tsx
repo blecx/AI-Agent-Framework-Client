@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import './GuidedBuilderNav.css';
 
 interface GuidedBuilderNavProps {
   onBack: () => void;

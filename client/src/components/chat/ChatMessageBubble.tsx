@@ -6,7 +6,6 @@
  */
 
 import type { ChatMessage } from '../../chat/types';
-import './ChatMessageBubble.css';
 
 interface ChatMessageBubbleProps {
   message: ChatMessage;

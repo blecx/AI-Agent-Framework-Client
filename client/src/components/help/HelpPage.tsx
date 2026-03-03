@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { HELP_TOPICS, type HelpCategory } from '../../content/helpTopics';
-import './HelpPage.css';
 
 const CATEGORY_ORDER: HelpCategory[] = [
   'getting-started',

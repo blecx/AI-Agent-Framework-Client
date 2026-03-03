@@ -19,7 +19,6 @@ import { executeCommand, canExecuteCommand } from '../../chat/chatApi';
 import type { ChatMessage, ConversationState } from '../../chat/types';
 import { ChatMessageList } from './ChatMessageList';
 import { ChatInput } from './ChatInput';
-import './ChatInterface.css';
 
 interface ChatInterfaceProps {
   projectKey: string;

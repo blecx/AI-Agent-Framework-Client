@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import type { ConnectionState } from "../types/connection";
-import "./ConnectionStatus.css";
 
 interface ConnectionStatusProps {
   state: ConnectionState;

@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import type { TableFilter } from '../types/table';
-import './TableFilters.css';
 
 interface TableFiltersProps<T> {
   filters: Array<TableFilter<T>>;

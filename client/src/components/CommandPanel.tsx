@@ -9,7 +9,6 @@ import apiClient from '../services/apiClient';
 import InputModal from './InputModal';
 import ConfirmDialog from './ConfirmDialog';
 import { useToast } from '../hooks/useToast';
-import './CommandPanel.css';
 
 interface CommandHistoryEntry {
   id: string;

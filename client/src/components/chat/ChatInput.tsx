@@ -6,7 +6,6 @@
  */
 
 import { useState, useRef, type KeyboardEvent } from 'react';
-import './ChatInput.css';
 
 interface ChatInputProps {
   onSend: (message: string) => void;

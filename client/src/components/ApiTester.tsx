@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import apiService, { type TestResult } from '../services/api';
 import { useToast } from '../hooks/useToast';
-import './ApiTester.css';
 
 interface TestConfig {
   name: string;

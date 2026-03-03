@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import type { ProjectReadiness, ReadinessCheck } from "../types/readiness";
-import "./ReadinessPanel.css";
 
 interface ReadinessPanelProps {
   readiness: ProjectReadiness;

@@ -14,7 +14,6 @@ import {
 } from '../types/raid';
 import { showToast } from '../utils/toast';
 import { TypeBadge, StatusBadge, PriorityBadge } from './raid/RAIDBadge';
-import './RAIDDetail.css';
 
 interface RAIDDetailProps {
   item: RAIDItem;

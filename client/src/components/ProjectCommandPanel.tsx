@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../services/apiClient';
 import type { Command } from '../types';
 import { useToast } from '../hooks/useToast';
-import './ProjectCommandPanel.css';
 
 interface ProjectCommandPanelProps {
   projectKey: string;

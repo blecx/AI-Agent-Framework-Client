@@ -11,7 +11,6 @@ import {
 } from "../services/ArtifactApiClient";
 import { AuditApiClient } from "../services/AuditApiClient";
 import EmptyState from "./ui/EmptyState";
-import "./ArtifactList.css";
 
 interface ArtifactListProps {
   projectKey: string;

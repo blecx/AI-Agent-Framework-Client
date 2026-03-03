@@ -1,4 +1,3 @@
-import './Skeleton.css';
 
 interface SkeletonProps {
   width?: string;

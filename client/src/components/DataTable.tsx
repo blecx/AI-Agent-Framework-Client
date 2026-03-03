@@ -5,7 +5,6 @@ import EmptyState from './ui/EmptyState';
 import { LoadingSkeleton } from './LoadingSkeleton';
 import TableFilters from './TableFilters';
 import type { TableColumn, TableFilter, TableSortOrder } from '../types/table';
-import './DataTable.css';
 
 interface DataTableProps<T> {
   columns: Array<TableColumn<T>>;

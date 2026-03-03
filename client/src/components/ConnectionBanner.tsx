@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ConnectionState } from "../types/connection";
-import "./ConnectionBanner.css";
 
 interface ConnectionBannerProps {
   state: ConnectionState;

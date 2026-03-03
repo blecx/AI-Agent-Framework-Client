@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DiffLine, ReviewGateProps } from '../types/reviewGate';
-import './ReviewGate.css';
 
 type DiffMode = 'side-by-side' | 'unified' | 'inline';
 

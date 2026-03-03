@@ -1,5 +1,4 @@
 import { useEffect, useId, useRef } from 'react';
-import './ui.css';
 
 export type ModalSize = 'sm' | 'md' | 'lg';
 

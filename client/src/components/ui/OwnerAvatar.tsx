@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import './OwnerAvatar.css';
 import { getOwnerInitials } from './ownerAvatarUtils';
 
 interface OwnerAvatarProps {

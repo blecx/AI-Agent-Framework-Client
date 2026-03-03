@@ -3,7 +3,6 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import './InputModal.css';
 
 interface InputModalProps {
   isOpen: boolean;

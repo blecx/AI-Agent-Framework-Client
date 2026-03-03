@@ -1,4 +1,3 @@
-import './ui.css';
 
 export type BadgeVariant = 'neutral' | 'primary' | 'danger';
 

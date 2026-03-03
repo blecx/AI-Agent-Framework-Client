@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import type { SyncEvent } from '../types/sync';
-import './SyncHistory.css';
 
 interface SyncHistoryProps {
   events: SyncEvent[];
